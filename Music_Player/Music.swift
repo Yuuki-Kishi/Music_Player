@@ -11,89 +11,63 @@ struct Music: View {
     @State var musicArray = Singleton.shared.musicArray
     @State var progressValue = Singleton.shared.progressValue
     var body: some View {
-        VStack {
-            ZStack {
-                HStack {
-                    Button(action: testPrint){
-                        Image(systemName: "play.circle")
-                            .foregroundColor(.purple)
-                        Text("すべて再生 " + String(musicArray.count) + "曲")
-                            .foregroundColor(.primary)
-                    }
-                    Spacer()
-                }
-            }
-            List {
-                ForEach(Array(musicArray.enumerated()), id: \.element.music) { index, music in
-                    let musicName = music.music
-                    let artistName = music.artist
-                    let albumName = music.album
-                        HStack {
-                            VStack {
-                                Text(musicName)
-                                    .font(.system(size: 20.0))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                HStack {
-                                    Text(artistName)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Text(albumName)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity,alignment: .leading)
-                                }
-                            }
-                            Spacer()
-                            Button(action: {
-                                testPrint()
-                            }){
-                                Image(systemName: "ellipsis")
-                            }
-                        }
-                        .listRowBackground(Color(UIColor.systemGray6))
-                }
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            ZStack {
-                VStack {
-                    ProgressView(value: progressValue, total: 100)
-                        .foregroundColor(.purple)
+        NavigationStack {
+            VStack {
+                ZStack {
                     HStack {
-                        VStack {
-                            Text("曲名")
-                                .font(.system(size: 20.0))
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                        Button(action: testPrint){
+                            Image(systemName: "play.circle")
+                                .foregroundStyle(.purple)
+                            Text("すべて再生 " + String(musicArray.count) + "曲")
+                            Spacer()
+                        }
+                        .foregroundStyle(.primary)
+                    }
+                }
+                List {
+                    ForEach(Array(musicArray.enumerated()), id: \.element.music) { index, music in
+                        let musicName = music.music
+                        let artistName = music.artist
+                        let albumName = music.album
+                        ZStack {
                             HStack {
-                                Text("アーティスト名")
-                                    .font(.system(size: 12.5))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Text("アルバム名")
-                                    .font(.system(size: 12.5))
-                                    .frame(maxWidth: .infinity,alignment: .leading)
+                                VStack {
+                                    Text(musicName)
+                                        .font(.system(size: 20.0))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    HStack {
+                                        Text(artistName)
+                                            .font(.system(size: 12.5))
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        Text(albumName)
+                                            .font(.system(size: 12.5))
+                                            .frame(maxWidth: .infinity,alignment: .leading)
+                                    }
+                                }
+                                Image(systemName: "ellipsis")
+                                    .onTapGesture {
+                                        print("ボタンタップ")
+                                    }
+                                    .frame(width: 30, height: 30)
                             }
                         }
-                        Button(action: {
-                            
-                        }){
-                            Image(systemName: "play.fill")
-                                .foregroundColor(.primary)
-                        }
-                            .frame(width: 50.0, height: 50.0)
-                            .font(.system(size: 30.0))
-                        Button(action: {
-                            
-                        }){
-                            Image(systemName: "forward.end.fill")
-                                .foregroundColor(.primary)
+                        .onTapGesture {
+                            print("セルタップ")
                         }
                     }
                 }
+                
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                playingMusic()
             }
-        }.padding()
+            .navigationTitle("ミュージック")
+            .navigationBarTitleDisplayMode(.inline)
+        }
         .onAppear {
             arrayPlus()
         }
-        
+        .padding(.horizontal)
     }
     func arrayPlus() {
         musicArray = []
@@ -101,7 +75,7 @@ struct Music: View {
         musicArray = musicArray + array
     }
     func testPrint() {
-        print("敵影感知")
+        print("すべて再生")
     }
 }
 

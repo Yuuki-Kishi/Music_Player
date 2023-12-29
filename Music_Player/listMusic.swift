@@ -10,6 +10,7 @@ import SwiftUI
 struct listMusic: View {
     @State var listMusicArray = Singleton.shared.listMusicArray
     @State var progressValue = Singleton.shared.progressValue
+    @State var navigationTitle = Singleton.shared.navigationTitle
     
     var body: some View {
         VStack {
@@ -17,11 +18,11 @@ struct listMusic: View {
                 HStack {
                     Button(action: testPrint){
                         Image(systemName: "play.circle")
-                            .foregroundColor(.purple)
+                            .foregroundStyle(.purple)
                         Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                            .foregroundColor(.primary)
+                        Spacer()
                     }
-                    Spacer()
+                    .foregroundStyle(.primary)
                 }
             }
             List {
@@ -29,72 +30,37 @@ struct listMusic: View {
                     let musicName = music.music
                     let artistName = music.artist
                     let albumName = music.album
-                        HStack {
-                            VStack {
-                                Text(musicName)
-                                    .font(.system(size: 20.0))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                HStack {
-                                    Text(artistName)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Text(albumName)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity,alignment: .leading)
-                                }
-                            }
-                            Spacer()
-                            Button(action: {
-                                testPrint()
-                            }){
-                                Image(systemName: "ellipsis")
-                            }
-                        }
-                        .listRowBackground(Color(UIColor.systemGray6))
-                }
-            }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            ZStack {
-                VStack {
-                    ProgressView(value: progressValue, total: 100)
-                        .foregroundColor(.purple)
                     HStack {
                         VStack {
-                            Text("曲名")
+                            Text(musicName)
                                 .font(.system(size: 20.0))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             HStack {
-                                Text("アーティスト名")
+                                Text(artistName)
                                     .font(.system(size: 12.5))
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                Text("アルバム名")
+                                Text(albumName)
                                     .font(.system(size: 12.5))
                                     .frame(maxWidth: .infinity,alignment: .leading)
                             }
                         }
+                        Spacer()
                         Button(action: {
-                            
+                            testPrint()
                         }){
-                            Image(systemName: "play.fill")
-                                .foregroundColor(.primary)
-                        }
-                            .frame(width: 50.0, height: 50.0)
-                            .font(.system(size: 30.0))
-                        Button(action: {
-                            
-                        }){
-                            Image(systemName: "forward.end.fill")
-                                .foregroundColor(.primary)
+                            Image(systemName: "ellipsis")
                         }
                     }
                 }
             }
+            .navigationTitle(navigationTitle)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            playingMusic()
         }
         .onAppear {
             arrayPlus()
         }
-        .padding()
     }
     func arrayPlus() {
         listMusicArray = []
