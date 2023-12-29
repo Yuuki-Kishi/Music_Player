@@ -7,12 +7,15 @@
 
 import SwiftUI
 
-struct playingMusic: View {
-    @State var progressValue = Singleton.shared.progressValue
+struct PlayingMusic: View {
+    @State var progressValue = Singleton.shared.seekPosition
+    @State var isPlay = Singleton.shared.isPlay
+    @State var showSheet = Singleton.shared.showSheet
+    
     var body: some View {
         ZStack {
             VStack {
-                ProgressView(value: progressValue, total: 100)
+                ProgressView(value: progressValue, total: 1)
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.purple))
                 HStack {
                     VStack {
@@ -29,12 +32,19 @@ struct playingMusic: View {
                         }
                     }
                     Button(action: {
-                        
-                    }){
-                        Image(systemName: "play.fill")
-                    }
+                        isPlay = !isPlay
+                        Singleton.shared.isPlay = isPlay
+                        print(Singleton.shared.isPlay, isPlay)
+                    }, label: {
+                        if isPlay {
+                            Image(systemName: "pause.fill")
+                        } else {
+                            Image(systemName: "play.fill")
+                        }
+                    })
+                    .font(.system(size: 25.0))
                     .foregroundStyle(.primary)
-                    .font(.system(size: 25))
+                    Spacer(minLength: 30)
                     Button(action: {
                         
                     }){
@@ -44,10 +54,22 @@ struct playingMusic: View {
                     .font(.system(size: 25.0))
                 }
             }
-        }.padding(.bottom)
+            Color.clear.contentShape(Rectangle())
+            .frame(maxWidth: .infinity, maxHeight: 20)
+            .padding()
+            .onTapGesture {
+                print("OK")
+                showSheet = !showSheet
+                Singleton.shared.showSheet = showSheet
+            }
+            .sheet(isPresented: $showSheet) {
+                Playing()
+            }
+        }
+        .padding(.bottom)
     }
 }
 
 #Preview {
-    playingMusic()
+    PlayingMusic()
 }

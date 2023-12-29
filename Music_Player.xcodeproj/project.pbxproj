@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		DE7BA5F02B3D749300FB78DD /* Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5EF2B3D749300FB78DD /* Singleton.swift */; };
-		DE7BA5F22B3DA95100FB78DD /* listMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5F12B3DA95100FB78DD /* listMusic.swift */; };
-		DEBC74982B3E570A0012973B /* playingMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74972B3E570A0012973B /* playingMusic.swift */; };
+		DE7BA5F22B3DA95100FB78DD /* ListMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */; };
+		DEBC74982B3E570A0012973B /* PlayingMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74972B3E570A0012973B /* PlayingMusic.swift */; };
+		DEBC749A2B3EA2920012973B /* Playing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74992B3EA2920012973B /* Playing.swift */; };
 		DEC04CFE2AE88C9600B4DE76 /* Music_PlayerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC04CFD2AE88C9600B4DE76 /* Music_PlayerApp.swift */; };
 		DEC04D002AE88C9600B4DE76 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC04CFF2AE88C9600B4DE76 /* ContentView.swift */; };
 		DEC04D022AE88C9A00B4DE76 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEC04D012AE88C9A00B4DE76 /* Assets.xcassets */; };
@@ -22,8 +23,9 @@
 
 /* Begin PBXFileReference section */
 		DE7BA5EF2B3D749300FB78DD /* Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Singleton.swift; sourceTree = "<group>"; };
-		DE7BA5F12B3DA95100FB78DD /* listMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = listMusic.swift; sourceTree = "<group>"; };
-		DEBC74972B3E570A0012973B /* playingMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = playingMusic.swift; sourceTree = "<group>"; };
+		DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListMusic.swift; sourceTree = "<group>"; };
+		DEBC74972B3E570A0012973B /* PlayingMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingMusic.swift; sourceTree = "<group>"; };
+		DEBC74992B3EA2920012973B /* Playing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playing.swift; sourceTree = "<group>"; };
 		DEC04CFA2AE88C9600B4DE76 /* Music_Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Music_Player.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEC04CFD2AE88C9600B4DE76 /* Music_PlayerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Music_PlayerApp.swift; sourceTree = "<group>"; };
 		DEC04CFF2AE88C9600B4DE76 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -71,8 +73,9 @@
 				DEE5AC502AE8A1A50082069C /* Artist.swift */,
 				DEE5AC522AE8A1B30082069C /* Album.swift */,
 				DEE5AC542AE8ABE50082069C /* PlayList.swift */,
-				DEBC74972B3E570A0012973B /* playingMusic.swift */,
-				DE7BA5F12B3DA95100FB78DD /* listMusic.swift */,
+				DEBC74972B3E570A0012973B /* PlayingMusic.swift */,
+				DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */,
+				DEBC74992B3EA2920012973B /* Playing.swift */,
 				DE7BA5EF2B3D749300FB78DD /* Singleton.swift */,
 				DEC04D012AE88C9A00B4DE76 /* Assets.xcassets */,
 				DEC04D032AE88C9A00B4DE76 /* Preview Content */,
@@ -162,11 +165,12 @@
 				DE7BA5F02B3D749300FB78DD /* Singleton.swift in Sources */,
 				DEC04CFE2AE88C9600B4DE76 /* Music_PlayerApp.swift in Sources */,
 				DEE5AC512AE8A1A50082069C /* Artist.swift in Sources */,
+				DEBC749A2B3EA2920012973B /* Playing.swift in Sources */,
 				DEE5AC552AE8ABE50082069C /* PlayList.swift in Sources */,
-				DEBC74982B3E570A0012973B /* playingMusic.swift in Sources */,
+				DEBC74982B3E570A0012973B /* PlayingMusic.swift in Sources */,
 				DEE5AC4F2AE8A1280082069C /* Music.swift in Sources */,
 				DEE5AC532AE8A1B30082069C /* Album.swift in Sources */,
-				DE7BA5F22B3DA95100FB78DD /* listMusic.swift in Sources */,
+				DE7BA5F22B3DA95100FB78DD /* ListMusic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

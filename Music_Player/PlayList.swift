@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlayList: View {
-    @State var progressValue = Singleton.shared.progressValue
+    @State var progressValue = Singleton.shared.seekPosition
     @State var playListArray = Singleton.shared.playListName
         
     var body: some View {
@@ -26,12 +26,12 @@ struct PlayList: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    listMusic(navigationTitle: title)
+                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .background(Color.white)
-                playingMusic()
+                PlayingMusic()
             }
             .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)

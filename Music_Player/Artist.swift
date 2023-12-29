@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Artist: View {
-    @State var progressValue = Singleton.shared.progressValue
+    @State var progressValue = Singleton.shared.seekPosition
     @State var artistArray = Singleton.shared.artistArray
     
     var body: some View {
@@ -26,11 +26,11 @@ struct Artist: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    listMusic(navigationTitle: title)
+                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                playingMusic()
+                PlayingMusic()
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)
@@ -42,7 +42,8 @@ struct Artist: View {
     }
     func arrayPlus() {
         artistArray = []
-        artistArray.append("アーティスト名")
+        artistArray.append("アーティスト名1")
+        artistArray.append("アーティスト名2")
     }
     func testPrint() {
         print("敵影感知")

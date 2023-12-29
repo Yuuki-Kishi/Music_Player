@@ -9,7 +9,8 @@ import SwiftUI
 
 struct Music: View {
     @State var musicArray = Singleton.shared.musicArray
-    @State var progressValue = Singleton.shared.progressValue
+    @State var progressValue = Singleton.shared.seekPosition
+    @State var showSheet = Singleton.shared.showSheet
     var body: some View {
         NavigationStack {
             VStack {
@@ -59,7 +60,10 @@ struct Music: View {
                 
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                playingMusic()
+                ZStack {
+                    PlayingMusic()
+                }
+                
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)

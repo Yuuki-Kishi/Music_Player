@@ -15,6 +15,9 @@ class Singleton {
     var playListName = [String]()
     var listMusicArray = [(music: String, artist: String, album: String)]()
     
-    var progressValue = 10.0
     var navigationTitle = ""
+    var seekPosition = 0.5
+    var playMode = 0
+    var isPlay = false
+    var showSheet = false
 }

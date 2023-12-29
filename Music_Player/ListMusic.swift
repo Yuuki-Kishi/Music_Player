@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct listMusic: View {
+struct ListMusic: View {
     @State var listMusicArray = Singleton.shared.listMusicArray
-    @State var progressValue = Singleton.shared.progressValue
+    @State var progressValue = Singleton.shared.seekPosition
     @State var navigationTitle = Singleton.shared.navigationTitle
     
     var body: some View {
@@ -56,7 +56,7 @@ struct listMusic: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            playingMusic()
+            PlayingMusic()
         }
         .onAppear {
             arrayPlus()
@@ -73,5 +73,5 @@ struct listMusic: View {
 }
 
 #Preview {
-    listMusic()
+    ListMusic()
 }
