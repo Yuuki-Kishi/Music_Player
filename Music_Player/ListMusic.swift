@@ -45,10 +45,31 @@ struct ListMusic: View {
                             }
                         }
                         Spacer()
-                        Button(action: {
-                            testPrint()
-                        }){
+                        Menu {
+                            Button(action: {testPrint()}) {
+                                Label("プレイリストに追加", systemImage: "text.badge.plus")
+                            }
+                            Button(action: {testPrint()}) {
+                                Label("ラブ", systemImage: "heart")
+                            }
+                            Button(action: {testPrint()}) {
+                                Label("曲の情報", systemImage: "info.circle")
+                            }
+                            Divider()
+                            Button(action: {testPrint()}) {
+                                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+                            }
+                            Button(action: {testPrint()}) {
+                                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+                            }
+                            Divider()
+                            Button(role: .destructive, action: {testPrint()}) {
+                                Label("ファイルを削除", systemImage: "trash")
+                            }
+                        } label: {
                             Image(systemName: "ellipsis")
+                                .foregroundStyle(Color.primary)
+                                .frame(width: 40, height: 40)
                         }
                     }
                 }

@@ -45,11 +45,32 @@ struct Music: View {
                                             .frame(maxWidth: .infinity,alignment: .leading)
                                     }
                                 }
-                                Image(systemName: "ellipsis")
-                                    .onTapGesture {
-                                        print("ボタンタップ")
+                                Menu {
+                                    Button(action: {testPrint()}) {
+                                        Label("プレイリストに追加", systemImage: "text.badge.plus")
                                     }
-                                    .frame(width: 30, height: 30)
+                                    Button(action: {testPrint()}) {
+                                        Label("ラブ", systemImage: "heart")
+                                    }
+                                    Button(action: {testPrint()}) {
+                                        Label("曲の情報", systemImage: "info.circle")
+                                    }
+                                    Divider()
+                                    Button(action: {testPrint()}) {
+                                        Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+                                    }
+                                    Button(action: {testPrint()}) {
+                                        Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+                                    }
+                                    Divider()
+                                    Button(role: .destructive, action: {testPrint()}) {
+                                        Label("ファイルを削除", systemImage: "trash")
+                                    }
+                                } label: {
+                                    Image(systemName: "ellipsis")
+                                        .foregroundStyle(Color.primary)
+                                        .frame(width: 40, height: 40)
+                                }
                             }
                         }
                         .onTapGesture {

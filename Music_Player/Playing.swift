@@ -43,16 +43,37 @@ struct Playing: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                     }
-                    Button(action: {
-                        
-                    }, label: {
+                    Menu {
+                        Button(role: .destructive, action: {testPrint()}) {
+                            Label("ファイルを削除", systemImage: "trash")
+                        }
+                        Divider()
+                        Button(action: {testPrint()}) {
+                            Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+                        }
+                        Button(action: {testPrint()}) {
+                            Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+                        }
+                        Divider()
+                        Button(action: {testPrint()}) {
+                            Label("曲の情報", systemImage: "info.circle")
+                        }
+                        Button(action: {testPrint()}) {
+                            Label("ラブ", systemImage: "heart")
+                        }
+                        Button(action: {testPrint()}) {
+                            Label("プレイリストに追加", systemImage: "text.badge.plus")
+                        }
+                    } label: {
                         Image(systemName: "ellipsis")
-                            .font(.system(size: 20, weight: .semibold))
-                            .frame(width: 30, height: 30)
-                            .background(Color(UIColor.systemGray5))
-                            .foregroundStyle(.purple)
-                            .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                    })
+                            .frame(width: 40, height: 40)
+                    }
+                    .font(.system(size: 20, weight: .semibold))
+                    .frame(width: 30, height: 30)
+                    .background(Color(UIColor.systemGray5))
+                    .foregroundStyle(.purple)
+                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                   
                 }
                 .padding(.horizontal)
                 Spacer()
@@ -132,6 +153,9 @@ struct Playing: View {
                 }
                 Spacer()
             }.padding()
+    }
+    func testPrint() {
+        print("tapped")
     }
     func seekChanged(bool: Bool) {
         if !bool {

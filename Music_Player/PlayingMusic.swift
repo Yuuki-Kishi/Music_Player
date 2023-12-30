@@ -62,7 +62,7 @@ struct PlayingMusic: View {
                 showSheet = !showSheet
                 Singleton.shared.showSheet = showSheet
             }
-            .sheet(isPresented: $showSheet) {
+            .fullScreenCover(isPresented: $showSheet) {
                 Playing()
             }
         }
