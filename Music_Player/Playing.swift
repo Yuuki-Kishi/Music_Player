@@ -28,7 +28,7 @@ struct Playing: View {
                     .scaledToFill()
                     .frame(width: UIScreen.main.bounds.width - 300, height: UIScreen.main.bounds.width - 300)
                     .padding(100)
-                    .foregroundStyle(Color(UIColor.systemGray6))
+                    .foregroundStyle(Color(UIColor.systemGray))
                     .background(Color(UIColor.systemGray3))
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Spacer()

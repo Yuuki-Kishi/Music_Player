@@ -9,6 +9,7 @@ import Foundation
 
 class Singleton {
     static var shared = Singleton()
+
     var musicArray = [(music: String, artist: String, album: String)]()
     var artistArray = [String]()
     var albumArray = [String]()

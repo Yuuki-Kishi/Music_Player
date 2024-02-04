@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct Music: View {
+    let fileManager = FileManager.default
     @State var musicArray = Singleton.shared.musicArray
     @State var progressValue = Singleton.shared.seekPosition
     @State var showSheet = Singleton.shared.showSheet
@@ -88,13 +89,37 @@ struct Music: View {
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                let directories = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+                let documentDirectory = directories.first
+                let fileURL = documentDirectory!.appendingPathComponent("explain.txt")
+                let content = "ここに書いた説明を読めるようにするために、このファイルを「このiPhone内」のフォルダの中に保存できるようにしたい。"
+                let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
+                let filePath = documentsPath + "/explain.txt"
+                if !fileManager.fileExists(atPath: filePath) {
+                    do {
+                        try content.write(to: fileURL, atomically: true, encoding: .utf8)
+                    } catch {
+                        print(error)
+                    }
+                }
+                let dir = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+                let docDir = dir.first
+                let path = docDir?.absoluteString
+                print("fileURL:", fileURL, "path:", path!)
+                do {
+                    let data = try fileManager.contentsOfDirectory(atPath: path!)
+                    print("data:", data)
+                } catch {
+                    print(error)
+                }
+            }
         }
-        .onAppear {
-            arrayPlus()
-        }
+        
         .padding(.horizontal)
     }
-    func arrayPlus() {
+    
+    func arrayPlus(music: String, artist: String, album: String) {
         musicArray = []
         let array = [(music: "曲名", artist: "アーティスト名", album: "アルバム名")]
         musicArray = musicArray + array
