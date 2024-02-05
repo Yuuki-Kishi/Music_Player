@@ -93,9 +93,9 @@ struct Music: View {
                 let directories = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
                 let documentDirectory = directories.first
                 let fileURL = documentDirectory!.appendingPathComponent("explain.txt")
-                let content = "ここに書いた説明を読めるようにするために、このファイルを「このiPhone内」のフォルダの中に保存できるようにしたい。"
                 let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
                 let filePath = documentsPath + "/explain.txt"
+                let content = "ここに書いた説明を読めるようにするために、このファイルを「このiPhone内」のフォルダの中に保存できるようにしたい。"
                 if !fileManager.fileExists(atPath: filePath) {
                     do {
                         try content.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -103,12 +103,8 @@ struct Music: View {
                         print(error)
                     }
                 }
-                let dir = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
-                let docDir = dir.first
-                let path = docDir?.absoluteString
-                print("fileURL:", fileURL, "path:", path!)
                 do {
-                    let data = try fileManager.contentsOfDirectory(atPath: path!)
+                    let data = try fileManager.contentsOfDirectory(atPath: documentsPath)
                     print("data:", data)
                 } catch {
                     print(error)
@@ -121,7 +117,7 @@ struct Music: View {
     
     func arrayPlus(music: String, artist: String, album: String) {
         musicArray = []
-        let array = [(music: "曲名", artist: "アーティスト名", album: "アルバム名")]
+        let array = [(music: music, artist: artist, album: album)]
         musicArray = musicArray + array
     }
     func testPrint() {

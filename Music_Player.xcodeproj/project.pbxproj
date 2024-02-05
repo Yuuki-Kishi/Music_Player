@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE49827B2B70D3E60005A407 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE49827A2B70D3E60005A407 /* FileManager.swift */; };
 		DE7BA5F02B3D749300FB78DD /* Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5EF2B3D749300FB78DD /* Singleton.swift */; };
 		DE7BA5F22B3DA95100FB78DD /* ListMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */; };
 		DEBC74982B3E570A0012973B /* PlayingMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74972B3E570A0012973B /* PlayingMusic.swift */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		DE49825B2B6E5ED20005A407 /* Music-Player-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Music-Player-Info.plist"; sourceTree = SOURCE_ROOT; };
+		DE49827A2B70D3E60005A407 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		DE7BA5EF2B3D749300FB78DD /* Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Singleton.swift; sourceTree = "<group>"; };
 		DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListMusic.swift; sourceTree = "<group>"; };
 		DEBC74972B3E570A0012973B /* PlayingMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingMusic.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */,
 				DEBC74992B3EA2920012973B /* Playing.swift */,
 				DE7BA5EF2B3D749300FB78DD /* Singleton.swift */,
+				DE49827A2B70D3E60005A407 /* FileManager.swift */,
 				DEC04D012AE88C9A00B4DE76 /* Assets.xcassets */,
 				DEC04D032AE88C9A00B4DE76 /* Preview Content */,
 			);
@@ -170,6 +173,7 @@
 				DEBC749A2B3EA2920012973B /* Playing.swift in Sources */,
 				DEE5AC552AE8ABE50082069C /* PlayList.swift in Sources */,
 				DEBC74982B3E570A0012973B /* PlayingMusic.swift in Sources */,
+				DE49827B2B70D3E60005A407 /* FileManager.swift in Sources */,
 				DEE5AC4F2AE8A1280082069C /* Music.swift in Sources */,
 				DEE5AC532AE8A1B30082069C /* Album.swift in Sources */,
 				DE7BA5F22B3DA95100FB78DD /* ListMusic.swift in Sources */,
