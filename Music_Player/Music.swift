@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct Music: View {
-    let fileManager = FileManager.default
+    @ObservedObject var viewModel = ViewModel()
+    let fileService = FileService.shared
     @State var musicArray = Singleton.shared.musicArray
     @State var progressValue = Singleton.shared.seekPosition
     @State var showSheet = Singleton.shared.showSheet
@@ -26,6 +27,7 @@ struct Music: View {
                         .foregroundStyle(.primary)
                     }
                 }
+                Text(viewModel.count)
                 List {
                     ForEach(Array(musicArray.enumerated()), id: \.element.music) { index, music in
                         let musicName = music.music
@@ -75,6 +77,7 @@ struct Music: View {
                             }
                         }
                         .onTapGesture {
+                            viewModel.count += 1
                             print("セルタップ")
                         }
                     }
@@ -89,36 +92,19 @@ struct Music: View {
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button(action: {
+                let musics = fileService.fileImport()
+                musicArray = musics
+            }, label: {
+                Image(systemName: "doc.viewfinder")
+                    .foregroundStyle(Color.primary)
+            }))
             .onAppear {
-                let directories = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
-                let documentDirectory = directories.first
-                let fileURL = documentDirectory!.appendingPathComponent("explain.txt")
-                let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-                let filePath = documentsPath + "/explain.txt"
-                let content = "ここに書いた説明を読めるようにするために、このファイルを「このiPhone内」のフォルダの中に保存できるようにしたい。"
-                if !fileManager.fileExists(atPath: filePath) {
-                    do {
-                        try content.write(to: fileURL, atomically: true, encoding: .utf8)
-                    } catch {
-                        print(error)
-                    }
-                }
-                do {
-                    let data = try fileManager.contentsOfDirectory(atPath: documentsPath)
-                    print("data:", data)
-                } catch {
-                    print(error)
-                }
+                let musics = fileService.fileImport()
+                musicArray = musics
             }
         }
-        
         .padding(.horizontal)
-    }
-    
-    func arrayPlus(music: String, artist: String, album: String) {
-        musicArray = []
-        let array = [(music: music, artist: artist, album: album)]
-        musicArray = musicArray + array
     }
     func testPrint() {
         print("すべて再生")
