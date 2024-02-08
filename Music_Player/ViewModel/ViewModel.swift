@@ -24,6 +24,33 @@ class ViewModel: ObservableObject {
         }
     }
     
+    var artistArray: [(artistName: String, musicCount: Int)] {
+        get {
+            return model.artistArray
+        }
+        set {
+            model.artistArray = newValue
+        }
+    }
+    
+    var albumArray: [(albumName: String, musicCount: Int)] {
+        get {
+            return model.albumArray
+        }
+        set {
+            model.albumArray = newValue
+        }
+    }
+    
+    var playListArray: [(playListName: String, musicCount: Int)] {
+        get {
+            return model.playListArray
+        }
+        set {
+            model.playListArray = newValue
+        }
+    }
+    
     public func directoryCheck() {
         model.directoryCheck()
     }

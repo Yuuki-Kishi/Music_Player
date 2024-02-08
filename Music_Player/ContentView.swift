@@ -20,7 +20,7 @@ struct ContentView: View {
                         Text("ミュージック")
                     }
                 }
-            Artist()
+            Artist(artistArray: viewModel.artistArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
@@ -28,14 +28,14 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("アーティスト")
-            Album()
+            Album(albumArray: viewModel.albumArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")
                         Text("アルバム")
                     }
                 }
-            PlayList()
+            PlayList(playListArray: viewModel.playListArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")
@@ -44,8 +44,4 @@ struct ContentView: View {
                 }
         }.accentColor(.purple)
     }
-}
-
-#Preview {
-    ContentView()
 }

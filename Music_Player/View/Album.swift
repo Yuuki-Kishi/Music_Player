@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct Album: View {
-    @Binding private var albumArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    @Binding private var albumArray: [(albumName: String, musicCount: Int)]
     
-    init(albumArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]) {
+    init(albumArray: [(albumName: String, musicCount: Int)]) {
         self.albumArray = albumArray
     }
     
@@ -47,8 +47,4 @@ struct Album: View {
     func testPrint() {
         print("敵影感知")
     }
-}
-
-#Preview {
-    Album()
 }

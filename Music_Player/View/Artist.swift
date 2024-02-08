@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct Artist: View {
-    @Binding private var artistArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    @Binding private var artistArray: [(artistName: String, musicCount: Int)]
     
-    init(artistArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]) {
+    init(artistArray: [(artistName: String, musicCount: Int)]) {
         self.artistArray = artistArray
     }
     
@@ -40,7 +40,7 @@ struct Artist: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-            //rrayPlus()
+            
         }
         .padding(.horizontal)
     }

@@ -83,7 +83,6 @@ struct Music: View {
                         }
                     }
                 }
-                
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 ZStack {
