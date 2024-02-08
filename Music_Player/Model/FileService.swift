@@ -8,12 +8,19 @@
 import Foundation
 import AVKit
 
-class FileService {
-    static let shared = FileService()
-    let fileManager = FileManager.default
-    var folderArray = [String]()
+struct FileService {
+    var musicArray = [(music: String, artist: String, album: String, belong: String)]()
+    var playListArray = [String]()
+    var folderArray = [(folderName: String, folderPath: String)]()
+    var listMusicArray = [(music: String, artist: String, album: String, belong: String)]()
     
-    func fileImport() -> [(music: String, artist: String, album: String, belong: String)] {
+    var seekPosition = 0.5
+    var playMode = 0
+    var isPlay = false
+    var showSheet = false
+    let fileManager = FileManager.default
+    
+    mutating func fileImport() {
         var fileNames = [String]()
         var musicArray = [(music: String, artist: String, album: String, belong: String)]()
         let belongFolder = "Documents"
@@ -44,7 +51,8 @@ class FileService {
             } catch {
                 print(error)
             }
-            if type == "NSFileTypeDirectory" { folderArray.append(fileName); continue }
+            let folderPath = documentsPath + "/\(fileName)"
+            if type == "NSFileTypeDirectory" { ViewModel().folderArray.append((folderName: fileName, folderPath: folderPath)); continue }
             let fileType = fileName.suffix(3)
             if fileType != "mp3" && fileType != "m4a" && fileType != "wav" {
                 fileNames.remove(at: fileNames.firstIndex(of: fileName)!)
@@ -52,14 +60,13 @@ class FileService {
                 var music = fileMetadata(fileName: fileName)
                 music[0].belong = belongFolder
                 musicArray = musicArray + music
-                print(music)
             }
         }
         musicArray.sort {$0.music < $1.music}
         return musicArray
     }
     
-    func fileMetadata(fileName: String) -> [(music: String, artist: String, album: String, belong: String)] {
+    mutating func fileMetadata(fileName: String) -> [(music: String, artist: String, album: String, belong: String)] {
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
         let fileURL = documentDirectory!.appendingPathComponent(fileName)
         let file = fileName.dropLast(4)
@@ -71,4 +78,5 @@ class FileService {
         let albumName = album?.value as? String
         return [(music: String(file), artist: artistName!, album: albumName!, belong: "String")]
     }
+    
 }

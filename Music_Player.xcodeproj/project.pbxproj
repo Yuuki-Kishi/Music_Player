@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		DE49827B2B70D3E60005A407 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE49827A2B70D3E60005A407 /* FileService.swift */; };
-		DE7BA5F02B3D749300FB78DD /* Singleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5EF2B3D749300FB78DD /* Singleton.swift */; };
 		DE7BA5F22B3DA95100FB78DD /* ListMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */; };
 		DEBC74982B3E570A0012973B /* PlayingMusic.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74972B3E570A0012973B /* PlayingMusic.swift */; };
 		DEBC749A2B3EA2920012973B /* Playing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBC74992B3EA2920012973B /* Playing.swift */; };
@@ -26,7 +25,6 @@
 /* Begin PBXFileReference section */
 		DE49825B2B6E5ED20005A407 /* Music-Player-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Music-Player-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DE49827A2B70D3E60005A407 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
-		DE7BA5EF2B3D749300FB78DD /* Singleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Singleton.swift; sourceTree = "<group>"; };
 		DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListMusic.swift; sourceTree = "<group>"; };
 		DEBC74972B3E570A0012973B /* PlayingMusic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingMusic.swift; sourceTree = "<group>"; };
 		DEBC74992B3EA2920012973B /* Playing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playing.swift; sourceTree = "<group>"; };
@@ -75,16 +73,9 @@
 				DE49825B2B6E5ED20005A407 /* Music-Player-Info.plist */,
 				DEC04CFD2AE88C9600B4DE76 /* Music_PlayerApp.swift */,
 				DEC04CFF2AE88C9600B4DE76 /* ContentView.swift */,
-				DEE5AC4E2AE8A1280082069C /* Music.swift */,
-				DEE5AC502AE8A1A50082069C /* Artist.swift */,
-				DEE5AC522AE8A1B30082069C /* Album.swift */,
-				DEE5AC542AE8ABE50082069C /* PlayList.swift */,
-				DEBC74972B3E570A0012973B /* PlayingMusic.swift */,
-				DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */,
-				DEBC74992B3EA2920012973B /* Playing.swift */,
-				DE7BA5EF2B3D749300FB78DD /* Singleton.swift */,
-				DED9FD622B7243770008B127 /* ViewModel.swift */,
-				DE49827A2B70D3E60005A407 /* FileService.swift */,
+				DED9FD662B74D49D0008B127 /* Model */,
+				DED9FD642B74D4780008B127 /* View */,
+				DED9FD652B74D4880008B127 /* ViewModel */,
 				DEC04D012AE88C9A00B4DE76 /* Assets.xcassets */,
 				DEC04D032AE88C9A00B4DE76 /* Preview Content */,
 			);
@@ -97,6 +88,36 @@
 				DEC04D042AE88C9A00B4DE76 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DED9FD642B74D4780008B127 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				DEE5AC4E2AE8A1280082069C /* Music.swift */,
+				DEE5AC502AE8A1A50082069C /* Artist.swift */,
+				DEE5AC522AE8A1B30082069C /* Album.swift */,
+				DEE5AC542AE8ABE50082069C /* PlayList.swift */,
+				DEBC74972B3E570A0012973B /* PlayingMusic.swift */,
+				DE7BA5F12B3DA95100FB78DD /* ListMusic.swift */,
+				DEBC74992B3EA2920012973B /* Playing.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		DED9FD652B74D4880008B127 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				DED9FD622B7243770008B127 /* ViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		DED9FD662B74D49D0008B127 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				DE49827A2B70D3E60005A407 /* FileService.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -170,7 +191,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DEC04D002AE88C9600B4DE76 /* ContentView.swift in Sources */,
-				DE7BA5F02B3D749300FB78DD /* Singleton.swift in Sources */,
 				DEC04CFE2AE88C9600B4DE76 /* Music_PlayerApp.swift in Sources */,
 				DEE5AC512AE8A1A50082069C /* Artist.swift in Sources */,
 				DEBC749A2B3EA2920012973B /* Playing.swift in Sources */,

@@ -1,5 +1,5 @@
 //
-//  Artist.swift
+//  PlayList.swift
 //  Music_Player
 //
 //  Created by 岸　優樹 on 2023/10/25.
@@ -7,43 +7,38 @@
 
 import SwiftUI
 
-struct Artist: View {
-    @State var progressValue = Singleton.shared.seekPosition
-    @State var artistArray = Singleton.shared.artistArray
-    
+struct PlayList: View {
+    @ObservedObject var vm = ViewModel()
+        
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(artistArray.count) + "人のアーティスト")
+                    Text(String(vm.playListArray.count) + "個のプレイリスト")
                         .font(.system(size: 15))
                         .frame(height: 20)
                     Spacer()
                 }
                 List {
-                    ForEach(Array(artistArray.enumerated()), id: \.element) { index, artistName in
-                        NavigationLink(artistName, value: artistName)
+                    ForEach(Array(vm.playListArray.enumerated()), id: \.element) { index, playListName in
+                        NavigationLink(playListName, value: playListName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(navigationTitle: title)
+//                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
+                .background(Color.white)
                 PlayingMusic()
             }
-            .navigationTitle("アーティスト")
+            .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-            arrayPlus()
+//            arrayPlus()
         }
         .padding(.horizontal)
-    }
-    func arrayPlus() {
-        artistArray = []
-        artistArray.append("アーティスト名1")
-        artistArray.append("アーティスト名2")
     }
     func testPrint() {
         print("敵影感知")
@@ -51,5 +46,5 @@ struct Artist: View {
 }
 
 #Preview {
-    Artist()
+    PlayList()
 }

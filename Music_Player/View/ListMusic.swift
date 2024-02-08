@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct ListMusic: View {
-    @State var listMusicArray = Singleton.shared.listMusicArray
-    @State var progressValue = Singleton.shared.seekPosition
-    @State var navigationTitle = Singleton.shared.navigationTitle
+    @ObservedObject var vm = ViewModel()
+    @State var navigationTitle = ""
     
     var body: some View {
         VStack {
@@ -19,14 +18,14 @@ struct ListMusic: View {
                     Button(action: testPrint){
                         Image(systemName: "play.circle")
                             .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
+                        Text("すべて再生 " + String(vm.listMusicArray.count) + "曲")
                         Spacer()
                     }
                     .foregroundStyle(.primary)
                 }
             }
             List {
-                ForEach(Array(listMusicArray.enumerated()), id: \.element.music) { index, music in
+                ForEach(Array(vm.listMusicArray.enumerated()), id: \.element.music) { index, music in
                     let musicName = music.music
                     let artistName = music.artist
                     let albumName = music.album
@@ -80,13 +79,8 @@ struct ListMusic: View {
             PlayingMusic()
         }
         .onAppear {
-            arrayPlus()
+            /*arrayPlus*/()
         }
-    }
-    func arrayPlus() {
-        listMusicArray = []
-        let array = [(music: "曲名", artist: "アーティスト名", album: "アルバム名")]
-        listMusicArray = listMusicArray + array
     }
     func testPrint() {
         print("敵影感知")

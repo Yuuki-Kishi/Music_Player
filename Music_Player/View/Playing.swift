@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct Playing: View {
-    @State var seekPosition = Singleton.shared.seekPosition
-    @State var playMode = Singleton.shared.playMode
-    @State var isPlay = Singleton.shared.isPlay
+    @ObservedObject var vm = ViewModel()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -77,16 +75,15 @@ struct Playing: View {
                 }
                 .padding(.horizontal)
                 Spacer()
-                Slider(value: $seekPosition, onEditingChanged: { bool in seekChanged(bool: bool)
-                })
+                Slider(value: $vm.seekPosition)
                 .tint(.purple)
                 .padding(.horizontal)
                 HStack {
-                    Text(String(seekPosition))
+                    Text(String(vm.seekPosition))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text(String(seekPosition - 1))
+                    Text(String(vm.seekPosition - 1))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                 }
@@ -130,10 +127,9 @@ struct Playing: View {
                     .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        isPlay = !isPlay
-                        Singleton.shared.isPlay = isPlay
+                        vm.isPlay = !vm.isPlay
                     }, label: {
-                        if isPlay {
+                        if vm.isPlay {
                             Image(systemName: "pause.fill")
                         } else {
                             Image(systemName: "play.fill")
@@ -157,10 +153,9 @@ struct Playing: View {
     func testPrint() {
         print("tapped")
     }
-    func seekChanged(bool: Bool) {
+    func seekChanged(bool: Bool, seekPosition: Double) {
         if !bool {
-            print("seekChanged")
-            Singleton.shared.seekPosition = seekPosition
+            vm.seekPosition = seekPosition
         }
     }
 }

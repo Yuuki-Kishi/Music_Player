@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct Music: View {
-    @ObservedObject var viewModel = ViewModel()
-    let fileService = FileService.shared
-    @State var musicArray = Singleton.shared.musicArray
-    @State var progressValue = Singleton.shared.seekPosition
-    @State var showSheet = Singleton.shared.showSheet
+    @Binding private var musicArray: Array<(music: String, artist: String, album: String, belong: String)>
+    private var fileImport: () -> Void
+    
+    init(musicArray: Array<(music: String, artist: String, album: String, belong: String)>, fileImport: @escaping () -> Void) {
+        self.musicArray = musicArray
+        self.fileImport = fileImport
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -27,7 +30,6 @@ struct Music: View {
                         .foregroundStyle(.primary)
                     }
                 }
-                Text(viewModel.count)
                 List {
                     ForEach(Array(musicArray.enumerated()), id: \.element.music) { index, music in
                         let musicName = music.music
@@ -77,7 +79,6 @@ struct Music: View {
                             }
                         }
                         .onTapGesture {
-                            viewModel.count += 1
                             print("セルタップ")
                         }
                     }
@@ -93,15 +94,13 @@ struct Music: View {
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: Button(action: {
-                let musics = fileService.fileImport()
-                musicArray = musics
+                fileImport()
             }, label: {
                 Image(systemName: "doc.viewfinder")
                     .foregroundStyle(Color.primary)
             }))
             .onAppear {
-                let musics = fileService.fileImport()
-                musicArray = musics
+                fileImport()
             }
         }
         .padding(.horizontal)
@@ -109,8 +108,4 @@ struct Music: View {
     func testPrint() {
         print("すべて再生")
     }
-}
-
-#Preview {
-    Music()
 }

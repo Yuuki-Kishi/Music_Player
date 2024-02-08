@@ -1,5 +1,5 @@
 //
-//  PlayList.swift
+//  Album.swift
 //  Music_Player
 //
 //  Created by 岸　優樹 on 2023/10/25.
@@ -7,43 +7,38 @@
 
 import SwiftUI
 
-struct PlayList: View {
-    @State var progressValue = Singleton.shared.seekPosition
-    @State var playListArray = Singleton.shared.playListName
-        
+struct Album: View {
+    @ObservedObject var vm = ViewModel()
+    
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(playListArray.count) + "個のプレイリスト")
+                    Text(String(vm.musicArray.count) + "枚のアルバム")
                         .font(.system(size: 15))
                         .frame(height: 20)
                     Spacer()
                 }
                 List {
-                    ForEach(Array(playListArray.enumerated()), id: \.element) { index, playListName in
-                        NavigationLink(playListName, value: playListName)
+                    ForEach(Array(vm.musicArray.enumerated()), id: \.element.album) { index, music in
+                        let albumName = music.album
+                        NavigationLink(albumName, value: albumName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(navigationTitle: title)
+//                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .background(Color.white)
                 PlayingMusic()
             }
-            .navigationTitle("プレイリスト")
+            .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-            arrayPlus()
+//            arrayPlus()
         }
         .padding(.horizontal)
-    }
-    func arrayPlus() {
-        playListArray = []
-        playListArray.append("プレイリスト名")
     }
     func testPrint() {
         print("敵影感知")
@@ -51,5 +46,5 @@ struct PlayList: View {
 }
 
 #Preview {
-    PlayList()
+    Album()
 }
