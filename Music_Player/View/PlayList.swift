@@ -8,24 +8,29 @@
 import SwiftUI
 
 struct PlayList: View {
-    @ObservedObject var vm = ViewModel()
+    @Binding private var playListArray: [(playListName: String, musicCount: Int)]
         
+    init(playListArray: [(playListName: String, musicCount: Int)]) {
+        self.playListArray = playListArray
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(vm.playListArray.count) + "個のプレイリスト")
+                    Text(String(playListArray.count) + "個のプレイリスト")
                         .font(.system(size: 15))
                         .frame(height: 20)
                     Spacer()
                 }
                 List {
-                    ForEach(Array(vm.playListArray.enumerated()), id: \.element) { index, playListName in
+                    ForEach(Array(playListArray.enumerated()), id: \.element.playListName) { index, playList in
+                        let playListName = playList.playListName
                         NavigationLink(playListName, value: playListName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-//                    ListMusic(navigationTitle: title)
+                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -36,15 +41,11 @@ struct PlayList: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-//            arrayPlus()
+            
         }
         .padding(.horizontal)
     }
     func testPrint() {
         print("敵影感知")
     }
-}
-
-#Preview {
-    PlayList()
 }

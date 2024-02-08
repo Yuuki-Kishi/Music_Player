@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var viewModel: ViewModel
     var body: some View {
         TabView() {
-            Music()
+            Music(musicArray: viewModel.musicArray) {
+                viewModel.directoryCheck()
+            }
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note")

@@ -15,7 +15,7 @@ class ViewModel: ObservableObject {
         self.model = model
     }
     
-    var musicArray: Array<(music: String, artist: String, album: String, belong: String)> {
+    var musicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)] {
         get {
             return model.musicArray
         }
@@ -24,7 +24,7 @@ class ViewModel: ObservableObject {
         }
     }
     
-    public func fileImport() {
-        model.fileImport()
+    public func directoryCheck() {
+        model.directoryCheck()
     }
 }

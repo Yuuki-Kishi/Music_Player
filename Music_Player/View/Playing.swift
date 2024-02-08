@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct Playing: View {
-    @ObservedObject var vm = ViewModel()
+    @Binding private var seekPosition: Double
+    @Binding private var isPlay: Bool
     @Environment(\.dismiss) private var dismiss
+    
+    init(seekPosition: Double, isPlay: Bool, dismiss: DismissAction) {
+        self.seekPosition = seekPosition
+        self.isPlay = isPlay
+        self.dismiss = dismiss
+    }
     
     var body: some View {
             VStack {
@@ -75,15 +82,15 @@ struct Playing: View {
                 }
                 .padding(.horizontal)
                 Spacer()
-                Slider(value: $vm.seekPosition)
+                Slider(value: $seekPosition)
                 .tint(.purple)
                 .padding(.horizontal)
                 HStack {
-                    Text(String(vm.seekPosition))
+                    Text(String(seekPosition))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text(String(vm.seekPosition - 1))
+                    Text(String(seekPosition - 1))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                 }
@@ -127,9 +134,9 @@ struct Playing: View {
                     .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        vm.isPlay = !vm.isPlay
+                        isPlay = !isPlay
                     }, label: {
-                        if vm.isPlay {
+                        if isPlay {
                             Image(systemName: "pause.fill")
                         } else {
                             Image(systemName: "play.fill")
@@ -153,13 +160,4 @@ struct Playing: View {
     func testPrint() {
         print("tapped")
     }
-    func seekChanged(bool: Bool, seekPosition: Double) {
-        if !bool {
-            vm.seekPosition = seekPosition
-        }
-    }
-}
-
-#Preview {
-    Playing()
 }

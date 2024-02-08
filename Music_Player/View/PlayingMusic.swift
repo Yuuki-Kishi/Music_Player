@@ -8,12 +8,20 @@
 import SwiftUI
 
 struct PlayingMusic: View {
-    @ObservedObject var vm = ViewModel.shaled
+    @Binding private var seekPosition: Double
+    @Binding private var isPlay: Bool
+    @Binding private var showSheet: Bool
+    
+    init(seekPosition: Double, isPlay: Bool, showSheet: Bool) {
+        self.seekPosition = seekPosition
+        self.isPlay = isPlay
+        self.showSheet = showSheet
+    }
     
     var body: some View {
         ZStack {
             VStack {
-                ProgressView(value: vm.seekPosition, total: 1)
+                ProgressView(value: seekPosition, total: 1)
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.purple))
                 HStack {
                     VStack {
@@ -30,9 +38,9 @@ struct PlayingMusic: View {
                         }
                     }
                     Button(action: {
-                        vm.isPlay = !vm.isPlay
+                        isPlay = !isPlay
                     }, label: {
-                        if vm.isPlay {
+                        if isPlay {
                             Image(systemName: "pause.fill")
                         } else {
                             Image(systemName: "play.fill")
@@ -55,9 +63,9 @@ struct PlayingMusic: View {
             .padding()
             .onTapGesture {
                 print("OK")
-                vm.showSheet = !vm.showSheet
+                showSheet = !showSheet
             }
-            .fullScreenCover(isPresented: $vm.showSheet) {
+            .fullScreenCover(isPresented: $showSheet) {
                 Playing()
             }
         }
@@ -65,6 +73,3 @@ struct PlayingMusic: View {
     }
 }
 
-#Preview {
-    PlayingMusic()
-}

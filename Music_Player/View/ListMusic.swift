@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct ListMusic: View {
-    @ObservedObject var vm = ViewModel()
+    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
     @State var navigationTitle = ""
+    
+    init(listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)], navigationTitle: String = "") {
+        self.listMusicArray = listMusicArray
+        self.navigationTitle = navigationTitle
+    }
     
     var body: some View {
         VStack {
@@ -18,17 +23,17 @@ struct ListMusic: View {
                     Button(action: testPrint){
                         Image(systemName: "play.circle")
                             .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(vm.listMusicArray.count) + "曲")
+                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
                         Spacer()
                     }
                     .foregroundStyle(.primary)
                 }
             }
             List {
-                ForEach(Array(vm.listMusicArray.enumerated()), id: \.element.music) { index, music in
-                    let musicName = music.music
-                    let artistName = music.artist
-                    let albumName = music.album
+                ForEach(Array(listMusicArray.enumerated()), id: \.element.musicName) { index, music in
+                    let musicName = music.musicName
+                    let artistName = music.artistName
+                    let albumName = music.albumName
                     HStack {
                         VStack {
                             Text(musicName)
@@ -79,14 +84,10 @@ struct ListMusic: View {
             PlayingMusic()
         }
         .onAppear {
-            /*arrayPlus*/()
+            
         }
     }
     func testPrint() {
         print("敵影感知")
     }
-}
-
-#Preview {
-    ListMusic()
 }

@@ -8,25 +8,29 @@
 import SwiftUI
 
 struct Album: View {
-    @ObservedObject var vm = ViewModel()
+    @Binding private var albumArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    
+    init(albumArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]) {
+        self.albumArray = albumArray
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(vm.musicArray.count) + "枚のアルバム")
+                    Text(String(albumArray.count) + "枚のアルバム")
                         .font(.system(size: 15))
                         .frame(height: 20)
                     Spacer()
                 }
                 List {
-                    ForEach(Array(vm.musicArray.enumerated()), id: \.element.album) { index, music in
-                        let albumName = music.album
+                    ForEach(Array(albumArray.enumerated()), id: \.element.albumName) { index, album in
+                        let albumName = album.albumName
                         NavigationLink(albumName, value: albumName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-//                    ListMusic(navigationTitle: title)
+                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -36,7 +40,7 @@ struct Album: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear {
-//            arrayPlus()
+            
         }
         .padding(.horizontal)
     }

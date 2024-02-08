@@ -8,25 +8,29 @@
 import SwiftUI
 
 struct Artist: View {
-    @ObservedObject var vm = ViewModel()
+    @Binding private var artistArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    
+    init(artistArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]) {
+        self.artistArray = artistArray
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(vm.musicArray.count) + "人のアーティスト")
+                    Text(String(artistArray.count) + "人のアーティスト")
                         .font(.system(size: 15))
                         .frame(height: 20)
                     Spacer()
                 }
                 List {
-                    ForEach(Array(vm.musicArray.enumerated()), id: \.element.artist) { index, music in
-                        let artistName = music.artist
+                    ForEach(Array(artistArray.enumerated()), id: \.element.artistName) { index, artist in
+                        let artistName = artist.artistName
                         NavigationLink(artistName, value: artistName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-//                    ListMusic(navigationTitle: title)
+                    ListMusic(navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -43,8 +47,4 @@ struct Artist: View {
     func testPrint() {
         print("敵影感知")
     }
-}
-
-#Preview {
-    Artist()
 }
