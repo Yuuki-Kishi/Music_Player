@@ -58,4 +58,16 @@ class ViewModel: ObservableObject {
     public func directoryCheck() {
         model.directoryCheck()
     }
+    
+    public func collectMusicOfArtist(artist: String) {
+        model.collectMusicOfArtist(artist: artist)
+    }
+    
+    public func collectMusicOfAlbum(album: String) {
+        model.collectMusicOfAlbum(album: album)
+    }
+    
+    public func collectMusicOfPlayList(playList: String) {
+        model.collectMusicOfPlayList(playList: playList)
+    }
 }

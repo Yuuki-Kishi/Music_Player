@@ -21,18 +21,28 @@ struct Album: View {
             VStack {
                 HStack {
                     Text(String(albumArray.count) + "枚のアルバム")
+                        .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
+                        .padding(.horizontal)
                     Spacer()
                 }
                 List {
                     ForEach(Array(albumArray.enumerated()), id: \.element.albumName) { index, album in
                         let albumName = album.albumName
-                        NavigationLink(albumName, value: albumName)
+                        let musicCount = album.musicCount
+                        NavigationLink(value: albumName, label: {
+                            HStack {
+                                Text(albumName)
+                                Spacer()
+                                Text(String(musicCount) + "曲")
+                                    .foregroundStyle(Color.gray)
+                            }
+                        })
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title)
+                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title, transitionSource: "Album")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -41,12 +51,5 @@ struct Album: View {
             .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .onAppear {
-            
-        }
-        .padding(.horizontal)
-    }
-    func testPrint() {
-        print("敵影感知")
     }
 }

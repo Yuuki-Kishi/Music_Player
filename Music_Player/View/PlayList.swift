@@ -21,8 +21,10 @@ struct PlayList: View {
             VStack {
                 HStack {
                     Text(String(playListArray.count) + "個のプレイリスト")
+                        .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
+                        .padding(.horizontal)
                     Spacer()
                 }
                 List {
@@ -32,7 +34,7 @@ struct PlayList: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title)
+                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title, transitionSource: "PlayList")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -45,9 +47,5 @@ struct PlayList: View {
         .onAppear {
             
         }
-        .padding(.horizontal)
-    }
-    func testPrint() {
-        print("敵影感知")
     }
 }

@@ -49,6 +49,7 @@ struct FileService {
     }
     
     mutating func collectFile(folderName: String, folderPath: String) {
+        musicArray = []
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
         var fileNames = [String]()
         do {
@@ -119,5 +120,44 @@ struct FileService {
             }
         }
         albumArray.sort {$0.albumName < $1.albumName}
+    }
+    
+    mutating func collectMusicOfArtist(artist: String) {
+        listMusicArray = []
+        for music in musicArray {
+            let musicName = music.musicName
+            let artistName = music.artistName
+            let albumName = music.albumName
+            let belongDirectory = music.belongDirectory
+            if artistName == artist {
+                listMusicArray.append((musicName: musicName, artistName: artistName, albumName: albumName, belongDirectory: belongDirectory))
+            }
+        }
+    }
+    
+    mutating func collectMusicOfAlbum(album: String) {
+        listMusicArray = []
+        for music in musicArray {
+            let musicName = music.musicName
+            let artistName = music.artistName
+            let albumName = music.albumName
+            let belongDirectory = music.belongDirectory
+            if albumName == album {
+                listMusicArray.append((musicName: musicName, artistName: artistName, albumName: albumName, belongDirectory: belongDirectory))
+            }
+        }
+    }
+    
+    mutating func collectMusicOfPlayList(playList: String) {
+        listMusicArray = []
+        for music in musicArray {
+            let musicName = music.musicName
+            let artistName = music.artistName
+            let albumName = music.albumName
+            let belongDirectory = music.belongDirectory
+            if albumName == playList {
+                listMusicArray.append((musicName: musicName, artistName: artistName, albumName: albumName, belongDirectory: belongDirectory))
+            }
+        }
     }
 }

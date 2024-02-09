@@ -28,50 +28,57 @@ struct PlayingMusic: View {
                 HStack {
                     VStack {
                         Text("曲名")
+                            .lineLimit(1)
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
                             Text("アーティスト名")
+                                .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Text("アルバム名")
+                                .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
                         }
                     }
-                    Button(action: {
-                        isPlay = !isPlay
-                    }, label: {
-                        if isPlay {
-                            Image(systemName: "pause.fill")
-                        } else {
-                            Image(systemName: "play.fill")
-                        }
-                    })
-                    .font(.system(size: 25.0))
-                    .foregroundStyle(.primary)
-                    Spacer(minLength: 30)
-                    Button(action: {
-                        
-                    }){
-                        Image(systemName: "forward.fill")
-                    }
-                    .foregroundStyle(.primary)
-                    .font(.system(size: 25.0))
                 }
             }
-            Color.clear.contentShape(Rectangle())
-            .frame(maxWidth: .infinity, maxHeight: 20)
-            .padding()
-            .onTapGesture {
-                print("OK")
-                showSheet = !showSheet
-            }
-            .fullScreenCover(isPresented: $showSheet) {
-                Playing(seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay)
+            HStack(spacing: 0){
+                Color.clear.contentShape(Rectangle())
+                    .frame(maxWidth: .infinity, maxHeight: 20)
+                    .padding()
+                    .onTapGesture {
+                        print("OK")
+                        showSheet = !showSheet
+                    }
+                    .fullScreenCover(isPresented: $showSheet) {
+                        Playing(seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay)
+                    }
+                Button(action: {
+                    isPlay = !isPlay
+                }, label: {
+                    if isPlay {
+                        Image(systemName: "pause.fill")
+                            .padding(14)
+                    } else {
+                        Image(systemName: "play.fill")
+                            .padding(14)
+                    }
+                })
+                .font(.system(size: 25.0))
+                .foregroundStyle(.primary)
+                Button(action: {
+                    
+                }){
+                    Image(systemName: "forward.fill")
+                        .padding(.vertical, 14)
+                }
+                .foregroundStyle(.primary)
+                .font(.system(size: 25.0))
             }
         }
-        .padding(.bottom)
+        .padding(.horizontal)
     }
 }
 

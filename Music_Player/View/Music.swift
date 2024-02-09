@@ -32,6 +32,7 @@ struct Music: View {
                         .foregroundStyle(.primary)
                     }
                 }
+                .padding(.horizontal)
                 List {
                     ForEach(Array(musicArray.enumerated()), id: \.element.musicName) { index, music in
                         let musicName = music.musicName
@@ -41,13 +42,16 @@ struct Music: View {
                             HStack {
                                 VStack {
                                     Text(musicName)
+                                        .lineLimit(1)
                                         .font(.system(size: 20.0))
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     HStack {
                                         Text(artistName)
+                                            .lineLimit(1)
                                             .font(.system(size: 12.5))
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                         Text(albumName)
+                                            .lineLimit(1)
                                             .font(.system(size: 12.5))
                                             .frame(maxWidth: .infinity,alignment: .leading)
                                     }
@@ -104,7 +108,6 @@ struct Music: View {
                 directoryCheck()
             }
         }
-        .padding(.horizontal)
     }
     func testPrint() {
         print("すべて再生")
