@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ListMusic: View {
+    @ObservedObject var viewModel: ViewModel
     @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
     @State var navigationTitle = ""
     
-    init(listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)], navigationTitle: String = "") {
-        self.listMusicArray = listMusicArray
+    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, belongDirectory: String)]>, navigationTitle: String = "") {
+        self.viewModel = viewModel
+        self._listMusicArray = listMusicArray
         self.navigationTitle = navigationTitle
     }
     
@@ -81,7 +83,7 @@ struct ListMusic: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            PlayingMusic()
+            PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
         }
         .onAppear {
             

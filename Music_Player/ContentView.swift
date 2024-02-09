@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var viewModel: ViewModel
+    @ObservedObject var viewModel: ViewModel = ViewModel(model: FileService())
+    
     var body: some View {
         TabView() {
-            Music(musicArray: viewModel.musicArray) {
+            Music(viewModel: viewModel, musicArray: $viewModel.musicArray) {
                 viewModel.directoryCheck()
             }
                 .tabItem {
@@ -20,7 +21,7 @@ struct ContentView: View {
                         Text("ミュージック")
                     }
                 }
-            Artist(artistArray: viewModel.artistArray)
+            Artist(viewModel: viewModel, artistArray: $viewModel.artistArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
@@ -28,14 +29,14 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("アーティスト")
-            Album(albumArray: viewModel.albumArray)
+            Album(viewModel: viewModel, albumArray: $viewModel.albumArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")
                         Text("アルバム")
                     }
                 }
-            PlayList(playListArray: viewModel.playListArray)
+            PlayList(viewModel: viewModel, playListArray: $viewModel.playListArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")

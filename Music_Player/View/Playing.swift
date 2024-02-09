@@ -12,9 +12,9 @@ struct Playing: View {
     @Binding private var isPlay: Bool
     @Environment(\.dismiss) private var dismiss
     
-    init(seekPosition: Double, isPlay: Bool) {
-        self.seekPosition = seekPosition
-        self.isPlay = isPlay
+    init(seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self._seekPosition = seekPosition
+        self._isPlay = isPlay
     }
     
     var body: some View {

@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct PlayingMusic: View {
+    @ObservedObject var viewModel: ViewModel
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @Binding private var showSheet: Bool
     
-    init(seekPosition: Double, isPlay: Bool, showSheet: Bool) {
-        self.seekPosition = seekPosition
-        self.isPlay = isPlay
-        self.showSheet = showSheet
+    init(viewModel: ViewModel, seekPosition: Binding<Double>, isPlay: Binding<Bool>, showSheet: Binding<Bool>) {
+        self.viewModel = viewModel
+        self._seekPosition = seekPosition
+        self._isPlay = isPlay
+        self._showSheet = showSheet
     }
     
     var body: some View {
@@ -66,7 +68,7 @@ struct PlayingMusic: View {
                 showSheet = !showSheet
             }
             .fullScreenCover(isPresented: $showSheet) {
-                Playing()
+                Playing(seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay)
             }
         }
         .padding(.bottom)

@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct Music: View {
+    @ObservedObject var viewModel: ViewModel
     @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
     private var directoryCheck: () -> Void
     
-    init(musicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)], directoryCheck: @escaping () -> Void) {
-        self.musicArray = musicArray
+    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, belongDirectory: String)]>, directoryCheck: @escaping () -> Void) {
+        self.viewModel = viewModel
+        self._musicArray = musicArray
         self.directoryCheck = directoryCheck
     }
     
@@ -86,7 +88,7 @@ struct Music: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 ZStack {
-                    PlayingMusic()
+                    PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
                 }
                 
             }

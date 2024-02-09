@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct Artist: View {
+    @ObservedObject var viewModel: ViewModel
     @Binding private var artistArray: [(artistName: String, musicCount: Int)]
     
-    init(artistArray: [(artistName: String, musicCount: Int)]) {
-        self.artistArray = artistArray
+    init(viewModel: ViewModel, artistArray: Binding<[(artistName: String, musicCount: Int)]>) {
+        self.viewModel = viewModel
+        self._artistArray = artistArray
     }
     
     var body: some View {
@@ -30,11 +32,11 @@ struct Artist: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(navigationTitle: title)
+                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusic()
+                PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)
