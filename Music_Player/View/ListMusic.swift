@@ -9,11 +9,11 @@ import SwiftUI
 
 struct ListMusic: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]
     @State var navigationTitle: String
     @State var transitionSource: String
     
-    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, belongDirectory: String)]>, navigationTitle: String, transitionSource: String) {
+    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]>, navigationTitle: String, transitionSource: String) {
         self.viewModel = viewModel
         self._listMusicArray = listMusicArray
         self.navigationTitle = navigationTitle
@@ -92,16 +92,16 @@ struct ListMusic: View {
             PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
         }
         .onAppear {
-            switch transitionSource {
-            case "Artist":
-                viewModel.collectMusicOfArtist(artist: navigationTitle)
-            case "Album":
-                viewModel.collectMusicOfAlbum(album: navigationTitle)
-            case "PlayList":
-                viewModel.collectMusicOfPlayList(playList: navigationTitle)
-            default:
-                break
-            }
+//            switch transitionSource {
+//            case "Artist":
+//                viewModel.collectMusicOfArtist(artist: navigationTitle)
+//            case "Album":
+//                viewModel.collectMusicOfAlbum(album: navigationTitle)
+//            case "PlayList":
+//                viewModel.collectMusicOfPlayList(playList: navigationTitle)
+//            default:
+//                break
+//            }
         }
     }
     func testPrint() {

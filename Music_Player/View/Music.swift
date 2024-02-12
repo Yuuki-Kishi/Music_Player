@@ -9,13 +9,15 @@ import SwiftUI
 
 struct Music: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)]
+    @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]
     private var directoryCheck: () -> Void
+    private var sort: (Int) -> Void
     
-    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, belongDirectory: String)]>, directoryCheck: @escaping () -> Void) {
+    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]>, directoryCheck: @escaping () -> Void, sort: @escaping (Int) -> Void) {
         self.viewModel = viewModel
         self._musicArray = musicArray
         self.directoryCheck = directoryCheck
+        self.sort = sort
     }
     
     var body: some View {
@@ -98,12 +100,27 @@ struct Music: View {
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button(action: {
-                directoryCheck()
-            }, label: {
-                Image(systemName: "doc.viewfinder")
-                    .foregroundStyle(Color.primary)
-            }))
+            .navigationBarItems(
+                trailing: Menu {
+                    Button(action: {testPrint()}) {
+                        Label("ファイルをスキャン", systemImage: "doc.viewfinder")
+                    }
+                    Menu {
+                        Button(action: {}, label: {
+                            
+                        })
+                    } label: {
+                        HStack {
+                            Text("並び替え")
+                            Image(systemName: "arrow.up.arrow.down")
+                                .foregroundStyle(Color.primary)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundStyle(Color.primary)
+                }
+            )
             .onAppear {
                 directoryCheck()
             }

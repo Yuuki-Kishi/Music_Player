@@ -15,7 +15,7 @@ class ViewModel: ObservableObject {
         self.model = model
     }
     
-    var musicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)] {
+    var musicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)] {
         get { return model.musicArray }
         set { model.musicArray = newValue }
     }
@@ -30,12 +30,12 @@ class ViewModel: ObservableObject {
         set { model.albumArray = newValue }
     }
     
-    var playListArray: [(playListName: String, musicCount: Int)] {
+    var playListArray: [(playListName: String, musicCount: Int, madeDate: Date)] {
         get { return model.playListArray }
         set { model.playListArray = newValue }
     }
     
-    var listMusicArray: [(musicName: String, artistName: String, albumName: String, belongDirectory: String)] {
+    var listMusicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)] {
         get { return model.listMusicArray }
         set { model.listMusicArray = newValue }
     }
@@ -55,19 +55,11 @@ class ViewModel: ObservableObject {
         set { model.showSheet = newValue }
     }
     
-    public func directoryCheck() {
-        model.directoryCheck()
+    public func directoryCheck() async {
+        await model.directoryCheck()
     }
     
-    public func collectMusicOfArtist(artist: String) {
-        model.collectMusicOfArtist(artist: artist)
-    }
-    
-    public func collectMusicOfAlbum(album: String) {
-        model.collectMusicOfAlbum(album: album)
-    }
-    
-    public func collectMusicOfPlayList(playList: String) {
-        model.collectMusicOfPlayList(playList: playList)
+    public func sort() {
+        model.sort()
     }
 }

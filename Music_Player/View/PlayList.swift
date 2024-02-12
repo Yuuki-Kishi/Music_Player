@@ -9,9 +9,9 @@ import SwiftUI
 
 struct PlayList: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding private var playListArray: [(playListName: String, musicCount: Int)]
+    @Binding private var playListArray: [(playListName: String, musicCount: Int, madeDate: Date)]
     
-    init(viewModel: ViewModel, playListArray: Binding<[(playListName: String, musicCount: Int)]>) {
+    init(viewModel: ViewModel, playListArray: Binding<[(playListName: String, musicCount: Int, madeDate: Date)]>) {
         self.viewModel = viewModel
         self._playListArray = playListArray
     }

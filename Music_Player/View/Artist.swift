@@ -42,7 +42,7 @@ struct Artist: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title, transitionSource: "Artist")
+//                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title, transitionSource: "Artist")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
