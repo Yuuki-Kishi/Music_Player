@@ -12,9 +12,7 @@ struct ContentView: View {
     
     var body: some View {
         TabView() {
-            Music(viewModel: viewModel, musicArray: $viewModel.musicArray, directoryCheck: { viewModel.directoryCheck() }) { num in
-                viewModel.sort(mode: num)
-            }
+            Music(viewModel: viewModel, musicArray: $viewModel.musicArray, directoryCheck: { Task{ await viewModel.directoryCheck() }}, sort: { viewModel.sort() })
             .tabItem {
                 VStack {
                         Image(systemName: "music.note")

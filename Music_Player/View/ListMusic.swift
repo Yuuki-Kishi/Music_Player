@@ -9,11 +9,11 @@ import SwiftUI
 
 struct ListMusic: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]
+    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]
     @State var navigationTitle: String
     @State var transitionSource: String
     
-    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]>, navigationTitle: String, transitionSource: String) {
+    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]>, navigationTitle: String, transitionSource: String) {
         self.viewModel = viewModel
         self._listMusicArray = listMusicArray
         self.navigationTitle = navigationTitle

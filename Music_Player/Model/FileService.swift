@@ -9,7 +9,7 @@ import Foundation
 import AVKit
 import AVFoundation
 
-struct FileService {
+class FileService {
     var musicArray = [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]()
     var artistArray = [(artistName: String, musicCount: Int)]()
     var albumArray = [(albumName: String, musicCount: Int)]()
@@ -18,19 +18,13 @@ struct FileService {
     var listMusicArray = [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]()
     
     var seekPosition = 0.5
-    enum sortObject {
-        case musicArray, artistArray, albumArray, playListArray, listMusicArray
-    }
-    enum sortMode {
-        case nameAsc, nameDesc, dateAsc, dateDesc
-    }
-    var sortObjectArray = sortObject.musicArray
-    var sortModeArray = sortMode.nameAsc
+    var sortObjectArray = 0
+    var sortModeArray = 0
     var isPlay = false
     var showSheet = false
     let fileManager = FileManager.default
     
-    mutating func directoryCheck() async {
+    func directoryCheck() async {
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
         let fileURL = documentDirectory!.appendingPathComponent("explain.txt")
         let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
@@ -46,19 +40,7 @@ struct FileService {
         await getFiles()
     }
     
-//    mutating func collcectFolder() {
-//        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
-//        do {
-//            let fileURLs = try fileManager.contentsOfDirectory(at: documentsURL!, includingPropertiesForKeys: nil, options: [])
-//            for fileURL in fileURLs {
-//                print(fileURL.path)
-//            }
-//        } catch {
-//            print("エラー: \(error)")
-//        }
-//    }
-    
-    mutating func getFiles() async {
+    func getFiles() async {
         let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         let files = fileManager.enumerator(at: documentsURL, includingPropertiesForKeys: [])
         var fileURLs = [URL]()
@@ -73,7 +55,7 @@ struct FileService {
         await collectFile(fileURLs: fileURLs)
     }
     
-    mutating func containFolder(fileURLs: Array<URL>) {
+    func containFolder(fileURLs: Array<URL>) {
         for fileURL in fileURLs {
             var filePieces = fileURL.pathComponents
             let folderName = filePieces[filePieces.count - 2]
@@ -90,27 +72,39 @@ struct FileService {
         }
     }
     
-    mutating func collectFile(fileURLs: Array<URL>) async {
+    func collectFile(fileURLs: Array<URL>) async {
         musicArray = []
         for fileURL in fileURLs {
             var filePieces = fileURL.pathComponents
+            let musicName = filePieces.last!
             filePieces.removeFirst()
             let filePath = "/" + filePieces.joined(separator: "/")
             let metadata = await fileMetadata(fileURL: fileURL)
+            let artistName = metadata[0].artistName
+            let albumName = metadata[0].albumName
+            let editedDate = metadata[0].editedDate
+            musicArray.append((musicName: musicName, artistName: artistName, albumName: albumName, editedDate: editedDate, filePath: filePath))
         }
     }
     
-    mutating func fileMetadata(fileURL: URL) async -> [(artistName: String, albumName: String, editedDate: Date)] {
+    func fileMetadata(fileURL: URL) async -> [(artistName: String, albumName: String, editedDate: Date)] {
         let asset = AVAsset(url: fileURL)
-        guard let metadata = try? await asset.load(.metadata) else { return [(artistName: "不明", albumName: "不明", editedDate: Date())] }
+        guard let metadata = try? await asset.load(.commonMetadata) else { return [(artistName: "不明", albumName: "不明", editedDate: Date())] }
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
         let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
-        let editedDate = try? await metadata.first(where: {$0.commonKey == .commonKeyLastModifiedDate})?.load(.dateValue)
+        var editedDate = try? await metadata.first(where: {$0.commonKey == .commonKeyCreationDate})?.load(.dateValue)
+        let filePath = fileURL.path(percentEncoded: false)
+        do {
+            let attributes:[FileAttributeKey:Any] = try fileManager.attributesOfItem(atPath: filePath)
+            editedDate = attributes[FileAttributeKey.modificationDate] as? Date
+        } catch {
+            print(error)
+        }
         containArtistNameAndAlbumName(artistName: artistName!, albumName: albumName!)
         return [(artistName: artistName!, albumName: albumName!, editedDate: editedDate!)]
     }
     
-    mutating func containArtistNameAndAlbumName(artistName: String, albumName: String) {
+    func containArtistNameAndAlbumName(artistName: String, albumName: String) {
         let artistIscontain = artistArray.contains(where: {$0.artistName == artistName})
         if artistIscontain {
             let index = artistArray.firstIndex(where: {$0.artistName == artistName})!
@@ -127,7 +121,7 @@ struct FileService {
         }
     }
     
-    mutating func collectMusic(item: String, itemName: String) {
+    func collectMusic(item: String, itemName: String) {
         listMusicArray = []
         switch item {
         case "artist":
@@ -168,59 +162,67 @@ struct FileService {
         }
     }
     
-    mutating func sort() {
+    func sort() {
         switch sortObjectArray {
-        case .musicArray:
+        case 0:
             switch sortModeArray {
-            case .nameAsc:
+            case 0:
                 musicArray.sort {$0.musicName < $1.musicName}
-            case .nameDesc:
+            case 1:
                 musicArray.sort {$0.musicName > $1.musicName}
-            case .dateAsc:
+            case 2:
                 musicArray.sort {$0.editedDate < $1.editedDate}
-            case .dateDesc:
+            case 3:
                 musicArray.sort {$0.editedDate > $1.editedDate}
+            default:
+                break
             }
-        case .artistArray:
+        case 1:
             switch sortModeArray {
-            case .nameAsc:
+            case 0:
                 artistArray.sort {$0.artistName < $1.artistName}
-            case .nameDesc:
+            case 1:
                 artistArray.sort {$0.artistName > $1.artistName}
             default:
                 break
             }
-        case .albumArray:
+        case 2:
             switch sortModeArray {
-            case .nameAsc:
+            case 0:
                 albumArray.sort {$0.albumName < $1.albumName}
-            case .nameDesc:
+            case 1:
                 albumArray.sort {$0.albumName > $1.albumName}
             default:
                 break
             }
-        case .playListArray:
+        case 3:
             switch sortModeArray {
-            case .nameAsc:
+            case 0:
                 playListArray.sort {$0.playListName < $1.playListName}
-            case .nameDesc:
+            case 1:
                 playListArray.sort {$0.playListName > $1.playListName}
-            case .dateAsc:
+            case 2:
                 playListArray.sort {$0.madeDate < $1.madeDate}
-            case .dateDesc:
+            case 3:
                 playListArray.sort {$0.madeDate > $1.madeDate}
+            default:
+                break
             }
-        case .listMusicArray:
+        case 4:
             switch sortModeArray {
-            case .nameAsc:
+            case 0:
                 listMusicArray.sort {$0.musicName < $1.musicName}
-            case .nameDesc:
+            case 1:
                 listMusicArray.sort {$0.musicName > $1.musicName}
-            case .dateAsc:
+            case 2:
                 listMusicArray.sort {$0.editedDate < $1.editedDate}
-            case .dateDesc:
+            case 3:
                 listMusicArray.sort {$0.editedDate > $1.editedDate}
+            default:
+                break
             }
+        default:
+            break
         }
     }
 }

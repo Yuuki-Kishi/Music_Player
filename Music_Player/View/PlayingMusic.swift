@@ -78,6 +78,7 @@ struct PlayingMusic: View {
                 .font(.system(size: 25.0))
             }
         }
+        .background(Color(UIColor.systemGray6))
         .padding(.horizontal)
     }
 }

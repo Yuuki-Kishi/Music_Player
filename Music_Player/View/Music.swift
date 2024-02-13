@@ -9,11 +9,11 @@ import SwiftUI
 
 struct Music: View {
     @ObservedObject var viewModel: ViewModel
-    @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]
+    @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]
     private var directoryCheck: () -> Void
-    private var sort: (Int) -> Void
+    private var sort: () -> Void
     
-    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, belongDirectory: String)]>, directoryCheck: @escaping () -> Void, sort: @escaping (Int) -> Void) {
+    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]>, directoryCheck: @escaping () -> Void, sort: @escaping () -> Void) {
         self.viewModel = viewModel
         self._musicArray = musicArray
         self.directoryCheck = directoryCheck
@@ -106,7 +106,9 @@ struct Music: View {
                         Label("ファイルをスキャン", systemImage: "doc.viewfinder")
                     }
                     Menu {
-                        Button(action: {}, label: {
+                        Button(action: {
+                            sort()
+                        }, label: {
                             
                         })
                     } label: {
