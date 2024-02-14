@@ -92,16 +92,8 @@ struct ListMusic: View {
             PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
         }
         .onAppear {
-//            switch transitionSource {
-//            case "Artist":
-//                viewModel.collectMusicOfArtist(artist: navigationTitle)
-//            case "Album":
-//                viewModel.collectMusicOfAlbum(album: navigationTitle)
-//            case "PlayList":
-//                viewModel.collectMusicOfPlayList(playList: navigationTitle)
-//            default:
-//                break
-//            }
+            listMusicArray = viewModel.musicArray
+            print(listMusicArray)
         }
     }
     func testPrint() {

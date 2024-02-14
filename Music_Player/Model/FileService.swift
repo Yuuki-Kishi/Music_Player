@@ -9,7 +9,8 @@ import Foundation
 import AVKit
 import AVFoundation
 
-class FileService {
+final class FileService {
+    public static let shared = FileService()
     var musicArray = [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]()
     var artistArray = [(artistName: String, musicCount: Int)]()
     var albumArray = [(albumName: String, musicCount: Int)]()
@@ -23,6 +24,8 @@ class FileService {
     var isPlay = false
     var showSheet = false
     let fileManager = FileManager.default
+    
+    private init() {}
     
     func directoryCheck() async {
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
@@ -76,7 +79,7 @@ class FileService {
         musicArray = []
         for fileURL in fileURLs {
             var filePieces = fileURL.pathComponents
-            let musicName = filePieces.last!
+            let musicName = String(filePieces.last!.dropLast(4))
             filePieces.removeFirst()
             let filePath = "/" + filePieces.joined(separator: "/")
             let metadata = await fileMetadata(fileURL: fileURL)
@@ -121,9 +124,9 @@ class FileService {
         }
     }
     
-    func collectMusic(item: String, itemName: String) {
+    func collectMusic(viewName: String, itemName: String) {
         listMusicArray = []
-        switch item {
+        switch viewName {
         case "artist":
             for music in musicArray {
                 let musicName = music.musicName

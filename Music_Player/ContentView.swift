@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var viewModel: ViewModel = ViewModel(model: FileService())
+    @ObservedObject var viewModel: ViewModel/* = ViewModel(model: FileService.shared)*/
     
     var body: some View {
         TabView() {

@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 class ViewModel: ObservableObject {
-    @Published var model: FileService
+    @Published var model = FileService.shared
     
     init(model: FileService) {
         self.model = model
@@ -61,5 +61,9 @@ class ViewModel: ObservableObject {
     
     public func sort() {
         model.sort()
+    }
+    
+    public func collectMusic(viewName: String, itemName: String) {
+        model.collectMusic(viewName: viewName, itemName: itemName)
     }
 }

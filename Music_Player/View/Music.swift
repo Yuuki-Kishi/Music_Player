@@ -123,7 +123,7 @@ struct Music: View {
                         .foregroundStyle(Color.primary)
                 }
             )
-            .onAppear {
+            .onAppear() {
                 directoryCheck()
             }
         }
