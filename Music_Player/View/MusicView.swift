@@ -7,17 +7,15 @@
 
 import SwiftUI
 
-struct Music: View {
-    @ObservedObject var viewModel: ViewModel
-    @Binding private var musicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]
-    private var directoryCheck: () -> Void
-    private var sort: () -> Void
+struct MusicView: View {
+    @ObservedObject var mdsvm: MusicDataStoreViewModel
+    @ObservedObject var pcvm: PlayControllerViewModel
+    @Binding private var musicArray: [Music]
     
-    init(viewModel: ViewModel, musicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]>, directoryCheck: @escaping () -> Void, sort: @escaping () -> Void) {
-        self.viewModel = viewModel
+    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, musicArray: Binding<[Music]>) {
+        self.mdsvm = mdsvm
+        self.pcvm = pcvm
         self._musicArray = musicArray
-        self.directoryCheck = directoryCheck
-        self.sort = sort
     }
     
     var body: some View {
@@ -94,7 +92,7 @@ struct Music: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 ZStack {
-                    PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
+                    PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
                 }
                 
             }
@@ -106,10 +104,41 @@ struct Music: View {
                         Label("ファイルをスキャン", systemImage: "doc.viewfinder")
                     }
                     Menu {
-                        Button(action: {
-                            sort()
-                        }, label: {
-                            
+                        Button(action: { mdsvm.sort(method: 0) }, label: {
+                            HStack {
+                                Text("曲名昇順")
+                                Image(systemName: "a.circle")
+                                    .foregroundStyle(.primary)
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.primary)
+                            }
+                        })
+                        Button(action: { mdsvm.sort(method: 1) }, label: {
+                            HStack {
+                                Text("曲名降順")
+                                Image(systemName: "z.circle")
+                                    .foregroundStyle(.primary)
+                                Image(systemName: "arrow.up")
+                                    .foregroundStyle(.primary)
+                            }
+                        })
+                        Button(action: { mdsvm.sort(method: 2) }, label: {
+                            HStack {
+                                Text("追加日昇順")
+                                Image(systemName: "clock")
+                                    .foregroundStyle(.primary)
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.primary)
+                            }
+                        })
+                        Button(action: { mdsvm.sort(method: 3) }, label: {
+                            HStack {
+                                Text("追加日降順")
+                                Image(systemName: "clock")
+                                    .foregroundStyle(.primary)
+                                Image(systemName: "arrow.up")
+                                    .foregroundStyle(.primary)
+                            }
                         })
                     } label: {
                         HStack {
@@ -124,7 +153,9 @@ struct Music: View {
                 }
             )
             .onAppear() {
-                directoryCheck()
+                Task {
+                    await mdsvm.getFile()
+                }
             }
         }
     }

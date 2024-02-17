@@ -7,15 +7,16 @@
 
 import SwiftUI
 
-struct ListMusic: View {
-    @ObservedObject var viewModel: ViewModel
-    @Binding private var listMusicArray: [(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]
-    @State var navigationTitle: String
-    @State var transitionSource: String
+struct ListMusicView: View {
+    @ObservedObject var mdsvm: MusicDataStoreViewModel
+    @ObservedObject var pcvm: PlayControllerViewModel
+    @State private var listMusicArray = [Music]()
+    @State private var navigationTitle: String
+    @State private var transitionSource: String
     
-    init(viewModel: ViewModel, listMusicArray: Binding<[(musicName: String, artistName: String, albumName: String, editedDate: Date, filePath: String)]>, navigationTitle: String, transitionSource: String) {
-        self.viewModel = viewModel
-        self._listMusicArray = listMusicArray
+    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, navigationTitle: String, transitionSource: String) {
+        self.mdsvm = mdsvm
+        self.pcvm = pcvm
         self.navigationTitle = navigationTitle
         self.transitionSource = transitionSource
     }
@@ -89,11 +90,19 @@ struct ListMusic: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
+            PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
         }
         .onAppear {
-            listMusicArray = viewModel.musicArray
-            print(listMusicArray)
+            switch transitionSource {
+            case "Artist":
+                listMusicArray = mdsvm.collectArtistMusic(artist: navigationTitle)
+            case "Album":
+                listMusicArray = mdsvm.collectAlbumMusic(album: navigationTitle)
+            case "playlist":
+                Task { listMusicArray = await mdsvm.collectPlaylistMusic(playlistName: navigationTitle) }
+            default:
+                break
+            }
         }
     }
     func testPrint() {

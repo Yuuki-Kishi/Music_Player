@@ -7,13 +7,16 @@
 
 import SwiftUI
 
-struct Artist: View {
-    @ObservedObject var viewModel: ViewModel
-    @Binding private var artistArray: [(artistName: String, musicCount: Int)]
+struct ArtistView: View {
+    @ObservedObject var mdsvm: MusicDataStoreViewModel
+    @ObservedObject var pcvm: PlayControllerViewModel
+    @Binding private var musicArray: [Music]
+    @State private var artistArray = [Artist]()
     
-    init(viewModel: ViewModel, artistArray: Binding<[(artistName: String, musicCount: Int)]>) {
-        self.viewModel = viewModel
-        self._artistArray = artistArray
+    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, musicArray: Binding<[Music]>) {
+        self.mdsvm = mdsvm
+        self.pcvm = pcvm
+        self._musicArray = musicArray
     }
     
     var body: some View {
@@ -42,14 +45,17 @@ struct Artist: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusic(viewModel: viewModel, listMusicArray: $viewModel.listMusicArray, navigationTitle: title, transitionSource: "Artist")
+                    ListMusicView(mdsvm: mdsvm, pcvm: pcvm, navigationTitle: title, transitionSource: "Artist")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusic(viewModel: viewModel, seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay, showSheet: $viewModel.showSheet)
+                PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .onAppear() {
+            artistArray = mdsvm.artistSelection()
         }
     }
 }

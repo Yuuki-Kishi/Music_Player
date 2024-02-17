@@ -7,12 +7,20 @@
 
 import SwiftUI
 
-struct Playing: View {
+struct PlayingView: View {
+    @ObservedObject var pcvm: PlayControllerViewModel
+    @Binding private var musicName: String
+    @Binding private var artistName: String
+    @Binding private var albumName: String
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @Environment(\.dismiss) private var dismiss
     
-    init(seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(pcvm: PlayControllerViewModel, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self.pcvm = pcvm
+        self._musicName = musicName
+        self._artistName = artistName
+        self._albumName = albumName
         self._seekPosition = seekPosition
         self._isPlay = isPlay
     }

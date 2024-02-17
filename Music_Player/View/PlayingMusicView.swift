@@ -7,17 +7,22 @@
 
 import SwiftUI
 
-struct PlayingMusic: View {
-    @ObservedObject var viewModel: ViewModel
+struct PlayingMusicView: View {
+    @ObservedObject var pcvm: PlayControllerViewModel
+    @Binding private var musicName: String
+    @Binding private var artistName: String
+    @Binding private var albumName: String
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
-    @Binding private var showSheet: Bool
+    @State private var showSheet = false
     
-    init(viewModel: ViewModel, seekPosition: Binding<Double>, isPlay: Binding<Bool>, showSheet: Binding<Bool>) {
-        self.viewModel = viewModel
+    init(pcvm: PlayControllerViewModel, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self.pcvm = pcvm
+        self._musicName = musicName
+        self._artistName = artistName
+        self._albumName = albumName
         self._seekPosition = seekPosition
         self._isPlay = isPlay
-        self._showSheet = showSheet
     }
     
     var body: some View {
@@ -27,16 +32,16 @@ struct PlayingMusic: View {
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.purple))
                 HStack {
                     VStack {
-                        Text("曲名")
+                        Text(musicName)
                             .lineLimit(1)
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
-                            Text("アーティスト名")
+                            Text(artistName)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text("アルバム名")
+                            Text(albumName)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
@@ -53,7 +58,7 @@ struct PlayingMusic: View {
                         showSheet = !showSheet
                     }
                     .fullScreenCover(isPresented: $showSheet) {
-                        Playing(seekPosition: $viewModel.seekPosition, isPlay: $viewModel.isPlay)
+                        PlayingView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
                     }
                 Button(action: {
                     isPlay = !isPlay

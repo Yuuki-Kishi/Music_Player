@@ -8,18 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @ObservedObject var viewModel: ViewModel/* = ViewModel(model: FileService.shared)*/
+    @ObservedObject var mdsvm: MusicDataStoreViewModel
+    @ObservedObject var pcvm: PlayControllerViewModel
     
     var body: some View {
         TabView() {
-            Music(viewModel: viewModel, musicArray: $viewModel.musicArray, directoryCheck: { Task{ await viewModel.directoryCheck() }}, sort: { viewModel.sort() })
+            MusicView(mdsvm: mdsvm, pcvm: pcvm, musicArray: $mdsvm.musicArray)
             .tabItem {
                 VStack {
                         Image(systemName: "music.note")
                         Text("ミュージック")
                     }
                 }
-            Artist(viewModel: viewModel, artistArray: $viewModel.artistArray)
+            ArtistView(mdsvm: mdsvm, pcvm: pcvm, musicArray: $mdsvm.musicArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
@@ -27,14 +28,14 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("アーティスト")
-            Album(viewModel: viewModel, albumArray: $viewModel.albumArray)
+            AlbumView(mdsvm: mdsvm, pcvm: pcvm, musicArray: $mdsvm.musicArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")
                         Text("アルバム")
                     }
                 }
-            PlayList(viewModel: viewModel, playListArray: $viewModel.playListArray)
+            PlaylistView(mdsvm: mdsvm, pcvm: pcvm, playlistArray: $mdsvm.playlistArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")
