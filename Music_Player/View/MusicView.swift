@@ -11,7 +11,7 @@ struct MusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Binding private var musicArray: [Music]
-    @State private var isShowsProgressView = false
+    @State private var isShowsProgressView = true
     
     init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
         self.mds = mds
@@ -36,7 +36,7 @@ struct MusicView: View {
                     }
                     .padding(.horizontal)
                     List {
-                        ForEach(Array(musicArray.enumerated()), id: \.element.musicName) { index, music in
+                        ForEach(Array(musicArray.enumerated()), id: \.element.filePath) { index, music in
                             let musicName = music.musicName
                             let artistName = music.artistName
                             let albumName = music.albumName
@@ -98,8 +98,8 @@ struct MusicView: View {
                 if isShowsProgressView {
                     ProgressView()
                         .progressViewStyle(.circular)
-                        .scaleEffect(50)
-                        .tint(Color.pink)
+                        .scaleEffect(1.5)
+                        .tint(Color.purple)
                 }
             }
             .navigationTitle("ミュージック")
@@ -107,52 +107,30 @@ struct MusicView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
                     Menu {
-                        Button(action: {testPrint()}) {
-                            Label("ファイルをスキャン", systemImage: "doc.viewfinder")
+                        Button(action: {
+                            Task {
+                                isShowsProgressView = true
+                                await mds.getFile()
+                                isShowsProgressView = false
+                            }
+                        }) {
+                            Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
                         }
                         Menu {
                             Button(action: { mds.sort(method: 0) }, label: {
-                                HStack {
-                                    Text("曲名昇順")
-                                    Image(systemName: "a.circle")
-                                        .foregroundStyle(.primary)
-                                    Image(systemName: "arrow.down")
-                                        .foregroundStyle(.primary)
-                                }
+                                Text("曲名昇順")
                             })
                             Button(action: { mds.sort(method: 1) }, label: {
-                                HStack {
-                                    Text("曲名降順")
-                                    Image(systemName: "z.circle")
-                                        .foregroundStyle(.primary)
-                                    Image(systemName: "arrow.up")
-                                        .foregroundStyle(.primary)
-                                }
+                                Text("曲名降順")
                             })
                             Button(action: { mds.sort(method: 2) }, label: {
-                                HStack {
-                                    Text("追加日昇順")
-                                    Image(systemName: "clock")
-                                        .foregroundStyle(.primary)
-                                    Image(systemName: "arrow.down")
-                                        .foregroundStyle(.primary)
-                                }
+                                Text("追加日昇順")
                             })
                             Button(action: { mds.sort(method: 3) }, label: {
-                                HStack {
-                                    Text("追加日降順")
-                                    Image(systemName: "clock")
-                                        .foregroundStyle(.primary)
-                                    Image(systemName: "arrow.up")
-                                        .foregroundStyle(.primary)
-                                }
+                                Text("追加日降順")
                             })
                         } label: {
-                            HStack {
-                                Text("並び替え")
-                                Image(systemName: "arrow.up.arrow.down")
-                                    .foregroundStyle(Color.primary)
-                            }
+                            Label("並び替え", systemImage: "arrow.up.arrow.down")
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
@@ -161,11 +139,10 @@ struct MusicView: View {
                 })
             }
             .onAppear() {
-                isShowsProgressView.toggle()
                 Task {
                     await mds.getFile()
+                    isShowsProgressView = false
                 }
-                isShowsProgressView.toggle()
             }
         }
     }

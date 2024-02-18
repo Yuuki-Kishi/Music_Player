@@ -14,21 +14,22 @@ struct PlayingView: View {
     @Binding private var albumName: String
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
-    @Environment(\.dismiss) private var dismiss
+    @Binding private var isActive: Bool
     
-    init(pc: PlayController, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(pc: PlayController, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>, isActive: Binding<Bool>) {
         self.pc = pc
         self._musicName = musicName
         self._artistName = artistName
         self._albumName = albumName
         self._seekPosition = seekPosition
         self._isPlay = isPlay
+        self._isActive = isActive
     }
     
     var body: some View {
             VStack {
                 Button(action: {
-                    dismiss()
+                    isActive = false
                 }, label: {
                     Image(systemName: "chevron.down")
                         .foregroundStyle(.purple)
@@ -37,7 +38,7 @@ struct PlayingView: View {
                 Spacer()
                 Image(systemName: "music.note")
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                     .frame(width: UIScreen.main.bounds.width - 300, height: UIScreen.main.bounds.width - 300)
                     .padding(100)
                     .foregroundStyle(Color(UIColor.systemGray))

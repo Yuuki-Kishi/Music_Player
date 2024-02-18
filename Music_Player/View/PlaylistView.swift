@@ -14,6 +14,7 @@ struct PlaylistView: View {
     @ObservedObject var pc: PlayController
     @Query private var playlistArray: [PlaylistData]
     @State private var isShowAlert = false
+    @State private var toPlaylistMusicView = false
     @State private var text = ""
     
     init(mds: MusicDataStore, pc: PlayController) {
@@ -35,13 +36,20 @@ struct PlaylistView: View {
                 List {
                     ForEach(Array(playlistArray.enumerated()), id: \.element.playlistName) { index, playlist in
                         let playlistName = playlist.playlistName
-                        NavigationLink(playlistName, value: playlistName)
+                        let musicCount = playlist.musicCount
+                        let playlistId = playlist.playlistId
+                        NavigationLink(value: playlist, label: {
+                            HStack {
+                                Text(playlistName)
+                                Spacer()
+                                Text(String(musicCount) + "曲")
+                                    .foregroundStyle(Color.gray)
+                            }
+                        })
                     }
                 }
-                .navigationDestination(for: String.self) { title in
-                    let index = playlistArray.firstIndex(where: {$0.playlistName == title})!
-                    let playlistId = playlistArray[index].playlistId
-                    PlaylistMusicView(mds: mds, pc: pc, navigationTitle: title, playlistId: playlistId)
+                .navigationDestination(for: PlaylistData.self) { playlist in
+                    PlaylistMusicView(mds: mds, pc: pc, navigationTitle: playlist.playlistName, playlistId: playlist.playlistId)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)

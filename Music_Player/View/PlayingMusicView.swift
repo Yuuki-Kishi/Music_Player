@@ -58,7 +58,7 @@ struct PlayingMusicView: View {
                         showSheet = !showSheet
                     }
                     .fullScreenCover(isPresented: $showSheet) {
-                        PlayingView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                        PlayingView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay, isActive: $showSheet)
                     }
                 Button(action: {
                     isPlay = !isPlay

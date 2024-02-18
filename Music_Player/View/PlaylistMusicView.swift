@@ -9,12 +9,15 @@ import SwiftUI
 import SwiftData
 
 struct PlaylistMusicView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Query private var playlists: [PlaylistData]
+    @Query private var playlistArray: [PlaylistData]
     @State private var listMusicArray = [Music]()
     @State private var navigationTitle: String
     @State private var playlistId: String
+    @State private var toSelectMusicView = false
+    @Environment(\.presentationMode) var presentation
     
     init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, playlistId: String) {
         self.mds = mds
@@ -92,11 +95,56 @@ struct PlaylistMusicView: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing, content: {
+                    Menu(content: {
+                        NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: playlistId), label: {
+                            Label("曲を追加", systemImage: "plus")
+                        })
+                        Menu {
+                            Button(action: {
+                                listMusicArray.sort {$0.musicName < $1.musicName}
+                            }, label: {
+                                Text("曲名昇順")
+                            })
+                            Button(action: {
+                                listMusicArray.sort {$0.musicName > $1.musicName}
+                            }, label: {
+                                Text("曲名降順")
+                            })
+                            Button(action: {
+                                listMusicArray.sort {$0.editedDate < $1.editedDate}
+                            }, label: {
+                                Text("追加日昇順")
+                            })
+                            Button(action: {
+                                listMusicArray.sort {$0.editedDate > $1.editedDate}
+                            }, label: {
+                                Text("追加日降順")
+                            })
+                        } label: {
+                            Label("並び替え", systemImage: "arrow.up.arrow.down")
+                        }
+                        Divider()
+                        Button(role: .destructive, action: {
+                            let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
+                            modelContext.delete(playlistArray[index])
+                            self.presentation.wrappedValue.dismiss()
+                        }, label: {
+                            Label("プレイリストを削除", systemImage: "trash")
+                        })
+                    }, label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundStyle(Color.primary)
+                    })
+                })
+            }
             PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .onAppear() {
-            let index = playlists.firstIndex(where: {$0.playlistId == playlistId})!
-            listMusicArray = playlists[index].musics
+            let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
+            listMusicArray = playlistArray[index].musics
+            listMusicArray.sort {$0.musicName < $1.musicName}
         }
     }
     func testPrint() {
