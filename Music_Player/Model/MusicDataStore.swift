@@ -7,11 +7,12 @@
 
 import Foundation
 
-class MusicDataStore {
+@MainActor
+class MusicDataStore: ObservableObject {
     static let shared = MusicDataStore()
-    var musicArray = [Music]()
-    var folderArray = [Folder]()
-    var playlistArray = [playlist]()
+    @Published var musicArray = [Music]()
+    @Published var folderArray = [Folder]()
+    @Published var playlistArray = [playlist]()
     let fileService = FileService()
     
     func getFile() async {
@@ -20,6 +21,7 @@ class MusicDataStore {
         let fileURLs = fileService.getFiles()
         folderArray = fileService.containFolder(fileURLs: fileURLs)
         musicArray = await fileService.collectFile(fileURLs: fileURLs)
+        sort(method: 0)
     }
     
     func artistSelection() -> Array<Artist> {

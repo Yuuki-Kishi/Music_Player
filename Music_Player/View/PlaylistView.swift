@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct PlaylistView: View {
-    @ObservedObject var mdsvm: MusicDataStoreViewModel
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var mds: MusicDataStore
+    @ObservedObject var pc: PlayController
     @Binding private var plalistArray: [playlist]
     
-    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, playlistArray: Binding<[playlist]>) {
-        self.mdsvm = mdsvm
-        self.pcvm = pcvm
+    init(mds: MusicDataStore, pc: PlayController, playlistArray: Binding<[playlist]>) {
+        self.mds = mds
+        self.pc = pc
         self._plalistArray = playlistArray
     }
     
@@ -36,12 +36,12 @@ struct PlaylistView: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusicView(mdsvm: mdsvm, pcvm: pcvm, navigationTitle: title, transitionSource: "playlist")
+                    ListMusicView(mds: mds, pc: pc, navigationTitle: title, transitionSource: "playlist")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .background(Color.white)
-                PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
+                PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)

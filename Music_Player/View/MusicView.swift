@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct MusicView: View {
-    @ObservedObject var mdsvm: MusicDataStoreViewModel
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var mds: MusicDataStore
+    @ObservedObject var pc: PlayController
     @Binding private var musicArray: [Music]
     
-    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, musicArray: Binding<[Music]>) {
-        self.mdsvm = mdsvm
-        self.pcvm = pcvm
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+        self.mds = mds
+        self.pc = pc
         self._musicArray = musicArray
     }
     
@@ -92,7 +92,7 @@ struct MusicView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 ZStack {
-                    PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
+                    PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                 }
                 
             }
@@ -104,7 +104,7 @@ struct MusicView: View {
                         Label("ファイルをスキャン", systemImage: "doc.viewfinder")
                     }
                     Menu {
-                        Button(action: { mdsvm.sort(method: 0) }, label: {
+                        Button(action: { mds.sort(method: 0) }, label: {
                             HStack {
                                 Text("曲名昇順")
                                 Image(systemName: "a.circle")
@@ -113,7 +113,7 @@ struct MusicView: View {
                                     .foregroundStyle(.primary)
                             }
                         })
-                        Button(action: { mdsvm.sort(method: 1) }, label: {
+                        Button(action: { mds.sort(method: 1) }, label: {
                             HStack {
                                 Text("曲名降順")
                                 Image(systemName: "z.circle")
@@ -122,7 +122,7 @@ struct MusicView: View {
                                     .foregroundStyle(.primary)
                             }
                         })
-                        Button(action: { mdsvm.sort(method: 2) }, label: {
+                        Button(action: { mds.sort(method: 2) }, label: {
                             HStack {
                                 Text("追加日昇順")
                                 Image(systemName: "clock")
@@ -131,7 +131,7 @@ struct MusicView: View {
                                     .foregroundStyle(.primary)
                             }
                         })
-                        Button(action: { mdsvm.sort(method: 3) }, label: {
+                        Button(action: { mds.sort(method: 3) }, label: {
                             HStack {
                                 Text("追加日降順")
                                 Image(systemName: "clock")
@@ -154,7 +154,7 @@ struct MusicView: View {
             )
             .onAppear() {
                 Task {
-                    await mdsvm.getFile()
+                    await mds.getFile()
                 }
             }
         }

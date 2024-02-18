@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlayingMusicView: View {
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var pc: PlayController
     @Binding private var musicName: String
     @Binding private var artistName: String
     @Binding private var albumName: String
@@ -16,8 +16,8 @@ struct PlayingMusicView: View {
     @Binding private var isPlay: Bool
     @State private var showSheet = false
     
-    init(pcvm: PlayControllerViewModel, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
-        self.pcvm = pcvm
+    init(pc: PlayController, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self.pc = pc
         self._musicName = musicName
         self._artistName = artistName
         self._albumName = albumName
@@ -58,7 +58,7 @@ struct PlayingMusicView: View {
                         showSheet = !showSheet
                     }
                     .fullScreenCover(isPresented: $showSheet) {
-                        PlayingView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
+                        PlayingView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                     }
                 Button(action: {
                     isPlay = !isPlay

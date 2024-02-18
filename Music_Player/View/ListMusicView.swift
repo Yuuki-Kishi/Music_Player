@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct ListMusicView: View {
-    @ObservedObject var mdsvm: MusicDataStoreViewModel
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var mds: MusicDataStore
+    @ObservedObject var pc: PlayController
     @State private var listMusicArray = [Music]()
     @State private var navigationTitle: String
     @State private var transitionSource: String
     
-    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, navigationTitle: String, transitionSource: String) {
-        self.mdsvm = mdsvm
-        self.pcvm = pcvm
+    init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, transitionSource: String) {
+        self.mds = mds
+        self.pc = pc
         self.navigationTitle = navigationTitle
         self.transitionSource = transitionSource
     }
@@ -90,16 +90,16 @@ struct ListMusicView: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
+            PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .onAppear {
             switch transitionSource {
             case "Artist":
-                listMusicArray = mdsvm.collectArtistMusic(artist: navigationTitle)
+                listMusicArray = mds.collectArtistMusic(artist: navigationTitle)
             case "Album":
-                listMusicArray = mdsvm.collectAlbumMusic(album: navigationTitle)
+                listMusicArray = mds.collectAlbumMusic(album: navigationTitle)
             case "playlist":
-                Task { listMusicArray = await mdsvm.collectPlaylistMusic(playlistName: navigationTitle) }
+                Task { listMusicArray = await mds.collectPlaylistMusic(playlistName: navigationTitle) }
             default:
                 break
             }

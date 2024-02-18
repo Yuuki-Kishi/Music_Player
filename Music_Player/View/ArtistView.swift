@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct ArtistView: View {
-    @ObservedObject var mdsvm: MusicDataStoreViewModel
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var mds: MusicDataStore
+    @ObservedObject var pc: PlayController
     @Binding private var musicArray: [Music]
     @State private var artistArray = [Artist]()
     
-    init(mdsvm: MusicDataStoreViewModel, pcvm: PlayControllerViewModel, musicArray: Binding<[Music]>) {
-        self.mdsvm = mdsvm
-        self.pcvm = pcvm
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+        self.mds = mds
+        self.pc = pc
         self._musicArray = musicArray
     }
     
@@ -45,17 +45,17 @@ struct ArtistView: View {
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusicView(mdsvm: mdsvm, pcvm: pcvm, navigationTitle: title, transitionSource: "Artist")
+                    ListMusicView(mds: mds, pc: pc, navigationTitle: title, transitionSource: "Artist")
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusicView(pcvm: pcvm, musicName: $pcvm.musicName, artistName: $pcvm.artistName, albumName: $pcvm.albumName, seekPosition: $pcvm.seekPosition, isPlay: $pcvm.isPlay)
+                PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
-            artistArray = mdsvm.artistSelection()
+            artistArray = mds.artistSelection()
         }
     }
 }

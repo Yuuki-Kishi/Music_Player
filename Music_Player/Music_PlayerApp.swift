@@ -11,7 +11,7 @@ import SwiftUI
 struct Music_PlayerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(mdsvm: MusicDataStoreViewModel(model: MusicDataStore.shared), pcvm: PlayControllerViewModel(model: PlayController.shared))
+            ContentView(mds: MusicDataStore.shared, pc: PlayController.shared)
         }
     }
 }

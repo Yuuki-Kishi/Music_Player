@@ -7,11 +7,12 @@
 
 import Foundation
 
-final class PlayController {
+@MainActor
+class PlayController: ObservableObject {
     static let shared = PlayController()
-    var musicName = "曲名"
-    var artistName = "アーティスト名"
-    var albumName = "アルバム名"
-    var seekPosition = 0.5
-    var isPlay = false
+    @Published var musicName = "曲名"
+    @Published var artistName = "アーティスト名"
+    @Published var albumName = "アルバム名"
+    @Published var seekPosition = 0.5
+    @Published var isPlay = false
 }

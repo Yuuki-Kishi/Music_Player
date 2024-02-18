@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlayingView: View {
-    @ObservedObject var pcvm: PlayControllerViewModel
+    @ObservedObject var pc: PlayController
     @Binding private var musicName: String
     @Binding private var artistName: String
     @Binding private var albumName: String
@@ -16,8 +16,8 @@ struct PlayingView: View {
     @Binding private var isPlay: Bool
     @Environment(\.dismiss) private var dismiss
     
-    init(pcvm: PlayControllerViewModel, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
-        self.pcvm = pcvm
+    init(pc: PlayController, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self.pc = pc
         self._musicName = musicName
         self._artistName = artistName
         self._albumName = albumName
