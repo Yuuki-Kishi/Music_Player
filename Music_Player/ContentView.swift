@@ -35,7 +35,7 @@ struct ContentView: View {
                         Text("アルバム")
                     }
                 }
-            PlaylistView(mds: mds, pc: pc, playlistArray: $mds.playlistArray)
+            PlaylistView(mds: mds, pc: pc)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")

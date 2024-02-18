@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
+@Model
 class Music {
     var musicName: String
     var artistName: String
@@ -43,25 +45,15 @@ class Album {
     }
 }
 
-class playlist {
+class Playlist {
     var playlistName: String
     var musicCount: Int
-    var musics: [playlistMusics]
+    var musics: [Music]
     
-    init(playlistName: String, musicCount: Int, musics: [playlistMusics]) {
+    init(playlistName: String, musicCount: Int, musics: [Music]) {
         self.playlistName = playlistName
         self.musicCount = musicCount
         self.musics = musics
-    }
-}
-
-class playlistMusics {
-    var musicName: String
-    var filePath: String
-    
-    init(musicName: String, filePath: String) {
-        self.musicName = musicName
-        self.filePath = filePath
     }
 }
 

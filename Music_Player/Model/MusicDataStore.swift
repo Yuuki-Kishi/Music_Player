@@ -12,10 +12,11 @@ class MusicDataStore: ObservableObject {
     static let shared = MusicDataStore()
     @Published var musicArray = [Music]()
     @Published var folderArray = [Folder]()
-    @Published var playlistArray = [playlist]()
+    @Published var playlistArray = [Playlist]()
     let fileService = FileService()
     
     func getFile() async {
+        musicArray = []
         let isDirectory = fileService.directoryCheck()
         if !isDirectory { fileService.makeDirectory() }
         let fileURLs = fileService.getFiles()

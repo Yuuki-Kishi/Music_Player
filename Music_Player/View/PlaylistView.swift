@@ -6,23 +6,26 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct PlaylistView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Binding private var plalistArray: [playlist]
+    @Query private var playlistArray: [PlaylistData]
+    @State private var isShowAlert = false
+    @State private var text = ""
     
-    init(mds: MusicDataStore, pc: PlayController, playlistArray: Binding<[playlist]>) {
+    init(mds: MusicDataStore, pc: PlayController) {
         self.mds = mds
         self.pc = pc
-        self._plalistArray = playlistArray
     }
     
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text(String(plalistArray.count) + "個のプレイリスト")
+                    Text(String(playlistArray.count) + "個のプレイリスト")
                         .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
@@ -30,21 +33,41 @@ struct PlaylistView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(Array(plalistArray.enumerated()), id: \.element.playlistName) { index, playlist in
+                    ForEach(Array(playlistArray.enumerated()), id: \.element.playlistName) { index, playlist in
                         let playlistName = playlist.playlistName
                         NavigationLink(playlistName, value: playlistName)
                     }
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusicView(mds: mds, pc: pc, navigationTitle: title, transitionSource: "playlist")
+                    let index = playlistArray.firstIndex(where: {$0.playlistName == title})!
+                    let playlistId = playlistArray[index].playlistId
+                    PlaylistMusicView(mds: mds, pc: pc, navigationTitle: title, playlistId: playlistId)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .background(Color.white)
                 PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing, content: {
+                    Button(action: { isShowAlert.toggle() }, label: {
+                        Image(systemName: "plus")
+                            .foregroundStyle(Color.primary)
+                    })
+                    .alert("プレイリストを作成する", isPresented: $isShowAlert, actions: {
+                        TextField("プレイリスト名", text: $text)
+                            
+                        Button("キャンセル", role: .cancel) {}
+                        Button("作成") {
+                            let playlist = PlaylistData(playlistName: text)
+                            modelContext.insert(playlist)
+                        }
+                    }, message: {
+                        Text("作成するプレイリストの名前を入力してください。")
+                    })
+                })
+            }
         }
         .onAppear {
             

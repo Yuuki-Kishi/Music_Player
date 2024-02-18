@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct Music_PlayerApp: App {
@@ -13,5 +14,6 @@ struct Music_PlayerApp: App {
         WindowGroup {
             ContentView(mds: MusicDataStore.shared, pc: PlayController.shared)
         }
+        .modelContainer(for: PlaylistData.self)
     }
 }

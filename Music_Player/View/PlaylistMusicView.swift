@@ -1,25 +1,26 @@
 //
-//  listMusic.swift
+//  PlaylistMusicView.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2023/12/28.
+//  Created by 岸　優樹 on 2024/02/18.
 //
 
 import SwiftUI
 import SwiftData
 
-struct ListMusicView: View {
+struct PlaylistMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
+    @Query private var playlists: [PlaylistData]
     @State private var listMusicArray = [Music]()
     @State private var navigationTitle: String
-    @State private var transitionSource: String
+    @State private var playlistId: String
     
-    init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, transitionSource: String) {
+    init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, playlistId: String) {
         self.mds = mds
         self.pc = pc
         _navigationTitle = State(initialValue: navigationTitle)
-        _transitionSource = State(initialValue: transitionSource)
+        _playlistId = State(initialValue: playlistId)
     }
     
     var body: some View {
@@ -93,15 +94,9 @@ struct ListMusicView: View {
             .scrollContentBackground(.hidden)
             PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
-        .onAppear {
-            switch transitionSource {
-            case "Artist":
-                listMusicArray = mds.collectArtistMusic(artist: navigationTitle)
-            case "Album":
-                listMusicArray = mds.collectAlbumMusic(album: navigationTitle)
-            default:
-                break
-            }
+        .onAppear() {
+            let index = playlists.firstIndex(where: {$0.playlistId == playlistId})!
+            listMusicArray = playlists[index].musics
         }
     }
     func testPrint() {
