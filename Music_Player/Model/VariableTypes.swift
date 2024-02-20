@@ -8,8 +8,7 @@
 import Foundation
 import SwiftData
 
-@Model
-class Music {
+struct Music: Codable, Hashable {
     var musicName: String
     var artistName: String
     var albumName: String

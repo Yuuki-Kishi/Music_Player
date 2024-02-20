@@ -17,6 +17,7 @@ struct SelectMusicView: View {
     @State private var selectionValue: Set<Music> = []
     @State private var playlistId: String
     @Binding private var isActive: Bool
+    @Environment(\.presentationMode) var presentation
     
     init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String, isActive: Binding<Bool>) {
         self.mds = mds
@@ -55,12 +56,20 @@ struct SelectMusicView: View {
                         Button(action: {
                             let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
                             let playlistName = playlistArray[index].playlistName
-                            let musicCount = playlistArray[index].musicCount
-                            let musics = playlistArray[index].musics + Array(selectionValue)
+                            var musics = playlistArray[index].musics
+                            for music in selectionValue {
+                                var i = 0
+                                let isContain = musics.contains(where: {$0 == music})
+                                if !isContain {
+                                    musics.append(music)
+                                }
+                                print(musics)
+                            }
+                            let musicCount = musics.count
                             let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
                             modelContext.delete(playlistArray[index])
                             modelContext.insert(playlist)
-                            isActive = false
+                            presentation.wrappedValue.dismiss()
                         }, label: {
                             Text("完了")
                         })

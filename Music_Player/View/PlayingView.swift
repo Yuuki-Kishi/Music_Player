@@ -24,6 +24,7 @@ struct PlayingView: View {
     }
     
     var body: some View {
+        NavigationStack {
             VStack {
                 Button(action: {
                     isActive = false
@@ -65,8 +66,8 @@ struct PlayingView: View {
                             Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
                         }
                         Divider()
-                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
-                            Label("曲の情報", systemImage: "i.circle")
+                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music, isActive: $toMusicInfo), label: {
+                            Label("曲の情報", systemImage: "info.circle")
                         })
                         Button(action: {testPrint()}) {
                             Label("ラブ", systemImage: "heart")
@@ -83,13 +84,12 @@ struct PlayingView: View {
                     .background(Color(UIColor.systemGray5))
                     .foregroundStyle(.purple)
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                   
                 }
                 .padding(.horizontal)
                 Spacer()
                 Slider(value: $seekPosition)
-                .tint(.purple)
-                .padding(.horizontal)
+                    .tint(.purple)
+                    .padding(.horizontal)
                 HStack {
                     Text(String(seekPosition))
                         .font(.system(size: 12.5))
@@ -161,6 +161,7 @@ struct PlayingView: View {
                 }
                 Spacer()
             }.padding()
+        }
     }
     func testPrint() {
         print("tapped")

@@ -93,7 +93,6 @@ final class FileService {
                 let bcf = ByteCountFormatter()
                 bcf.allowedUnits = [.useAll]
                 bcf.countStyle = .file
-                print(musicName, bcf.string(fromByteCount: bytes))
             }
         } catch {
             print(error)
