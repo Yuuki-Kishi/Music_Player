@@ -9,19 +9,21 @@ import SwiftUI
 import SwiftData
 
 struct SelectMusicView: View {
+    @Environment(\.modelContext) private var modelContext
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Query private var playlistArray: [PlaylistData]
     @Binding private var musicArray: [Music]
     @State private var selectionValue: Set<Music> = []
     @State private var playlistId: String
-    @Environment(\.presentationMode) var presentation
+    @Binding private var isActive: Bool
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String) {
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String, isActive: Binding<Bool>) {
         self.mds = mds
         self.pc = pc
         self._musicArray = musicArray
         _playlistId = State(initialValue: playlistId)
+        self._isActive = isActive
     }
     
     var body: some View {
@@ -52,9 +54,13 @@ struct SelectMusicView: View {
                         })
                         Button(action: {
                             let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
-                            let newValue = playlistArray[index].musics + Array(selectionValue)
-                            playlistArray[index].musics = newValue
-                            self.presentation.wrappedValue.dismiss()
+                            let playlistName = playlistArray[index].playlistName
+                            let musicCount = playlistArray[index].musicCount
+                            let musics = playlistArray[index].musics + Array(selectionValue)
+                            let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
+                            modelContext.delete(playlistArray[index])
+                            modelContext.insert(playlist)
+                            isActive = false
                         }, label: {
                             Text("完了")
                         })

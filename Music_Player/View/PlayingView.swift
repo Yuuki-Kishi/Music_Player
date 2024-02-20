@@ -9,18 +9,15 @@ import SwiftUI
 
 struct PlayingView: View {
     @ObservedObject var pc: PlayController
-    @Binding private var musicName: String
-    @Binding private var artistName: String
-    @Binding private var albumName: String
+    @Binding private var music: Music
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @Binding private var isActive: Bool
+    @State private var toMusicInfo = false
     
-    init(pc: PlayController, musicName: Binding<String>, artistName: Binding<String>, albumName: Binding<String>, seekPosition: Binding<Double>, isPlay: Binding<Bool>, isActive: Binding<Bool>) {
+    init(pc: PlayController, music: Binding<Music>, seekPosition: Binding<Double>, isPlay: Binding<Bool>, isActive: Binding<Bool>) {
         self.pc = pc
-        self._musicName = musicName
-        self._artistName = artistName
-        self._albumName = albumName
+        self._music = music
         self._seekPosition = seekPosition
         self._isPlay = isPlay
         self._isActive = isActive
@@ -68,9 +65,9 @@ struct PlayingView: View {
                             Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
                         }
                         Divider()
-                        Button(action: {testPrint()}) {
-                            Label("曲の情報", systemImage: "info.circle")
-                        }
+                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
+                            Label("曲の情報", systemImage: "i.circle")
+                        })
                         Button(action: {testPrint()}) {
                             Label("ラブ", systemImage: "heart")
                         }
@@ -142,7 +139,7 @@ struct PlayingView: View {
                     .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        isPlay = !isPlay
+                        isPlay.toggle()
                     }, label: {
                         if isPlay {
                             Image(systemName: "pause.fill")

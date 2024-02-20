@@ -84,78 +84,21 @@ final class FileService {
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
         let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
         var editedDate: Date?
+        var fileSize: NSDictionary
         let filePath = fileURL.path(percentEncoded: false)
         do {
             let attributes:[FileAttributeKey:Any] = try fileManager.attributesOfItem(atPath: filePath)
             editedDate = attributes[FileAttributeKey.modificationDate] as? Date
+            if let bytes = attributes[.size] as? Int64 {
+                let bcf = ByteCountFormatter()
+                bcf.allowedUnits = [.useAll]
+                bcf.countStyle = .file
+                print(musicName, bcf.string(fromByteCount: bytes))
+            }
         } catch {
             print(error)
         }
         let music = Music(musicName: musicName, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, filePath: filePath)
         return music
     }
-    
-//    func sort() {
-//        switch sortObjectArray {
-//        case 0:
-//            switch sortModeArray {
-//            case 0:
-//                musicArray.sort {$0.musicName < $1.musicName}
-//            case 1:
-//                musicArray.sort {$0.musicName > $1.musicName}
-//            case 2:
-//                musicArray.sort {$0.editedDate < $1.editedDate}
-//            case 3:
-//                musicArray.sort {$0.editedDate > $1.editedDate}
-//            default:
-//                break
-//            }
-//        case 1:
-//            switch sortModeArray {
-//            case 0:
-//                artistArray.sort {$0.artistName < $1.artistName}
-//            case 1:
-//                artistArray.sort {$0.artistName > $1.artistName}
-//            default:
-//                break
-//            }
-//        case 2:
-//            switch sortModeArray {
-//            case 0:
-//                albumArray.sort {$0.albumName < $1.albumName}
-//            case 1:
-//                albumArray.sort {$0.albumName > $1.albumName}
-//            default:
-//                break
-//            }
-//        case 3:
-//            switch sortModeArray {
-//            case 0:
-//                playListArray.sort {$0.playListName < $1.playListName}
-//            case 1:
-//                playListArray.sort {$0.playListName > $1.playListName}
-//            case 2:
-//                playListArray.sort {$0.madeDate < $1.madeDate}
-//            case 3:
-//                playListArray.sort {$0.madeDate > $1.madeDate}
-//            default:
-//                break
-//            }
-//        case 4:
-//            switch sortModeArray {
-//            case 0:
-//                listMusicArray.sort {$0.musicName < $1.musicName}
-//            case 1:
-//                listMusicArray.sort {$0.musicName > $1.musicName}
-//            case 2:
-//                listMusicArray.sort {$0.editedDate < $1.editedDate}
-//            case 3:
-//                listMusicArray.sort {$0.editedDate > $1.editedDate}
-//            default:
-//                break
-//            }
-//        default:
-//            break
-//        }
-//    }
 }

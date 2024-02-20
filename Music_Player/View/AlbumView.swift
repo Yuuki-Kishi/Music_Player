@@ -49,13 +49,35 @@ struct AlbumView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing, content: {
+                        Menu {
+                            Button(action: {albumArray.sort {$0.albumName < $1.albumName}}, label: {
+                                Text("アルバム名昇順")
+                            })
+                            Button(action: {albumArray.sort {$0.albumName > $1.albumName}}, label: {
+                                Text("アルバム名降順")
+                            })
+                            Button(action: {albumArray.sort {$0.musicCount < $1.musicCount}}, label: {
+                                Text("曲数昇順")
+                            })
+                            Button(action: {albumArray.sort {$0.musicCount > $1.musicCount}}, label: {
+                                Text("曲数降順")
+                            })
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .foregroundStyle(Color.primary)
+                        }
+                    })
+                }
+                PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
             albumArray = mds.albumSelection()
+            albumArray.sort {$0.albumName < $1.albumName}
         }
     }
 }

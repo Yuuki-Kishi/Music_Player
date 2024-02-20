@@ -53,7 +53,7 @@ struct PlaylistView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)
@@ -70,6 +70,7 @@ struct PlaylistView: View {
                         Button("作成") {
                             let playlist = PlaylistData(playlistName: text)
                             modelContext.insert(playlist)
+                            text = ""
                         }
                     }, message: {
                         Text("作成するプレイリストの名前を入力してください。")

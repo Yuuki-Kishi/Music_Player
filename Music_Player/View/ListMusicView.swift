@@ -91,7 +91,7 @@ struct ListMusicView: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+            PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .onAppear {
             switch transitionSource {

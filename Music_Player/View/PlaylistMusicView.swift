@@ -17,6 +17,7 @@ struct PlaylistMusicView: View {
     @State private var navigationTitle: String
     @State private var playlistId: String
     @State private var toSelectMusicView = false
+    @State private var isShowAlert = false
     @Environment(\.presentationMode) var presentation
     
     init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, playlistId: String) {
@@ -97,8 +98,8 @@ struct PlaylistMusicView: View {
             .scrollContentBackground(.hidden)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
-                    Menu(content: {
-                        NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: playlistId), label: {
+                    Menu {
+                        NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: playlistId, isActive: $toSelectMusicView), label: {
                             Label("曲を追加", systemImage: "plus")
                         })
                         Menu {
@@ -126,20 +127,26 @@ struct PlaylistMusicView: View {
                             Label("並び替え", systemImage: "arrow.up.arrow.down")
                         }
                         Divider()
-                        Button(role: .destructive, action: {
+                        Button(role: .destructive, action: { isShowAlert.toggle() }, label: {
+                            Label("プレイリストを削除", systemImage: "trash")
+                        })
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundStyle(Color.primary)
+                    }
+                    .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
+                        Button("キャンセル", role: .cancel) {}
+                        Button("削除", role: .destructive) {
                             let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
                             modelContext.delete(playlistArray[index])
                             self.presentation.wrappedValue.dismiss()
-                        }, label: {
-                            Label("プレイリストを削除", systemImage: "trash")
-                        })
-                    }, label: {
-                        Image(systemName: "ellipsis.circle")
-                            .foregroundStyle(Color.primary)
+                        }
+                    }, message: {
+                        Text("作成するプレイリストの名前を入力してください。")
                     })
                 })
             }
-            PlayingMusicView(pc: pc, musicName: $pc.musicName, artistName: $pc.artistName, albumName: $pc.albumName, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+            PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .onAppear() {
             let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!

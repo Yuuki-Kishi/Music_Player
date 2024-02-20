@@ -22,4 +22,11 @@ final class PlaylistData {
         self.musicCount = 0
         self.musics = []
     }
+    
+    init(playlistId: String, playlistName: String, musicCount: Int, musics: [Music]) {
+        self.playlistId = playlistId
+        self.playlistName = playlistName
+        self.musicCount = musicCount
+        self.musics = musics
+    }
 }
