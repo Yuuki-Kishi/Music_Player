@@ -16,15 +16,13 @@ struct SelectMusicView: View {
     @Binding private var musicArray: [Music]
     @State private var selectionValue: Set<Music> = []
     @State private var playlistId: String
-    @Binding private var isActive: Bool
     @Environment(\.presentationMode) var presentation
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String, isActive: Binding<Bool>) {
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String) {
         self.mds = mds
         self.pc = pc
         self._musicArray = musicArray
         _playlistId = State(initialValue: playlistId)
-        self._isActive = isActive
     }
     
     var body: some View {
@@ -58,7 +56,6 @@ struct SelectMusicView: View {
                             let playlistName = playlistArray[index].playlistName
                             var musics = playlistArray[index].musics
                             for music in selectionValue {
-                                var i = 0
                                 let isContain = musics.contains(where: {$0 == music})
                                 if !isContain {
                                     musics.append(music)

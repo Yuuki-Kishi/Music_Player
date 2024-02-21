@@ -65,9 +65,9 @@ struct MusicView: View {
                                         Button(action: {testPrint()}) {
                                             Label("ラブ", systemImage: "heart")
                                         }
-                                        Button(action: {testPrint()}) {
+                                        NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
                                             Label("曲の情報", systemImage: "info.circle")
-                                        }
+                                        })
                                         Divider()
                                         Button(action: {testPrint()}) {
                                             Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")

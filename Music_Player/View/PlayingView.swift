@@ -12,22 +12,21 @@ struct PlayingView: View {
     @Binding private var music: Music
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
-    @Binding private var isActive: Bool
     @State private var toMusicInfo = false
+    @Environment(\.presentationMode) var presentation
     
-    init(pc: PlayController, music: Binding<Music>, seekPosition: Binding<Double>, isPlay: Binding<Bool>, isActive: Binding<Bool>) {
+    init(pc: PlayController, music: Binding<Music>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
         self.pc = pc
         self._music = music
         self._seekPosition = seekPosition
         self._isPlay = isPlay
-        self._isActive = isActive
     }
     
     var body: some View {
         NavigationStack {
             VStack {
                 Button(action: {
-                    isActive = false
+                    presentation.wrappedValue.dismiss()
                 }, label: {
                     Image(systemName: "chevron.down")
                         .foregroundStyle(.purple)
@@ -66,7 +65,7 @@ struct PlayingView: View {
                             Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
                         }
                         Divider()
-                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music, isActive: $toMusicInfo), label: {
+                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
                             Label("曲の情報", systemImage: "info.circle")
                         })
                         Button(action: {testPrint()}) {

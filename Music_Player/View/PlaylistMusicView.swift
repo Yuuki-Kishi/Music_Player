@@ -99,7 +99,7 @@ struct PlaylistMusicView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
                     Menu {
-                        NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: playlistId, isActive: $toSelectMusicView), label: {
+                        NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: playlistId), label: {
                             Label("曲を追加", systemImage: "plus")
                         })
                         Menu {

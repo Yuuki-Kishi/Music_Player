@@ -80,11 +80,11 @@ final class FileService {
     func fileMetadata(musicName: String, filePath: String) async -> Music {
         let fileURL = URL(fileURLWithPath: filePath)
         let asset = AVAsset(url: fileURL)
-        guard let metadata = try? await asset.load(.commonMetadata) else { return Music(musicName: musicName, artistName: "不明", albumName: "不明", editedDate: Date(), filePath: filePath)}
+        guard let metadata = try? await asset.load(.commonMetadata) else { return Music(musicName: musicName, artistName: "不明", albumName: "不明", editedDate: Date(), fileSize: "0MB", filePath: filePath)}
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
         let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
         var editedDate: Date?
-        var fileSize: NSDictionary
+        var fileSize: String?
         let filePath = fileURL.path(percentEncoded: false)
         do {
             let attributes:[FileAttributeKey:Any] = try fileManager.attributesOfItem(atPath: filePath)
@@ -93,11 +93,12 @@ final class FileService {
                 let bcf = ByteCountFormatter()
                 bcf.allowedUnits = [.useAll]
                 bcf.countStyle = .file
+                fileSize = bcf.string(fromByteCount: bytes)
             }
         } catch {
             print(error)
         }
-        let music = Music(musicName: musicName, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, filePath: filePath)
+        let music = Music(musicName: musicName, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, fileSize: fileSize!, filePath: filePath)
         return music
     }
 }
