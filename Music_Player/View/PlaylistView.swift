@@ -34,10 +34,9 @@ struct PlaylistView: View {
                     Spacer()
                 }
                 List {
-                    ForEach(Array(playlistArray.enumerated()), id: \.element.playlistName) { index, playlist in
+                    ForEach(Array(playlistArray.enumerated()), id: \.element.playlistId) { index, playlist in
                         let playlistName = playlist.playlistName
                         let musicCount = playlist.musicCount
-                        let playlistId = playlist.playlistId
                         NavigationLink(value: playlist, label: {
                             HStack {
                                 Text(playlistName)
@@ -49,7 +48,7 @@ struct PlaylistView: View {
                     }
                 }
                 .navigationDestination(for: PlaylistData.self) { playlist in
-                    PlaylistMusicView(mds: mds, pc: pc, navigationTitle: playlist.playlistName, playlistId: playlist.playlistId)
+                    PlaylistMusicView(mds: mds, pc: pc, playlistId: playlist.playlistId)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -79,7 +78,7 @@ struct PlaylistView: View {
             }
         }
         .onAppear {
-            
+//            mds.playlistArray = playlistArray
         }
     }
 }

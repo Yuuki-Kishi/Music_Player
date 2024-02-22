@@ -15,14 +15,14 @@ struct SelectMusicView: View {
     @Query private var playlistArray: [PlaylistData]
     @Binding private var musicArray: [Music]
     @State private var selectionValue: Set<Music> = []
-    @State private var playlistId: String
+    @Binding private var playlistId: UUID
     @Environment(\.presentationMode) var presentation
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: String) {
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, playlistId: Binding<UUID>) {
         self.mds = mds
         self.pc = pc
         self._musicArray = musicArray
-        _playlistId = State(initialValue: playlistId)
+        self._playlistId = playlistId
     }
     
     var body: some View {
@@ -63,7 +63,8 @@ struct SelectMusicView: View {
                                 print(musics)
                             }
                             let musicCount = musics.count
-                            let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
+                            let playlist = PlaylistData(playlistName: playlistName, musicCount: musicCount, musics: musics)
+                            playlistId = playlist.playlistId
                             modelContext.delete(playlistArray[index])
                             modelContext.insert(playlist)
                             presentation.wrappedValue.dismiss()

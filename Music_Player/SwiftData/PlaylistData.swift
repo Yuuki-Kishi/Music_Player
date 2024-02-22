@@ -9,22 +9,21 @@ import Foundation
 import SwiftData
 
 @Model
-final class PlaylistData {
-    @Attribute(.unique) var playlistId: String
+final class PlaylistData: Identifiable {
+    @Attribute(.unique) var playlistId: UUID
     var playlistName: String
     var musicCount: Int
     var musics: [Music]
         
     init(playlistName: String) {
-        let uuid = UUID()
-        self.playlistId = uuid.uuidString
+        self.playlistId = UUID()
         self.playlistName = playlistName
         self.musicCount = 0
         self.musics = []
     }
     
-    init(playlistId: String, playlistName: String, musicCount: Int, musics: [Music]) {
-        self.playlistId = playlistId
+    init(playlistName: String, musicCount: Int, musics: [Music]) {
+        self.playlistId = UUID()
         self.playlistName = playlistName
         self.musicCount = musicCount
         self.musics = musics

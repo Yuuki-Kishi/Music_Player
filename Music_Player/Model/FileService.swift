@@ -8,6 +8,7 @@
 import Foundation
 import AVKit
 import AVFoundation
+import SwiftData
 
 final class FileService {
     let fileManager = FileManager.default

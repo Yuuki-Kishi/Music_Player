@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MusicView: View {
     @ObservedObject var mds: MusicDataStore
@@ -35,60 +36,33 @@ struct MusicView: View {
                         }
                     }
                     .padding(.horizontal)
-                    List {
-                        ForEach(Array(musicArray.enumerated()), id: \.element.filePath) { index, music in
-                            let musicName = music.musicName
-                            let artistName = music.artistName
-                            let albumName = music.albumName
-                            ZStack {
-                                HStack {
-                                    VStack {
-                                        Text(musicName)
+                    List($musicArray) { $music in
+                        let musicName = music.musicName
+                        let artistName = music.artistName
+                        let albumName = music.albumName
+                        ZStack {
+                            HStack {
+                                VStack {
+                                    Text(musicName)
+                                        .lineLimit(1)
+                                        .font(.system(size: 20.0))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    HStack {
+                                        Text(artistName)
                                             .lineLimit(1)
-                                            .font(.system(size: 20.0))
+                                            .font(.system(size: 12.5))
                                             .frame(maxWidth: .infinity, alignment: .leading)
-                                        HStack {
-                                            Text(artistName)
-                                                .lineLimit(1)
-                                                .font(.system(size: 12.5))
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            Text(albumName)
-                                                .lineLimit(1)
-                                                .font(.system(size: 12.5))
-                                                .frame(maxWidth: .infinity,alignment: .leading)
-                                        }
-                                    }
-                                    Menu {
-                                        Button(action: {testPrint()}) {
-                                            Label("プレイリストに追加", systemImage: "text.badge.plus")
-                                        }
-                                        Button(action: {testPrint()}) {
-                                            Label("ラブ", systemImage: "heart")
-                                        }
-                                        NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
-                                            Label("曲の情報", systemImage: "info.circle")
-                                        })
-                                        Divider()
-                                        Button(action: {testPrint()}) {
-                                            Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-                                        }
-                                        Button(action: {testPrint()}) {
-                                            Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-                                        }
-                                        Divider()
-                                        Button(role: .destructive, action: {testPrint()}) {
-                                            Label("ファイルを削除", systemImage: "trash")
-                                        }
-                                    } label: {
-                                        Image(systemName: "ellipsis")
-                                            .foregroundStyle(Color.primary)
-                                            .frame(width: 40, height: 40)
+                                        Text(albumName)
+                                            .lineLimit(1)
+                                            .font(.system(size: 12.5))
+                                            .frame(maxWidth: .infinity,alignment: .leading)
                                     }
                                 }
+                                musicMenu(music: $music)
                             }
-                            .onTapGesture {
-                                print("セルタップ")
-                            }
+                        }
+                        .onTapGesture {
+                            print("セルタップ")
                         }
                     }
                     .listStyle(.plain)
@@ -144,6 +118,34 @@ struct MusicView: View {
                     isShowsProgressView = false
                 }
             }
+        }
+    }
+    func musicMenu(music: Binding<Music>) -> some View {
+        Menu {
+            Button(action: {testPrint()}) {
+                Label("プレイリストに追加", systemImage: "text.badge.plus")
+            }
+            Button(action: {testPrint()}) {
+                Label("ラブ", systemImage: "heart")
+            }
+            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
+                Label("曲の情報", systemImage: "info.circle")
+            })
+            Divider()
+            Button(action: {testPrint()}) {
+                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            Button(action: {testPrint()}) {
+                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+            }
+            Divider()
+            Button(role: .destructive, action: {testPrint()}) {
+                Label("ファイルを削除", systemImage: "trash")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(Color.primary)
+                .frame(width: 40, height: 40)
         }
     }
     func testPrint() {

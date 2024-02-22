@@ -8,7 +8,8 @@
 import Foundation
 import SwiftData
 
-struct Music: Codable, Hashable {
+struct Music: Codable, Hashable, Identifiable {
+    var id = UUID()
     var musicName: String
     var artistName: String
     var albumName: String
