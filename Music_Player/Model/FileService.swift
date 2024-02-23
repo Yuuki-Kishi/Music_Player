@@ -102,4 +102,12 @@ final class FileService {
         let music = Music(musicName: musicName, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, fileSize: fileSize!, filePath: filePath)
         return music
     }
+    
+    func fileDelete(filePath: String) {
+        do {
+            try fileManager.removeItem(atPath: filePath)
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
 }

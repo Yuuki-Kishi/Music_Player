@@ -13,6 +13,7 @@ struct MusicView: View {
     @ObservedObject var pc: PlayController
     @Binding private var musicArray: [Music]
     @State private var isShowsProgressView = true
+    @State private var isShowAlert = false
     
     init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
         self.mds = mds
@@ -40,26 +41,24 @@ struct MusicView: View {
                         let musicName = music.musicName
                         let artistName = music.artistName
                         let albumName = music.albumName
-                        ZStack {
-                            HStack {
-                                VStack {
-                                    Text(musicName)
+                        HStack {
+                            VStack {
+                                Text(musicName)
+                                    .lineLimit(1)
+                                    .font(.system(size: 20.0))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                HStack {
+                                    Text(artistName)
                                         .lineLimit(1)
-                                        .font(.system(size: 20.0))
+                                        .font(.system(size: 12.5))
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                    HStack {
-                                        Text(artistName)
-                                            .lineLimit(1)
-                                            .font(.system(size: 12.5))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        Text(albumName)
-                                            .lineLimit(1)
-                                            .font(.system(size: 12.5))
-                                            .frame(maxWidth: .infinity,alignment: .leading)
-                                    }
+                                    Text(albumName)
+                                        .lineLimit(1)
+                                        .font(.system(size: 12.5))
+                                        .frame(maxWidth: .infinity,alignment: .leading)
                                 }
-                                musicMenu(music: $music)
                             }
+                            musicMenu(music: $music)
                         }
                         .onTapGesture {
                             print("セルタップ")
@@ -139,7 +138,7 @@ struct MusicView: View {
                 Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
             }
             Divider()
-            Button(role: .destructive, action: {testPrint()}) {
+            Button(role: .destructive, action: { isShowAlert.toggle() }) {
                 Label("ファイルを削除", systemImage: "trash")
             }
         } label: {
@@ -147,6 +146,21 @@ struct MusicView: View {
                 .foregroundStyle(Color.primary)
                 .frame(width: 40, height: 40)
         }
+        .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
+            Button(role: .destructive, action: {
+                print(music.wrappedValue.filePath)
+                Task {
+                    await mds.fileDelete(filePath: music.wrappedValue.filePath)
+                }
+            }, label: {
+                Text("削除")
+            })
+            Button(role: .cancel, action: {}, label: {
+                Text("キャンセル")
+            })
+        }, message: {
+            Text("この操作は取り消すことができません。")
+        })
     }
     func testPrint() {
         print("すべて再生")

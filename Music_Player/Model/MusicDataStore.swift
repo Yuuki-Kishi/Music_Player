@@ -12,6 +12,7 @@ class MusicDataStore: ObservableObject {
     static let shared = MusicDataStore()
     @Published var musicArray = [Music]()
     @Published var folderArray = [Folder]()
+    @Published var sortMode = 0
     let fileService = FileService()
     
     func getFile() async {
@@ -21,7 +22,7 @@ class MusicDataStore: ObservableObject {
         let fileURLs = fileService.getFiles()
         folderArray = fileService.containFolder(fileURLs: fileURLs)
         musicArray = await fileService.collectFile(fileURLs: fileURLs)
-        sort(method: 0)
+        sort(method: sortMode)
     }
     
     func artistSelection() -> Array<Artist> {
@@ -74,15 +75,13 @@ class MusicDataStore: ObservableObject {
         return listMusicArray
     }
     
-//    func collectPlaylistMusic(playlistName: String) async -> Array<Music> {
-//        let index = playlistArray.firstIndex(where: {$0.playlistName == playlistName})!
-//        var fileURLs = [URL]()
-//        for music in playlistArray[index].musics {
-//            fileURLs.append(URL(fileURLWithPath: music.filePath))
-//        }
-//        let listMusicArray = await fileService.collectFile(fileURLs: fileURLs)
-//        return listMusicArray
-//    }
+    func fileDelete(filePath: String) async {
+        fileService.fileDelete(filePath: filePath)
+        musicArray = []
+        let fileURLs = fileService.getFiles()
+        musicArray = await fileService.collectFile(fileURLs: fileURLs)
+        sort(method: sortMode)
+    }
     
     func sort(method: Int) {
         switch method {

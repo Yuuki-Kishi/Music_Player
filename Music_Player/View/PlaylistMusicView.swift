@@ -62,8 +62,7 @@ struct PlaylistMusicView: View {
                         }
                     }
                     Spacer()
-                    musicMenu(music: $music
-                    )
+                    musicMenu(music: $music)
                 }
             }
             PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
