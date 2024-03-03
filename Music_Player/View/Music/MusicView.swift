@@ -14,6 +14,7 @@ struct MusicView: View {
     @Binding private var musicArray: [Music]
     @State private var isShowsProgressView = true
     @State private var isShowAlert = false
+    @State private var deleteTarget: Music?
     
     init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
         self.mds = mds
@@ -39,8 +40,8 @@ struct MusicView: View {
                     .padding(.horizontal)
                     List($musicArray) { $music in
                         let musicName = music.musicName
-                        let artistName = music.artistName
-                        let albumName = music.albumName
+                        let artistName = music.artistName!
+                        let albumName = music.albumName!
                         HStack {
                             VStack {
                                 Text(musicName)
@@ -90,16 +91,16 @@ struct MusicView: View {
                             Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
                         }
                         Menu {
-                            Button(action: { mds.sort(method: 0) }, label: {
+                            Button(action: { mds.musicSort(method: .nameAscending) }, label: {
                                 Text("曲名昇順")
                             })
-                            Button(action: { mds.sort(method: 1) }, label: {
+                            Button(action: { mds.musicSort(method: .nameDescending) }, label: {
                                 Text("曲名降順")
                             })
-                            Button(action: { mds.sort(method: 2) }, label: {
+                            Button(action: { mds.musicSort(method: .dateAscending) }, label: {
                                 Text("追加日昇順")
                             })
-                            Button(action: { mds.sort(method: 3) }, label: {
+                            Button(action: { mds.musicSort(method: .dateDescending) }, label: {
                                 Text("追加日降順")
                             })
                         } label: {
@@ -107,7 +108,6 @@ struct MusicView: View {
                         }
                     } label: {
                         Image(systemName: "ellipsis.circle")
-                            .foregroundStyle(Color.primary)
                     }
                 })
             }
@@ -138,7 +138,10 @@ struct MusicView: View {
                 Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
             }
             Divider()
-            Button(role: .destructive, action: { isShowAlert.toggle() }) {
+            Button(role: .destructive, action: {
+                isShowAlert = true
+                deleteTarget = music.wrappedValue
+            }) {
                 Label("ファイルを削除", systemImage: "trash")
             }
         } label: {
@@ -148,9 +151,10 @@ struct MusicView: View {
         }
         .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
             Button(role: .destructive, action: {
-                print(music.wrappedValue.filePath)
-                Task {
-                    await mds.fileDelete(filePath: music.wrappedValue.filePath)
+                if let deleteTarget {
+                    Task {
+                        await mds.fileDelete(filePath: deleteTarget.filePath)
+                    }
                 }
             }, label: {
                 Text("削除")
@@ -159,7 +163,7 @@ struct MusicView: View {
                 Text("キャンセル")
             })
         }, message: {
-            Text("この操作は取り消すことができません。")
+                Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
         })
     }
     func testPrint() {

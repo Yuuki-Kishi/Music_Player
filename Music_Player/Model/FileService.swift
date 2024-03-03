@@ -103,9 +103,10 @@ final class FileService {
         return music
     }
     
-    func fileDelete(filePath: String) {
+    func fileDelete(filePath: String?) {
         do {
-            try fileManager.removeItem(atPath: filePath)
+            let url = URL(fileURLWithPath: filePath!)
+            try fileManager.trashItem(at: url, resultingItemURL: nil)
         } catch let error {
             print(error.localizedDescription)
         }

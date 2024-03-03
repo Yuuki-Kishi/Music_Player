@@ -10,13 +10,12 @@ import SwiftUI
 struct AlbumView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Binding private var musicArray: [Music]
-    @State private var albumArray = [Album]()
+    @Binding private var albumArray: [Album]
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+    init(mds: MusicDataStore, pc: PlayController, albumArray: Binding<[Album]>) {
         self.mds = mds
         self.pc = pc
-        self._musicArray = musicArray
+        self._albumArray = albumArray
     }
     
     var body: some View {
@@ -30,43 +29,40 @@ struct AlbumView: View {
                         .padding(.horizontal)
                     Spacer()
                 }
-                List {
-                    ForEach(Array(albumArray.enumerated()), id: \.element.albumName) { index, album in
-                        let albumName = album.albumName
-                        let musicCount = album.musicCount
-                        NavigationLink(value: albumName, label: {
-                            HStack {
-                                Text(albumName)
-                                Spacer()
-                                Text(String(musicCount) + "曲")
-                                    .foregroundStyle(Color.gray)
-                            }
-                        })
-                    }
+                List($albumArray) { album in
+                    let albumName = album.albumName.wrappedValue
+                    let musicCount = album.musicCount.wrappedValue
+                    NavigationLink(value: albumName, label: {
+                        HStack {
+                            Text(albumName)
+                            Spacer()
+                            Text(String(musicCount) + "曲")
+                                .foregroundStyle(Color.gray)
+                        }
+                    })
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusicView(mds: mds, pc: pc, navigationTitle: title, transitionSource: "Album")
+                    AlbumMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing, content: {
                         Menu {
-                            Button(action: {albumArray.sort {$0.albumName < $1.albumName}}, label: {
+                            Button(action: { mds.albumSort(method: .nameAscending) }, label: {
                                 Text("アルバム名昇順")
                             })
-                            Button(action: {albumArray.sort {$0.albumName > $1.albumName}}, label: {
+                            Button(action: { mds.albumSort(method: .nameDescending) }, label: {
                                 Text("アルバム名降順")
                             })
-                            Button(action: {albumArray.sort {$0.musicCount < $1.musicCount}}, label: {
+                            Button(action: { mds.albumSort(method: .countAscending) }, label: {
                                 Text("曲数昇順")
                             })
-                            Button(action: {albumArray.sort {$0.musicCount > $1.musicCount}}, label: {
+                            Button(action: { mds.albumSort(method: .countDescending) }, label: {
                                 Text("曲数降順")
                             })
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(Color.primary)
                         }
                     })
                 }
@@ -76,8 +72,8 @@ struct AlbumView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
-            albumArray = mds.albumSelection()
-            albumArray.sort {$0.albumName < $1.albumName}
+            mds.albumSelection()
         }
     }
 }
+

@@ -20,7 +20,7 @@ struct ContentView: View {
                         Text("ミュージック")
                     }
                 }
-            ArtistView(mds: mds, pc: pc, musicArray: $mds.musicArray)
+            ArtistView(mds: mds, pc: pc, artistArray: $mds.artistArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
@@ -28,7 +28,7 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("アーティスト")
-            AlbumView(mds: mds, pc: pc, musicArray: $mds.musicArray)
+            AlbumView(mds: mds, pc: pc, albumArray: $mds.albumArray)
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")

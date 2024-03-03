@@ -45,11 +45,10 @@ struct MusicInfoView: View {
         .navigationTitle("曲の情報")
         .onAppear() {
             infoArray.append((title: "曲名", value: music.musicName))
-            infoArray.append((title: "アーティスト名", value: music.artistName))
-            infoArray.append((title: "アルバム名", value: music.albumName))
-            infoArray.append((title: "ファイルパス", value: music.filePath))
-            infoArray.append((title: "ファイルサイズ", value: music.fileSize))
-            print(music.filePath)
+            infoArray.append((title: "アーティスト名", value: music.artistName ?? ""))
+            infoArray.append((title: "アルバム名", value: music.albumName ?? ""))
+            infoArray.append((title: "ファイルパス", value: music.filePath ?? ""))
+            infoArray.append((title: "ファイルサイズ", value: music.fileSize ?? ""))
         }
     }
 }

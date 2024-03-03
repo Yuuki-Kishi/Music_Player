@@ -11,13 +11,13 @@ import SwiftData
 struct Music: Codable, Hashable, Identifiable {
     var id = UUID()
     var musicName: String
-    var artistName: String
-    var albumName: String
-    var editedDate: Date
-    var fileSize: String
-    var filePath: String
+    var artistName: String?
+    var albumName: String?
+    var editedDate: Date?
+    var fileSize: String?
+    var filePath: String?
     
-    init(musicName: String, artistName: String, albumName: String, editedDate: Date, fileSize: String, filePath: String) {
+    init(musicName: String, artistName: String?, albumName: String?, editedDate: Date?, fileSize: String?, filePath: String?) {
         self.musicName = musicName
         self.artistName = artistName
         self.albumName = albumName
@@ -27,7 +27,8 @@ struct Music: Codable, Hashable, Identifiable {
     }
 }
 
-class Artist {
+class Artist: Identifiable {
+    var id = UUID()
     var artistName: String
     var musicCount: Int
     
@@ -37,7 +38,8 @@ class Artist {
     }
 }
 
-class Album {
+class Album: Identifiable {
+    var id = UUID()
     var albumName: String
     var musicCount: Int
     

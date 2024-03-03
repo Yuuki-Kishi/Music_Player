@@ -28,4 +28,11 @@ final class PlaylistData: Identifiable {
         self.musicCount = musicCount
         self.musics = musics
     }
+    
+    init(playlistId: UUID, playlistName: String, musicCount: Int, musics: [Music]) {
+        self.playlistId = playlistId
+        self.playlistName = playlistName
+        self.musicCount = musicCount
+        self.musics = musics
+    }
 }

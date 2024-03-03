@@ -14,15 +14,20 @@ struct PlaylistMusicView: View {
     @ObservedObject var pc: PlayController
     @Query private var playlistArray: [PlaylistData]
     @State private var listMusicArray = [Music]()
-    @State private var navigationTitle = ""
+    @State private var navigationTitle: String
     @State private var playlistId: UUID
     @State private var toSelectMusicView = false
-    @State private var isShowAlert = false
+    @State private var isShowDeleteAlert = false
+    @State private var isShowRenameAlert = false
+    @State private var deleteTarget: Music?
+    @State private var text = ""
     @Environment(\.presentationMode) var presentation
+    let fileService = FileService()
     
-    init(mds: MusicDataStore, pc: PlayController, playlistId: UUID) {
+    init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, playlistId: UUID) {
         self.mds = mds
         self.pc = pc
+        _navigationTitle = State(initialValue: navigationTitle)
         _playlistId = State(initialValue: playlistId)
     }
     
@@ -51,11 +56,11 @@ struct PlaylistMusicView: View {
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
-                            Text(artistName)
+                            Text(artistName!)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(albumName)
+                            Text(albumName!)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
@@ -76,39 +81,48 @@ struct PlaylistMusicView: View {
                     NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, musicArray: $mds.musicArray, playlistId: $playlistId), label: {
                         Label("曲を追加", systemImage: "plus")
                     })
+                    Button(action: { text = navigationTitle; isShowRenameAlert.toggle() }, label: {
+                        Label("名前を変更する", systemImage: "arrow.triangle.2.circlepath")
+                    })
                     Menu {
-                        Button(action: {
-                            listMusicArray.sort {$0.musicName < $1.musicName}
-                        }, label: {
+                        Button(action: { mds.musicSort(method: .nameAscending) }, label: {
                             Text("曲名昇順")
                         })
-                        Button(action: {
-                            listMusicArray.sort {$0.musicName > $1.musicName}
-                        }, label: {
+                        Button(action: { mds.musicSort(method: .nameDescending) }, label: {
                             Text("曲名降順")
                         })
-                        Button(action: {
-                            listMusicArray.sort {$0.editedDate < $1.editedDate}
-                        }, label: {
+                        Button(action: { mds.musicSort(method: .dateAscending) }, label: {
                             Text("追加日昇順")
                         })
-                        Button(action: {
-                            listMusicArray.sort {$0.editedDate > $1.editedDate}
-                        }, label: {
+                        Button(action: { mds.musicSort(method: .dateDescending) }, label: {
                             Text("追加日降順")
                         })
                     } label: {
                         Label("並び替え", systemImage: "arrow.up.arrow.down")
                     }
                     Divider()
-                    Button(role: .destructive, action: { isShowAlert.toggle() }, label: {
+                    Button(role: .destructive, action: { isShowDeleteAlert.toggle() }, label: {
                         Label("プレイリストを削除", systemImage: "trash")
                     })
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .foregroundStyle(Color.primary)
                 }
-                .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
+                .alert("プレイリスト名の変更", isPresented: $isShowRenameAlert, actions: {
+                    TextField("新しい名前", text: $text)
+                    Button("キャンセル", role: .cancel) {}
+                    Button("作成") {
+                        let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
+                        let musicCount = playlistArray[index].musicCount
+                        let musics = playlistArray[index].musics
+                        navigationTitle = text
+                        let playlist = PlaylistData(playlistId: playlistId, playlistName: navigationTitle, musicCount: musicCount, musics: musics)
+                        modelContext.delete(playlistArray[index])
+                        modelContext.insert(playlist)
+                    }
+                }, message: {
+                    Text("プレイリストの新しい名前を入力してください。")
+                })
+                .alert("本当に削除しますか？", isPresented: $isShowDeleteAlert, actions: {
                     Button("キャンセル", role: .cancel) {}
                     Button("削除", role: .destructive) {
                         let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
@@ -121,12 +135,16 @@ struct PlaylistMusicView: View {
             })
         }
         .onAppear() {
-            if let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId}) {
-                navigationTitle = playlistArray[index].playlistName
-                if !playlistArray[index].musics.isEmpty {
-                    listMusicArray = playlistArray[index].musics
-                    listMusicArray.sort {$0.musicName < $1.musicName}
-                }
+            selectMusics()
+        }
+    }
+    func selectMusics() {
+        listMusicArray = []
+        if let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId}) {
+            navigationTitle = playlistArray[index].playlistName
+            if !playlistArray[index].musics.isEmpty {
+                listMusicArray = playlistArray[index].musics
+                listMusicArray.sort {$0.musicName < $1.musicName}
             }
         }
     }
@@ -149,14 +167,46 @@ struct PlaylistMusicView: View {
                 Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
             }
             Divider()
-            Button(role: .destructive, action: {testPrint()}) {
+            Button(role: .destructive, action: {
+                deleteTarget = music.wrappedValue
+                let playlistIndex = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
+                var musics = playlistArray[playlistIndex].musics
+                let musicIndex = musics.firstIndex(where: {$0.filePath == deleteTarget?.filePath})!
+                musics.remove(at: musicIndex)
+                playlistArray[playlistIndex].musics = musics
+                playlistArray[playlistIndex].musicCount -= 1
+                selectMusics()
+            }, label: {
+                Label("プレイリストから削除", systemImage: "text.badge.minus")
+            })
+            Button(role: .destructive, action: {
+                isShowDeleteAlert = true
+                deleteTarget = music.wrappedValue
+            }) {
                 Label("ファイルを削除", systemImage: "trash")
             }
         } label: {
             Image(systemName: "ellipsis")
-                .foregroundStyle(Color.primary)
                 .frame(width: 40, height: 40)
+                .foregroundStyle(Color.primary)
         }
+        .alert("本当に削除しますか？", isPresented: $isShowDeleteAlert, actions: {
+            Button(role: .destructive, action: {
+                if let deleteTarget {
+                    Task {
+                        await mds.fileDelete(filePath: deleteTarget.filePath)
+                        
+                    }
+                }
+            }, label: {
+                Text("削除")
+            })
+            Button(role: .cancel, action: {}, label: {
+                Text("キャンセル")
+            })
+        }, message: {
+            Text("この操作は取り消すことができません。")
+        })
     }
     func testPrint() {
         print("敵影感知")

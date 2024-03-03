@@ -11,9 +11,21 @@ import Foundation
 class MusicDataStore: ObservableObject {
     static let shared = MusicDataStore()
     @Published var musicArray = [Music]()
+    @Published var artistArray = [Artist]()
+    @Published var albumArray = [Album]()
     @Published var folderArray = [Folder]()
+    @Published var listMusicArray = [Music]()
     @Published var sortMode = 0
     let fileService = FileService()
+    enum musicSortMode {
+        case nameAscending, nameDescending, dateAscending, dateDescending
+    }
+    enum artistSortMode {
+        case nameAscending, nameDescending, countAscending, countDescending
+    }
+    enum albumSortMode {
+        case nameAscending, nameDescending, countAscending, countDescending
+    }
     
     func getFile() async {
         musicArray = []
@@ -22,13 +34,13 @@ class MusicDataStore: ObservableObject {
         let fileURLs = fileService.getFiles()
         folderArray = fileService.containFolder(fileURLs: fileURLs)
         musicArray = await fileService.collectFile(fileURLs: fileURLs)
-        sort(method: sortMode)
+        musicSort(method: .nameAscending)
     }
     
-    func artistSelection() -> Array<Artist> {
-        var artistArray =  [Artist]()
+    func artistSelection() {
+        artistArray = []
         for music in musicArray {
-            let artistName = music.artistName
+            let artistName = music.artistName!
             let contain = artistArray.contains(where: {$0.artistName == artistName})
             if contain {
                 let index = artistArray.firstIndex(where: {$0.artistName == artistName})!
@@ -38,20 +50,18 @@ class MusicDataStore: ObservableObject {
                 artistArray.append(artist)
             }
         }
-        return artistArray
     }
     
-    func collectArtistMusic(artist: String) -> Array<Music> {
-        var listMusicArray = [Music]()
+    func collectArtistMusic(artist: String) {
+        listMusicArray = []
         for music in musicArray {
-            let artistName = music.artistName
+            let artistName = music.artistName!
             if artistName == artist { listMusicArray.append(music) }
         }
-        return listMusicArray
     }
     
-    func albumSelection() -> Array<Album> {
-        var albumArray = [Album]()
+    func albumSelection() {
+        albumArray = []
         for music in musicArray {
             let albumName = music.albumName
             let contain = albumArray.contains(where: {$0.albumName == albumName})
@@ -59,42 +69,65 @@ class MusicDataStore: ObservableObject {
                 let index = albumArray.firstIndex(where: {$0.albumName == albumName})!
                 albumArray[index].musicCount += 1
             } else {
-                let artist = Album(albumName: albumName, musicCount: 1)
+                let artist = Album(albumName: albumName!, musicCount: 1)
                 albumArray.append(artist)
             }
         }
-        return albumArray
     }
     
-    func collectAlbumMusic(album: String) -> Array<Music> {
-        var listMusicArray = [Music]()
+    func collectAlbumMusic(album: String) {
+        listMusicArray = []
         for music in musicArray {
-            let artistName = music.albumName
+            let artistName = music.albumName!
             if artistName == album { listMusicArray.append(music) }
         }
-        return listMusicArray
     }
     
-    func fileDelete(filePath: String) async {
+    func fileDelete(filePath: String?) async {
         fileService.fileDelete(filePath: filePath)
         musicArray = []
         let fileURLs = fileService.getFiles()
         musicArray = await fileService.collectFile(fileURLs: fileURLs)
-        sort(method: sortMode)
+        musicSort(method: .nameAscending)
     }
     
-    func sort(method: Int) {
+    func musicSort(method: musicSortMode) {
         switch method {
-        case 0:
+        case .nameAscending:
             musicArray.sort {$0.musicName < $1.musicName}
-        case 1:
+        case .nameDescending:
             musicArray.sort {$0.musicName > $1.musicName}
-        case 2:
-            musicArray.sort {$0.editedDate < $1.editedDate}
-        case 3:
-            musicArray.sort {$0.editedDate > $1.editedDate}
-        default:
-            break
+        case .dateAscending:
+            musicArray.sort {$0.editedDate ?? Date() < $1.editedDate ?? Date()}
+        case .dateDescending:
+            musicArray.sort {$0.editedDate ?? Date() > $1.editedDate ?? Date()}
+        }
+    }
+    
+    
+    func artistSort(method: artistSortMode) {
+        switch method {
+        case .nameAscending:
+            artistArray.sort {$0.artistName < $1.artistName}
+        case .nameDescending:
+            artistArray.sort {$0.artistName > $1.artistName}
+        case .countAscending:
+            artistArray.sort {$0.musicCount < $1.musicCount}
+        case .countDescending:
+            artistArray.sort {$0.musicCount > $1.musicCount}
+        }
+    }
+    
+    func albumSort(method: albumSortMode) {
+        switch method {
+        case .nameAscending:
+            albumArray.sort {$0.albumName < $1.albumName}
+        case .nameDescending:
+            albumArray.sort {$0.albumName > $1.albumName}
+        case .countAscending:
+            albumArray.sort {$0.musicCount < $1.musicCount}
+        case .countDescending:
+            albumArray.sort {$0.musicCount > $1.musicCount}
         }
     }
 }

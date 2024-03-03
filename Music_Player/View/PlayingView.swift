@@ -54,30 +54,31 @@ struct PlayingView: View {
                             .padding(.horizontal)
                     }
                     Menu {
-                        Button(role: .destructive, action: {testPrint()}) {
-                            Label("ファイルを削除", systemImage: "trash")
-                        }
-                        Divider()
                         Button(action: {testPrint()}) {
-                            Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+                            Label("プレイリストに追加", systemImage: "text.badge.plus")
                         }
-                        Button(action: {testPrint()}) {
-                            Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-                        }
-                        Divider()
-                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
-                            Label("曲の情報", systemImage: "info.circle")
-                        })
                         Button(action: {testPrint()}) {
                             Label("ラブ", systemImage: "heart")
                         }
+                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
+                            Label("曲の情報", systemImage: "info.circle")
+                        })
+                        Divider()
                         Button(action: {testPrint()}) {
-                            Label("プレイリストに追加", systemImage: "text.badge.plus")
+                            Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+                        }
+                        Button(action: {testPrint()}) {
+                            Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+                        }
+                        Divider()
+                        Button(role: .destructive, action: {testPrint()}) {
+                            Label("ファイルを削除", systemImage: "trash")
                         }
                     } label: {
                         Image(systemName: "ellipsis")
                             .frame(width: 40, height: 40)
                     }
+                    .menuOrder(.fixed)
                     .font(.system(size: 20, weight: .semibold))
                     .frame(width: 30, height: 30)
                     .background(Color(UIColor.systemGray5))

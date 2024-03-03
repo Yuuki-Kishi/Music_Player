@@ -1,28 +1,26 @@
 //
-//  listMusic.swift
+//  AlbumMusicView.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2023/12/28.
+//  Created by 岸　優樹 on 2024/02/24.
 //
 
 import SwiftUI
-import SwiftData
 
-struct ListMusicView: View {
+struct AlbumMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @State private var listMusicArray = [Music]()
+    @Binding private var listMusicArray: [Music]
     @State private var navigationTitle: String
-    @State private var transitionSource: String
     @State private var isShowAlert = false
     @State private var deleteTarget: Music?
     @Environment(\.presentationMode) var presentation
     
-    init(mds: MusicDataStore, pc: PlayController, navigationTitle: String, transitionSource: String) {
+    init(mds: MusicDataStore, pc: PlayController, listMusicArray: Binding<[Music]>, navigationTitle: String) {
         self.mds = mds
         self.pc = pc
+        self._listMusicArray = listMusicArray
         _navigationTitle = State(initialValue: navigationTitle)
-        _transitionSource = State(initialValue: transitionSource)
     }
     
     var body: some View {
@@ -68,17 +66,10 @@ struct ListMusicView: View {
             .navigationTitle(navigationTitle)
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
+            .onAppear() {
+                mds.collectAlbumMusic(album: navigationTitle)
+            }
             PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
-        }
-        .onAppear {
-//            switch transitionSource {
-//            case "Artist":
-//                listMusicArray = mds.collectArtistMusic(artist: navigationTitle)
-//            case "Album":
-//                listMusicArray = mds.collectAlbumMusic(album: navigationTitle)
-//            default:
-//                break
-//            }
         }
     }
     func musicMenu(music: Binding<Music>) -> some View {
@@ -115,16 +106,14 @@ struct ListMusicView: View {
             Button(role: .destructive, action: {
                 if let deleteTarget {
                     Task {
-//                        await mds.fileDelete(filePath: deleteTarget.filePath)
-//                        switch transitionSource {
-//                        case "Artist":
-//                            listMusicArray = mds.collectArtistMusic(artist: navigationTitle)
-//                        case "Album":
-//                            listMusicArray = mds.collectAlbumMusic(album: navigationTitle)
-//                        default:
-//                            break
-//                        }
-//                        self.presentation.wrappedValue.dismiss()
+                        await mds.fileDelete(filePath: deleteTarget.filePath)
+                        mds.collectAlbumMusic(album: navigationTitle)
+                        let index = mds.albumArray.firstIndex(where: {$0.albumName == navigationTitle})!
+                        mds.albumArray[index].musicCount -= 1
+                        if mds.albumArray[index].musicCount == 0 {
+                            mds.albumArray.remove(at: index)
+                            self.presentation.wrappedValue.dismiss()
+                        }
                     }
                 }
             }, label: {

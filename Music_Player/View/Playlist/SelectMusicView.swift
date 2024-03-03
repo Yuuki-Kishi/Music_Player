@@ -63,8 +63,7 @@ struct SelectMusicView: View {
                                 print(musics)
                             }
                             let musicCount = musics.count
-                            let playlist = PlaylistData(playlistName: playlistName, musicCount: musicCount, musics: musics)
-                            playlistId = playlist.playlistId
+                            let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
                             modelContext.delete(playlistArray[index])
                             modelContext.insert(playlist)
                             presentation.wrappedValue.dismiss()

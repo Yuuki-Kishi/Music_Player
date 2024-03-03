@@ -10,13 +10,12 @@ import SwiftUI
 struct ArtistView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Binding private var musicArray: [Music]
-    @State private var artistArray = [Artist]()
+    @Binding private var artistArray: [Artist]
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+    init(mds: MusicDataStore, pc: PlayController, artistArray: Binding<[Artist]>) {
         self.mds = mds
         self.pc = pc
-        self._musicArray = musicArray
+        self._artistArray = artistArray
     }
     
     var body: some View {
@@ -30,43 +29,41 @@ struct ArtistView: View {
                     Spacer()
                 }
                 .padding(.horizontal)
-                List {
-                    ForEach(Array(artistArray.enumerated()), id: \.element.artistName) { index, artist in
-                        let artistName = artist.artistName
-                        let musicCount = artist.musicCount
-                        NavigationLink(value: artistName, label: {
-                            HStack {
-                                Text(artistName)
-                                Spacer()
-                                Text(String(musicCount) + "曲")
-                                    .foregroundStyle(Color.gray)
-                            }
-                        })
-                    }
+                List($artistArray) { artist in
+                    let artistName = artist.artistName.wrappedValue
+                    let musicCount = artist.musicCount.wrappedValue
+                    NavigationLink(value: artistName, label: {
+                        HStack {
+                            Text(artistName)
+                            Spacer()
+                            Text(String(musicCount) + "曲")
+                                .foregroundStyle(Color.gray)
+                        }
+                    })
+                    
                 }
                 .navigationDestination(for: String.self) { title in
-                    ListMusicView(mds: mds, pc: pc, navigationTitle: title, transitionSource: "Artist")
+                    ArtistMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing, content: {
                         Menu {
-                            Button(action: {artistArray.sort {$0.artistName < $1.artistName}}, label: {
+                            Button(action: { mds.artistSort(method: .nameAscending) }, label: {
                                 Text("アーティスト名昇順")
                             })
-                            Button(action: {artistArray.sort {$0.artistName > $1.artistName}}, label: {
+                            Button(action: { mds.artistSort(method: .nameDescending) }, label: {
                                 Text("アーティスト名降順")
                             })
-                            Button(action: {artistArray.sort {$0.musicCount < $1.musicCount}}, label: {
+                            Button(action: { mds.artistSort(method: .countAscending) }, label: {
                                 Text("曲数昇順")
                             })
-                            Button(action: {artistArray.sort {$0.musicCount > $1.musicCount}}, label: {
+                            Button(action: { mds.artistSort(method: .countDescending) }, label: {
                                 Text("曲数降順")
                             })
                         } label: {
                             Image(systemName: "ellipsis.circle")
-                                .foregroundStyle(Color.primary)
                         }
                     })
                 }
@@ -76,8 +73,7 @@ struct ArtistView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onAppear() {
-            artistArray = mds.artistSelection()
-            artistArray.sort {$0.artistName < $1.artistName}
+            mds.artistSelection()
         }
     }
 }

@@ -33,11 +33,11 @@ struct PlayingMusicView: View {
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
-                            Text(music.artistName)
+                            Text(music.artistName!)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(music.albumName)
+                            Text(music.albumName!)
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
