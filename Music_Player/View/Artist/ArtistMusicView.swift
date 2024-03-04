@@ -43,7 +43,7 @@ struct ArtistMusicView: View {
                 let albumName = music.albumName
                 HStack {
                     VStack {
-                        Text(musicName)
+                        Text(music.musicName)
                             .lineLimit(1)
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -106,14 +106,7 @@ struct ArtistMusicView: View {
             Button(role: .destructive, action: {
                 if let deleteTarget {
                     Task {
-                        await mds.fileDelete(filePath: deleteTarget.filePath)
-                        mds.collectArtistMusic(artist: navigationTitle)
-                        let index = mds.artistArray.firstIndex(where: {$0.artistName == navigationTitle})!
-                        mds.artistArray[index].musicCount -= 1
-                        if mds.artistArray[index].musicCount == 0 {
-                            mds.artistArray.remove(at: index)
-                            self.presentation.wrappedValue.dismiss()
-                        }
+                        await deleteFile(deleteTarget: deleteTarget)
                     }
                 }
             }, label: {
@@ -125,6 +118,16 @@ struct ArtistMusicView: View {
         }, message: {
             Text("この操作は取り消すことができません。")
         })
+    }
+    func deleteFile(deleteTarget: Music) async {
+        await mds.fileDelete(filePath: deleteTarget.filePath)
+        mds.collectArtistMusic(artist: navigationTitle)
+        let index = mds.artistArray.firstIndex(where: {$0.artistName == navigationTitle})!
+        mds.artistArray[index].musicCount -= 1
+        if mds.artistArray[index].musicCount == 0 {
+            mds.artistArray.remove(at: index)
+            self.presentation.wrappedValue.dismiss()
+        }
     }
     func testPrint() {
         print("敵影感知")

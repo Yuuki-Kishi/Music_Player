@@ -9,13 +9,13 @@ import SwiftUI
 
 struct PlayingView: View {
     @ObservedObject var pc: PlayController
-    @Binding private var music: Music
+    @Binding public var music: Music?
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @State private var toMusicInfo = false
     @Environment(\.presentationMode) var presentation
     
-    init(pc: PlayController, music: Binding<Music>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(pc: PlayController, music: Binding<Music?>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
         self.pc = pc
         self._music = music
         self._seekPosition = seekPosition
@@ -60,7 +60,7 @@ struct PlayingView: View {
                         Button(action: {testPrint()}) {
                             Label("ラブ", systemImage: "heart")
                         }
-                        NavigationLink(destination: MusicInfoView(pc: pc, music: $pc.music), label: {
+                        NavigationLink(destination: MusicInfoView(pc: pc, music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
                             Label("曲の情報", systemImage: "info.circle")
                         })
                         Divider()
@@ -139,7 +139,9 @@ struct PlayingView: View {
                     .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        isPlay.toggle()
+                        if music?.filePath != nil {
+                            isPlay.toggle()
+                        }
                     }, label: {
                         if isPlay {
                             Image(systemName: "pause.fill")

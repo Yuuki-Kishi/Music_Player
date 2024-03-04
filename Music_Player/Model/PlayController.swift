@@ -11,32 +11,64 @@ import AVFoundation
 @MainActor
 class PlayController: ObservableObject {
     static let shared = PlayController()
-    private var audioPlayer: AVAudioPlayer?
-    @Published var music = Music(musicName: "曲名", artistName: "アーティスト名", albumName: "アルバム名", editedDate: Date(), fileSize: "0MB", filePath: "path")
+    private let audioEngine: AVAudioEngine = .init()
+    private let playerNode: AVAudioPlayerNode = .init()
+    @Published var playMusics = [Music]()
+    @Published var music: Music? = nil
     @Published var seekPosition = 0.5
-    @Published var isPlay = false
-    
-    func setupAudioPlayer(path: String) {
-        guard let player = try? AVAudioPlayer(contentsOf: URL(fileURLWithPath: path)) else { return }
-        player.delegate = self
-        self.audioPlayer = player
+    @Published var isPlay: Bool {
+        didSet {
+            if isPlay {
+                play()
+            } else {
+                pause()
+            }
+        }
     }
     
-    func playAudioPlayer() {
-        audioPlayer?.play()
+    init() {
+        // 接続するオーディオノードをAudioEngineにアタッチする
+        audioEngine.attach(playerNode)
+        isPlay = false
     }
     
-    func pauseAudioPlayer() {
-        audioPlayer?.pause()
-    }
-}
-
-extension PlayController: AVAudioPlayerDelegate {
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        // あとで実装
+    func setMusic(music: Music) {
+        self.music = music
     }
     
-    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
-        // あとで実装
+    func setScheduleFile() -> Bool {
+        // 楽曲のURLを取得する
+        // currentItem.itemはMPMediaItemクラス
+        guard let filePath = music?.filePath else { return false }
+        let assetURL = URL(fileURLWithPath: filePath)
+        do {
+            // Source fileを取得する
+            let audioFile = try AVAudioFile(forReading: assetURL)
+            // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
+            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+            // 再生準備
+            playerNode.scheduleFile(audioFile, at: nil)
+            return true
+        }
+        catch let error {
+            print(error.localizedDescription)
+            return false
+        }
+    }
+    
+    func play() {
+        do {
+            // 再生処理
+            try audioEngine.start()
+            playerNode.play()
+        }
+        catch let error {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func pause() {
+        audioEngine.pause()
+        playerNode.pause()
     }
 }

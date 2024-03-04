@@ -106,14 +106,7 @@ struct AlbumMusicView: View {
             Button(role: .destructive, action: {
                 if let deleteTarget {
                     Task {
-                        await mds.fileDelete(filePath: deleteTarget.filePath)
-                        mds.collectAlbumMusic(album: navigationTitle)
-                        let index = mds.albumArray.firstIndex(where: {$0.albumName == navigationTitle})!
-                        mds.albumArray[index].musicCount -= 1
-                        if mds.albumArray[index].musicCount == 0 {
-                            mds.albumArray.remove(at: index)
-                            self.presentation.wrappedValue.dismiss()
-                        }
+                        await deleteFile(deleteTarget: deleteTarget)
                     }
                 }
             }, label: {
@@ -125,6 +118,16 @@ struct AlbumMusicView: View {
         }, message: {
             Text("この操作は取り消すことができません。")
         })
+    }
+    func deleteFile(deleteTarget: Music) async {
+        await mds.fileDelete(filePath: deleteTarget.filePath)
+        mds.collectAlbumMusic(album: navigationTitle)
+        let index = mds.albumArray.firstIndex(where: {$0.albumName == navigationTitle})!
+        mds.albumArray[index].musicCount -= 1
+        if mds.albumArray[index].musicCount == 0 {
+            mds.albumArray.remove(at: index)
+            self.presentation.wrappedValue.dismiss()
+        }
     }
     func testPrint() {
         print("敵影感知")

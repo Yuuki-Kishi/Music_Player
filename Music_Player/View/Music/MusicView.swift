@@ -59,10 +59,15 @@ struct MusicView: View {
                                         .frame(maxWidth: .infinity,alignment: .leading)
                                 }
                             }
+                            Spacer()
                             musicMenu(music: $music)
                         }
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             print("セルタップ")
+                            pc.setMusic(music: music)
+                            pc.setScheduleFile()
+                            pc.isPlay = true
                         }
                     }
                     .listStyle(.plain)

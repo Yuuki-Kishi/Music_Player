@@ -9,12 +9,12 @@ import SwiftUI
 
 struct PlayingMusicView: View {
     @ObservedObject var pc: PlayController
-    @Binding private var music: Music
+    @Binding private var music: Music?
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @State private var showSheet = false
     
-    init(pc: PlayController, music: Binding<Music>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(pc: PlayController, music: Binding<Music?>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
         self.pc = pc
         self._music = music
         self._seekPosition = seekPosition
@@ -28,16 +28,16 @@ struct PlayingMusicView: View {
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.purple))
                 HStack {
                     VStack {
-                        Text(music.musicName)
+                        Text(music?.musicName ?? "再生停止中")
                             .lineLimit(1)
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
-                            Text(music.artistName!)
+                            Text(music?.artistName! ?? "")
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(music.albumName!)
+                            Text(music?.albumName! ?? "")
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
@@ -57,7 +57,9 @@ struct PlayingMusicView: View {
                         PlayingView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                     }
                 Button(action: {
-                    isPlay.toggle()
+                    if music?.filePath != nil {
+                        isPlay.toggle()
+                    }
                 }, label: {
                     if isPlay {
                         Image(systemName: "pause.fill")

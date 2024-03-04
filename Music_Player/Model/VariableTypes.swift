@@ -25,6 +25,15 @@ struct Music: Codable, Hashable, Identifiable {
         self.fileSize = fileSize
         self.filePath = filePath
     }
+    
+    init() {
+        self.musicName = "曲名"
+        self.artistName = "アーティスト名"
+        self.albumName = "アルバム名"
+        self.editedDate = Date()
+        self.fileSize = "0MB"
+        self.filePath = "path"
+    }
 }
 
 class Artist: Identifiable {

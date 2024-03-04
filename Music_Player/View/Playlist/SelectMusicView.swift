@@ -60,7 +60,6 @@ struct SelectMusicView: View {
                                 if !isContain {
                                     musics.append(music)
                                 }
-                                print(musics)
                             }
                             let musicCount = musics.count
                             let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
