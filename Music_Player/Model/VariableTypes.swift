@@ -15,14 +15,16 @@ struct Music: Codable, Hashable, Identifiable {
     var albumName: String?
     var editedDate: Date?
     var fileSize: String?
+    var musicLength: TimeInterval?
     var filePath: String?
     
-    init(musicName: String, artistName: String?, albumName: String?, editedDate: Date?, fileSize: String?, filePath: String?) {
+    init(musicName: String, artistName: String?, albumName: String?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, filePath: String?) {
         self.musicName = musicName
         self.artistName = artistName
         self.albumName = albumName
         self.editedDate = editedDate
         self.fileSize = fileSize
+        self.musicLength = musicLength
         self.filePath = filePath
     }
     

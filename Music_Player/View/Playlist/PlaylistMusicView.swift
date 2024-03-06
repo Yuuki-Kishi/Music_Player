@@ -46,29 +46,7 @@ struct PlaylistMusicView: View {
                 }
             }
             List($listMusicArray) { $music in
-                let musicName = music.musicName
-                let artistName = music.artistName
-                let albumName = music.albumName
-                HStack {
-                    VStack {
-                        Text(musicName)
-                            .lineLimit(1)
-                            .font(.system(size: 20.0))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        HStack {
-                            Text(artistName!)
-                                .lineLimit(1)
-                                .font(.system(size: 12.5))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(albumName!)
-                                .lineLimit(1)
-                                .font(.system(size: 12.5))
-                                .frame(maxWidth: .infinity,alignment: .leading)
-                        }
-                    }
-                    Spacer()
-                    musicMenu(music: $music)
-                }
+                MusicCellView(mds: mds, pc: pc, music: music)
             }
             PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
@@ -147,66 +125,6 @@ struct PlaylistMusicView: View {
                 listMusicArray.sort {$0.musicName < $1.musicName}
             }
         }
-    }
-    func musicMenu(music: Binding<Music>) -> some View {
-        Menu {
-            Button(action: {testPrint()}) {
-                Label("プレイリストに追加", systemImage: "text.badge.plus")
-            }
-            Button(action: {testPrint()}) {
-                Label("ラブ", systemImage: "heart")
-            }
-            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
-                Label("曲の情報", systemImage: "info.circle")
-            })
-            Divider()
-            Button(action: {testPrint()}) {
-                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-            }
-            Button(action: {testPrint()}) {
-                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-            }
-            Divider()
-            Button(role: .destructive, action: {
-                deleteTarget = music.wrappedValue
-                let playlistIndex = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
-                var musics = playlistArray[playlistIndex].musics
-                let musicIndex = musics.firstIndex(where: {$0.filePath == deleteTarget?.filePath})!
-                musics.remove(at: musicIndex)
-                playlistArray[playlistIndex].musics = musics
-                playlistArray[playlistIndex].musicCount -= 1
-                selectMusics()
-            }, label: {
-                Label("プレイリストから削除", systemImage: "text.badge.minus")
-            })
-            Button(role: .destructive, action: {
-                isShowDeleteAlert = true
-                deleteTarget = music.wrappedValue
-            }) {
-                Label("ファイルを削除", systemImage: "trash")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .frame(width: 40, height: 40)
-                .foregroundStyle(Color.primary)
-        }
-        .alert("本当に削除しますか？", isPresented: $isShowDeleteAlert, actions: {
-            Button(role: .destructive, action: {
-                if let deleteTarget {
-                    Task {
-                        await mds.fileDelete(filePath: deleteTarget.filePath)
-                        
-                    }
-                }
-            }, label: {
-                Text("削除")
-            })
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-        }, message: {
-            Text("この操作は取り消すことができません。")
-        })
     }
     func testPrint() {
         print("敵影感知")

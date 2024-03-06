@@ -68,6 +68,7 @@ struct PlaylistView: View {
                                 let playlist = PlaylistData(playlistName: text)
                                 modelContext.insert(playlist)
                                 text = ""
+                                isShowAlert = false
                             }
                         }, message: {
                             Text("作成するプレイリストの名前を入力してください。")
@@ -104,6 +105,7 @@ struct PlaylistView: View {
                                 let playlist = PlaylistData(playlistName: text)
                                 modelContext.insert(playlist)
                                 text = ""
+                                isShowAlert = false
                             }
                         }, message: {
                             Text("作成するプレイリストの名前を入力してください。")

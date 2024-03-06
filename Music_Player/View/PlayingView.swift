@@ -44,11 +44,11 @@ struct PlayingView: View {
                 Spacer()
                 HStack {
                     VStack {
-                        Text("曲名")
+                        Text(pc.music?.musicName ?? "再生停止中")
                             .font(.system(size: 25).bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
-                        Text("アーティスト名")
+                        Text(pc.music?.artistName ?? "")
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)

@@ -72,24 +72,42 @@ final class FileService {
             let musicName = String(filePieces.last!.dropLast(4))
             filePieces.removeFirst()
             let filePath = "/" + filePieces.joined(separator: "/")
-            let music = await fileMetadata(musicName: musicName, filePath: filePath)
+            let music = await fileMetadata(fileName: musicName, filePath: filePath)
             musicArray.append(music)
         }
         return musicArray
     }
     
-    func fileMetadata(musicName: String, filePath: String) async -> Music {
+    func fileMetadata(fileName: String, filePath: String) async -> Music {
         let fileURL = URL(fileURLWithPath: filePath)
         let asset = AVAsset(url: fileURL)
-        guard let metadata = try? await asset.load(.commonMetadata) else { return Music(musicName: musicName, artistName: "不明", albumName: "不明", editedDate: Date(), fileSize: "0MB", filePath: filePath)}
+        guard let metadata = try? await asset.load(.commonMetadata) else { return Music(musicName: fileName, artistName: "不明", albumName: "不明", editedDate: Date(), fileSize: "0MB", musicLength: 0, filePath: filePath)}
+        let musicName = try? await metadata.first(where: {$0.commonKey == .commonKeyTitle})?.load(.stringValue)
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
         let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
-        var editedDate: Date?
-        var fileSize: String?
         let filePath = fileURL.path(percentEncoded: false)
+        let editedDate = getEditedDate(filePath: filePath)
+        let fileSize = getFileSize(filePath: filePath)
+        let musicLength = getMusicLength(fileURL: fileURL)
+        let music = Music(musicName: musicName!, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, fileSize: fileSize!, musicLength: musicLength, filePath: filePath)
+        return music
+    }
+    
+    func getEditedDate(filePath: String) -> Date? {
+        var editedDate: Date?
         do {
             let attributes:[FileAttributeKey:Any] = try fileManager.attributesOfItem(atPath: filePath)
             editedDate = attributes[FileAttributeKey.modificationDate] as? Date
+        } catch {
+            print(error)
+        }
+        return editedDate
+    }
+    
+    func getFileSize(filePath: String) -> String? {
+        var fileSize: String?
+        do {
+            let attributes:[FileAttributeKey:Any] = try fileManager.attributesOfItem(atPath: filePath)
             if let bytes = attributes[.size] as? Int64 {
                 let bcf = ByteCountFormatter()
                 bcf.allowedUnits = [.useAll]
@@ -99,8 +117,13 @@ final class FileService {
         } catch {
             print(error)
         }
-        let music = Music(musicName: musicName, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, fileSize: fileSize!, filePath: filePath)
-        return music
+        return fileSize
+    }
+    
+    func getMusicLength(fileURL: URL) -> TimeInterval? {
+        let audioPlayer: AVAudioPlayer = try! AVAudioPlayer(contentsOf: fileURL)
+        let duration = audioPlayer.duration
+        return duration
     }
     
     func fileDelete(filePath: String?) {

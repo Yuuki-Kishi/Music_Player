@@ -47,7 +47,9 @@ class PlayController: ObservableObject {
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
             audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
             // 再生準備
-            playerNode.scheduleFile(audioFile, at: nil)
+            playerNode.scheduleFile(audioFile, at: nil) {
+                
+            }
             return true
         }
         catch let error {

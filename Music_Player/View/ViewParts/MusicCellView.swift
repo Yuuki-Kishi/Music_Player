@@ -1,53 +1,64 @@
 //
-//  AlbumMusicView.swift
+//  MusicCellView.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/02/24.
+//  Created by 岸　優樹 on 2024/03/06.
 //
 
 import SwiftUI
 
-struct AlbumMusicView: View {
+struct MusicCellView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Binding private var listMusicArray: [Music]
-    @State private var navigationTitle: String
+    @State var music: Music
     @State private var isShowAlert = false
     @State private var deleteTarget: Music?
-    @Environment(\.presentationMode) var presentation
     
-    init(mds: MusicDataStore, pc: PlayController, listMusicArray: Binding<[Music]>, navigationTitle: String) {
+    init(mds: MusicDataStore, pc: PlayController, music: Music) {
         self.mds = mds
         self.pc = pc
-        self._listMusicArray = listMusicArray
-        _navigationTitle = State(initialValue: navigationTitle)
+        _music = State(initialValue: music)
     }
     
     var body: some View {
-        VStack {
-            ZStack {
+        HStack {
+            VStack {
+                Text(music.musicName)
+                    .lineLimit(1)
+                    .font(.system(size: 20.0))
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
-                    Button(action: testPrint){
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                        Spacer()
-                    }
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal)
+                    Text(music.artistName!)
+                        .lineLimit(1)
+                        .font(.system(size: 12.5))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundStyle(Color.gray)
+                    Text(music.albumName!)
+                        .lineLimit(1)
+                        .font(.system(size: 12.5))
+                        .frame(maxWidth: .infinity,alignment: .leading)
+                        .foregroundStyle(Color.gray)
                 }
             }
-            List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, music: music)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                pc.setMusic(music: music)
+                pc.setScheduleFile()
+                pc.isPlay = true
             }
-            .navigationTitle(navigationTitle)
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .onAppear() {
-                mds.collectAlbumMusic(album: navigationTitle)
-            }
-            PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+            Spacer()
+            Text(secToMin(second:music.musicLength!))
+                .foregroundStyle(Color.gray)
+            musicMenu(music: $music)
         }
+    }
+    func secToMin(second: TimeInterval) -> String {
+        let dateFormatter = DateComponentsFormatter()
+        dateFormatter.unitsStyle = .positional
+        if second < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
+        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
+        dateFormatter.zeroFormattingBehavior = .pad
+        return dateFormatter.string(from: second)!
     }
     func musicMenu(music: Binding<Music>) -> some View {
         Menu {
@@ -83,7 +94,7 @@ struct AlbumMusicView: View {
             Button(role: .destructive, action: {
                 if let deleteTarget {
                     Task {
-                        await deleteFile(deleteTarget: deleteTarget)
+                        await mds.fileDelete(filePath: deleteTarget.filePath)
                     }
                 }
             }, label: {
@@ -93,20 +104,10 @@ struct AlbumMusicView: View {
                 Text("キャンセル")
             })
         }, message: {
-            Text("この操作は取り消すことができません。")
+                Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
         })
     }
-    func deleteFile(deleteTarget: Music) async {
-        await mds.fileDelete(filePath: deleteTarget.filePath)
-        mds.collectAlbumMusic(album: navigationTitle)
-        let index = mds.albumArray.firstIndex(where: {$0.albumName == navigationTitle})!
-        mds.albumArray[index].musicCount -= 1
-        if mds.albumArray[index].musicCount == 0 {
-            mds.albumArray.remove(at: index)
-            self.presentation.wrappedValue.dismiss()
-        }
-    }
     func testPrint() {
-        print("敵影感知")
+        print("OK")
     }
 }

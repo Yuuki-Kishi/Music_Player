@@ -39,36 +39,7 @@ struct MusicView: View {
                     }
                     .padding(.horizontal)
                     List($musicArray) { $music in
-                        let musicName = music.musicName
-                        let artistName = music.artistName!
-                        let albumName = music.albumName!
-                        HStack {
-                            VStack {
-                                Text(musicName)
-                                    .lineLimit(1)
-                                    .font(.system(size: 20.0))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                HStack {
-                                    Text(artistName)
-                                        .lineLimit(1)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    Text(albumName)
-                                        .lineLimit(1)
-                                        .font(.system(size: 12.5))
-                                        .frame(maxWidth: .infinity,alignment: .leading)
-                                }
-                            }
-                            Spacer()
-                            musicMenu(music: $music)
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            print("セルタップ")
-                            pc.setMusic(music: music)
-                            pc.setScheduleFile()
-                            pc.isPlay = true
-                        }
+                        MusicCellView(mds: mds, pc: pc, music: music)
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
@@ -123,53 +94,6 @@ struct MusicView: View {
                 }
             }
         }
-    }
-    func musicMenu(music: Binding<Music>) -> some View {
-        Menu {
-            Button(action: {testPrint()}) {
-                Label("プレイリストに追加", systemImage: "text.badge.plus")
-            }
-            Button(action: {testPrint()}) {
-                Label("ラブ", systemImage: "heart")
-            }
-            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
-                Label("曲の情報", systemImage: "info.circle")
-            })
-            Divider()
-            Button(action: {testPrint()}) {
-                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-            }
-            Button(action: {testPrint()}) {
-                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-            }
-            Divider()
-            Button(role: .destructive, action: {
-                isShowAlert = true
-                deleteTarget = music.wrappedValue
-            }) {
-                Label("ファイルを削除", systemImage: "trash")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(Color.primary)
-                .frame(width: 40, height: 40)
-        }
-        .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
-            Button(role: .destructive, action: {
-                if let deleteTarget {
-                    Task {
-                        await mds.fileDelete(filePath: deleteTarget.filePath)
-                    }
-                }
-            }, label: {
-                Text("削除")
-            })
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-        }, message: {
-                Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
-        })
     }
     func testPrint() {
         print("すべて再生")
