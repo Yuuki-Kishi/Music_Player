@@ -30,13 +30,11 @@ struct ArtistView: View {
                 }
                 .padding(.horizontal)
                 List($artistArray) { artist in
-                    let artistName = artist.artistName.wrappedValue
-                    let musicCount = artist.musicCount.wrappedValue
-                    NavigationLink(value: artistName, label: {
+                    NavigationLink(value: artist.artistName.wrappedValue, label: {
                         HStack {
-                            Text(artistName)
+                            Text(artist.artistName.wrappedValue)
                             Spacer()
-                            Text(String(musicCount) + "曲")
+                            Text(String(artist.musicCount.wrappedValue) + "曲")
                                 .foregroundStyle(Color.gray)
                         }
                     })

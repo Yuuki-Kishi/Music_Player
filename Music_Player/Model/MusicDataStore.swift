@@ -26,6 +26,9 @@ class MusicDataStore: ObservableObject {
     enum albumSortMode {
         case nameAscending, nameDescending, countAscending, countDescending
     }
+    enum folderSortMode {
+        case nameAscending, nameDescending, countAscending, countDescending
+    }
     
     func getFile() async {
         musicArray = []
@@ -83,6 +86,18 @@ class MusicDataStore: ObservableObject {
         }
     }
     
+    func collectFolderMusic(folder: String) {
+        listMusicArray = []
+        for music in musicArray {
+            let filePath = music.filePath
+            let fileURL = URL(filePath: filePath!)
+            var pathPeces = fileURL.pathComponents
+            pathPeces.removeLast()
+            let directoryName = pathPeces.last
+            if directoryName == folder { listMusicArray.append(music)}
+        }
+    }
+    
     func fileDelete(filePath: String?) async {
         fileService.fileDelete(filePath: filePath)
         musicArray = []
@@ -128,6 +143,19 @@ class MusicDataStore: ObservableObject {
             albumArray.sort {$0.musicCount < $1.musicCount}
         case .countDescending:
             albumArray.sort {$0.musicCount > $1.musicCount}
+        }
+    }
+    
+    func folderSort(method: folderSortMode) {
+        switch method {
+        case .nameAscending:
+            folderArray.sort {$0.folderName < $1.folderName}
+        case .nameDescending:
+            folderArray.sort {$0.folderName > $1.folderName}
+        case .countAscending:
+            folderArray.sort {$0.musicCount < $1.musicCount}
+        case .countDescending:
+            folderArray.sort {$0.musicCount > $1.musicCount}
         }
     }
 }

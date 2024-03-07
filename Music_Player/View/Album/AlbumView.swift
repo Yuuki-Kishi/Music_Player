@@ -30,13 +30,11 @@ struct AlbumView: View {
                     Spacer()
                 }
                 List($albumArray) { album in
-                    let albumName = album.albumName.wrappedValue
-                    let musicCount = album.musicCount.wrappedValue
-                    NavigationLink(value: albumName, label: {
+                    NavigationLink(value: album.albumName.wrappedValue, label: {
                         HStack {
-                            Text(albumName)
+                            Text(album.albumName.wrappedValue)
                             Spacer()
-                            Text(String(musicCount) + "曲")
+                            Text(String(album.musicCount.wrappedValue) + "曲")
                                 .foregroundStyle(Color.gray)
                         }
                     })

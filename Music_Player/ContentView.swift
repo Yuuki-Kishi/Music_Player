@@ -42,6 +42,13 @@ struct ContentView: View {
                         Text("プレイリスト")
                     }
                 }
+            FolderView(mds: mds, pc: pc, folderArray: $mds.folderArray)
+                .tabItem {
+                    VStack {
+                        Image(systemName: "folder.fill")
+                        Text("フォルダ")
+                    }
+                }
         }.accentColor(.purple)
     }
 }

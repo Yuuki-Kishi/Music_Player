@@ -72,7 +72,8 @@ class Playlist {
     }
 }
 
-class Folder {
+class Folder: Identifiable {
+    var id = UUID()
     var folderName: String
     var musicCount: Int
     var folderPath: String

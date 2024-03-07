@@ -34,13 +34,11 @@ struct PlaylistView: View {
                     Spacer()
                 }
                 List(playlistArray) { playlist in
-                    let playlistName = playlist.playlistName
-                    let musicCount = playlist.musicCount
                     NavigationLink(value: playlist, label: {
                         HStack {
-                            Text(playlistName)
+                            Text(playlist.playlistName)
                             Spacer()
-                            Text(String(musicCount) + "曲")
+                            Text(String(playlist.musicCount) + "曲")
                                 .foregroundStyle(Color.gray)
                         }
                     })
@@ -56,66 +54,24 @@ struct PlaylistView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
-                    if playlistArray.isEmpty {
-                        Button(action: { isShowAlert.toggle() }, label: {
-                            Image(systemName: "plus")
-                        })
-                        .alert("プレイリストを作成する", isPresented: $isShowAlert, actions: {
-                            TextField("プレイリスト名", text: $text)
-                            
-                            Button("キャンセル", role: .cancel) {}
-                            Button("作成") {
-                                let playlist = PlaylistData(playlistName: text)
-                                modelContext.insert(playlist)
-                                text = ""
-                                isShowAlert = false
-                            }
-                        }, message: {
-                            Text("作成するプレイリストの名前を入力してください。")
-                        })
-                    } else {
-                        Menu {
-                            Button(action: { isShowAlert.toggle() }, label: {
-                                Label("プレイリストを作成", systemImage: "plus")
-                            })
-                            Menu {
-                                Button(action: { mds.albumSort(method: .nameAscending) }, label: {
-                                    Text("アルバム名昇順")
-                                })
-                                Button(action: { mds.albumSort(method: .nameDescending) }, label: {
-                                    Text("アルバム名降順")
-                                })
-                                Button(action: { mds.albumSort(method: .countAscending) }, label: {
-                                    Text("曲数昇順")
-                                })
-                                Button(action: { mds.albumSort(method: .countDescending) }, label: {
-                                    Text("曲数降順")
-                                })
-                            } label: {
-                                Label("並び替え", systemImage: "arrow.up.arrow.down")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
+                    Button(action: { isShowAlert.toggle() }, label: {
+                        Image(systemName: "plus")
+                    })
+                    .alert("プレイリストを作成する", isPresented: $isShowAlert, actions: {
+                        TextField("プレイリスト名", text: $text)
+                        
+                        Button("キャンセル", role: .cancel) {}
+                        Button("作成") {
+                            let playlist = PlaylistData(playlistName: text)
+                            modelContext.insert(playlist)
+                            text = ""
+                            isShowAlert = false
                         }
-                        .alert("プレイリストを作成する", isPresented: $isShowAlert, actions: {
-                            TextField("プレイリスト名", text: $text)
-                            
-                            Button("キャンセル", role: .cancel) {}
-                            Button("作成") {
-                                let playlist = PlaylistData(playlistName: text)
-                                modelContext.insert(playlist)
-                                text = ""
-                                isShowAlert = false
-                            }
-                        }, message: {
-                            Text("作成するプレイリストの名前を入力してください。")
-                        })
-                    }
+                    }, message: {
+                        Text("作成するプレイリストの名前を入力してください。")
+                    })
                 })
             }
-        }
-        .onAppear {
-            
         }
     }
 }
