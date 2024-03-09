@@ -60,7 +60,7 @@ struct AlbumView: View {
                                 Text("曲数降順")
                             })
                         } label: {
-                            Image(systemName: "ellipsis.circle")
+                            Image(systemName: "arrow.up.arrow.down.circle")
                         }
                     })
                 }

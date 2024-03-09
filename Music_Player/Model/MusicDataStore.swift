@@ -43,7 +43,7 @@ class MusicDataStore: ObservableObject {
     func artistSelection() {
         artistArray = []
         for music in musicArray {
-            let artistName = music.artistName!
+            let artistName = music.artistName ?? "不明なアーティスト"
             let contain = artistArray.contains(where: {$0.artistName == artistName})
             if contain {
                 let index = artistArray.firstIndex(where: {$0.artistName == artistName})!
@@ -66,13 +66,13 @@ class MusicDataStore: ObservableObject {
     func albumSelection() {
         albumArray = []
         for music in musicArray {
-            let albumName = music.albumName
+            let albumName = music.albumName ?? "不明なアルバム"
             let contain = albumArray.contains(where: {$0.albumName == albumName})
             if contain {
                 let index = albumArray.firstIndex(where: {$0.albumName == albumName})!
                 albumArray[index].musicCount += 1
             } else {
-                let artist = Album(albumName: albumName!, musicCount: 1)
+                let artist = Album(albumName: albumName, musicCount: 1)
                 albumArray.append(artist)
             }
         }

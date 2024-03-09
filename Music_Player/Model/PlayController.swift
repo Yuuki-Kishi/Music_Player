@@ -59,10 +59,10 @@ class PlayController: ObservableObject {
         }
     }
     
-    func setScheduleFile() -> Bool {
+    func setScheduleFile() {
         // 楽曲のURLを取得する
         // currentItem.itemはMPMediaItemクラス
-        guard let filePath = music?.filePath else { return false }
+        guard let filePath = music?.filePath else { return }
         let assetURL = URL(fileURLWithPath: filePath)
         do {
             // Source fileを取得する
@@ -71,13 +71,14 @@ class PlayController: ObservableObject {
             audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
             // 再生準備
             playerNode.scheduleFile(audioFile, at: nil) {
-                self.moveNextMusic()
+                DispatchQueue.main.async {
+                    self.moveNextMusic()
+                }
             }
-            return true
         }
         catch let error {
             print(error.localizedDescription)
-            return false
+            return
         }
     }
     
