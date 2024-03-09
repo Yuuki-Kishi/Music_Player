@@ -64,7 +64,7 @@ struct FolderView: View {
                             Text("曲数降順")
                         })
                     } label: {
-                        Label("並び替え", systemImage: "ellipsis.circle")
+                        Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
                     }
                 })
             }
