@@ -49,63 +49,6 @@ struct AlbumMusicView: View {
             PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
     }
-    func musicMenu(music: Binding<Music>) -> some View {
-        Menu {
-            Button(action: {testPrint()}) {
-                Label("プレイリストに追加", systemImage: "text.badge.plus")
-            }
-            Button(action: {testPrint()}) {
-                Label("ラブ", systemImage: "heart")
-            }
-            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
-                Label("曲の情報", systemImage: "info.circle")
-            })
-            Divider()
-            Button(action: {testPrint()}) {
-                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-            }
-            Button(action: {testPrint()}) {
-                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-            }
-            Divider()
-            Button(role: .destructive, action: {
-                isShowAlert = true
-                deleteTarget = music.wrappedValue
-            }) {
-                Label("ファイルを削除", systemImage: "trash")
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(Color.primary)
-                .frame(width: 40, height: 40)
-        }
-        .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
-            Button(role: .destructive, action: {
-                if let deleteTarget {
-                    Task {
-                        await deleteFile(deleteTarget: deleteTarget)
-                    }
-                }
-            }, label: {
-                Text("削除")
-            })
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-        }, message: {
-            Text("この操作は取り消すことができません。")
-        })
-    }
-    func deleteFile(deleteTarget: Music) async {
-        await mds.fileDelete(filePath: deleteTarget.filePath)
-        mds.collectAlbumMusic(album: navigationTitle)
-        let index = mds.albumArray.firstIndex(where: {$0.albumName == navigationTitle})!
-        mds.albumArray[index].musicCount -= 1
-        if mds.albumArray[index].musicCount == 0 {
-            mds.albumArray.remove(at: index)
-            self.presentation.wrappedValue.dismiss()
-        }
-    }
     func testPrint() {
         print("敵影感知")
     }

@@ -52,20 +52,7 @@ struct SelectMusicView: View {
                             }
                         })
                         Button(action: {
-                            let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
-                            let playlistName = playlistArray[index].playlistName
-                            var musics = playlistArray[index].musics
-                            for music in selectionValue {
-                                let isContain = musics.contains(where: {$0 == music})
-                                if !isContain {
-                                    musics.append(music)
-                                }
-                            }
-                            let musicCount = musics.count
-                            let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
-                            modelContext.delete(playlistArray[index])
-                            modelContext.insert(playlist)
-                            presentation.wrappedValue.dismiss()
+                            addMusics()
                         }, label: {
                             Text("完了")
                         })
@@ -73,5 +60,21 @@ struct SelectMusicView: View {
                 })
             }
         }
+    }
+    func addMusics() {
+        let index = playlistArray.firstIndex(where: {$0.playlistId == playlistId})!
+        let playlistName = playlistArray[index].playlistName
+        var musics = playlistArray[index].musics
+        for music in selectionValue {
+            let isContain = musics.contains(where: {$0 == music})
+            if !isContain {
+                musics.append(music)
+            }
+        }
+        let musicCount = musics.count
+        let playlist = PlaylistData(playlistId: playlistId, playlistName: playlistName, musicCount: musicCount, musics: musics)
+        modelContext.delete(playlistArray[index])
+        modelContext.insert(playlist)
+        presentation.wrappedValue.dismiss()
     }
 }

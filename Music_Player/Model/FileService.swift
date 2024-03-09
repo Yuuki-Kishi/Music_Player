@@ -89,7 +89,7 @@ final class FileService {
         let editedDate = getEditedDate(filePath: filePath)
         let fileSize = getFileSize(filePath: filePath)
         let musicLength = getMusicLength(fileURL: fileURL)
-        let music = Music(musicName: musicName!, artistName: artistName!, albumName: albumName!, editedDate: editedDate!, fileSize: fileSize!, musicLength: musicLength, filePath: filePath)
+        let music = Music(musicName: musicName ?? "不明な曲", artistName: artistName ?? "不明なアーティスト", albumName: albumName ?? "不明なアルバム", editedDate: editedDate ?? Date(), fileSize: fileSize ?? "不明なサイズ", musicLength: musicLength, filePath: filePath)
         return music
     }
     
