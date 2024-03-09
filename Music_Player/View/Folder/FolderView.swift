@@ -40,7 +40,7 @@ struct FolderView: View {
                     })
                 }
                 .navigationDestination(for: String.self) { title in
-                    FolderMusicView(folderName: title)
+                    FolderMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, navigationTitle: title)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)

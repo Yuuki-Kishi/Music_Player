@@ -42,8 +42,10 @@ struct MusicCellView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
+                pc.stop()
                 pc.setMusic(music: music)
                 pc.setScheduleFile()
+                pc.setNextMusics(playMode: .shuffle, musicArray: mds.musicArray)
                 pc.isPlay = true
             }
             Spacer()
