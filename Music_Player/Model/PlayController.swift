@@ -68,7 +68,7 @@ class PlayController: ObservableObject {
             // Source fileを取得する
             let audioFile = try AVAudioFile(forReading: assetURL)
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
-            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)//ここで落ちる
             // 再生準備
             playerNode.scheduleFile(audioFile, at: nil) {
                 self.moveNextMusic()
