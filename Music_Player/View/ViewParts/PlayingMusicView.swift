@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct PlayingMusicView: View {
+    @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Binding private var music: Music?
     @Binding private var seekPosition: Double
     @Binding private var isPlay: Bool
     @State private var showSheet = false
     
-    init(pc: PlayController, music: Binding<Music?>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(mds: MusicDataStore, pc: PlayController, music: Binding<Music?>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+        self.mds = mds
         self.pc = pc
         self._music = music
         self._seekPosition = seekPosition
@@ -24,7 +26,7 @@ struct PlayingMusicView: View {
     var body: some View {
         ZStack {
             VStack {
-                ProgressView(value: seekPosition, total: 1)
+                ProgressView(value: seekPosition, total: Double(music?.musicLength ?? 300))
                     .progressViewStyle(LinearProgressViewStyle(tint: Color.purple))
                 HStack {
                     VStack {
@@ -43,6 +45,18 @@ struct PlayingMusicView: View {
                                 .frame(maxWidth: .infinity,alignment: .leading)
                         }
                     }
+                    Button(action: {}, label: {
+                        Image(systemName: "play.fill")
+                                .padding(14)
+                    })
+                    .font(.system(size: 25.0))
+                    .foregroundStyle(.clear)
+                    Button(action: {}){
+                        Image(systemName: "forward.fill")
+                            .padding(.vertical, 14)
+                    }
+                    .foregroundStyle(.clear)
+                    .font(.system(size: 25.0))
                 }
             }
             HStack(spacing: 0){
@@ -54,11 +68,13 @@ struct PlayingMusicView: View {
                         showSheet.toggle()
                     }
                     .fullScreenCover(isPresented: $showSheet) {
-                        PlayingView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                        PlayingView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                     }
                 Button(action: {
                     if music?.filePath != nil {
                         isPlay.toggle()
+                    } else {
+                        pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray)
                     }
                 }, label: {
                     if isPlay {
@@ -72,7 +88,7 @@ struct PlayingMusicView: View {
                 .font(.system(size: 25.0))
                 .foregroundStyle(.primary)
                 Button(action: {
-                    
+                    pc.moveNextMusic()
                 }){
                     Image(systemName: "forward.fill")
                         .padding(.vertical, 14)

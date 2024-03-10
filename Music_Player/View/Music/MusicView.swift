@@ -28,7 +28,9 @@ struct MusicView: View {
                 VStack {
                     ZStack {
                         HStack {
-                            Button(action: testPrint){
+                            Button(action: {
+                                pc.musicChoosed(music: musicArray[Int.random(in: 0 ..< musicArray.count)], musicArray: musicArray)
+                            }){
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.purple)
                                 Text("すべて再生 " + String(musicArray.count) + "曲")
@@ -43,7 +45,7 @@ struct MusicView: View {
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
-                    PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                    PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                 }
                 if isShowsProgressView {
                     ProgressView()

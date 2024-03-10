@@ -21,8 +21,11 @@ struct FolderMusicView: View {
     }
     
     var body: some View {
-        List($listMusicArray) { $folder in
-            MusicCellView(mds: mds, pc: pc, music: folder)
+        VStack {
+            List($listMusicArray) { $folder in
+                MusicCellView(mds: mds, pc: pc, music: folder)
+            }
+            PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .onAppear() {
             mds.collectFolderMusic(folder: navigationTitle)

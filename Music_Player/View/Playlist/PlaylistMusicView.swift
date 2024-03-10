@@ -48,7 +48,7 @@ struct PlaylistMusicView: View {
             List($listMusicArray) { $music in
                 MusicCellView(mds: mds, pc: pc, music: music)
             }
-            PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+            PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .navigationTitle(navigationTitle)
         .listStyle(.plain)

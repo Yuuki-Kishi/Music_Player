@@ -44,7 +44,7 @@ struct FolderView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("フォルダ")
             .navigationBarTitleDisplayMode(.inline)

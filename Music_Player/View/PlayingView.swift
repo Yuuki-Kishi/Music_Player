@@ -8,14 +8,16 @@
 import SwiftUI
 
 struct PlayingView: View {
+    @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Binding public var music: Music?
-    @Binding private var seekPosition: Double
+    @Binding private var seekPosition: TimeInterval
     @Binding private var isPlay: Bool
     @State private var toMusicInfo = false
     @Environment(\.presentationMode) var presentation
     
-    init(pc: PlayController, music: Binding<Music?>, seekPosition: Binding<Double>, isPlay: Binding<Bool>) {
+    init(mds: MusicDataStore, pc: PlayController, music: Binding<Music?>, seekPosition: Binding<TimeInterval>, isPlay: Binding<Bool>) {
+        self.mds = mds
         self.pc = pc
         self._music = music
         self._seekPosition = seekPosition
@@ -45,10 +47,12 @@ struct PlayingView: View {
                 HStack {
                     VStack {
                         Text(pc.music?.musicName ?? "再生停止中")
+                            .lineLimit(1)
                             .font(.system(size: 25).bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                         Text(pc.music?.artistName ?? "")
+                            .lineLimit(1)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
@@ -87,15 +91,15 @@ struct PlayingView: View {
                 }
                 .padding(.horizontal)
                 Spacer()
-                Slider(value: $seekPosition)
+                Slider(value: $seekPosition, in: 0 ... (music?.musicLength ?? 300))
                     .tint(.purple)
                     .padding(.horizontal)
                 HStack {
-                    Text(String(seekPosition))
+                    Text(secToMin(sec: seekPosition))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text(String(seekPosition - 1))
+                    Text(secToMin(sec: seekPosition - (music?.musicLength ?? 300)))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                 }
@@ -141,6 +145,8 @@ struct PlayingView: View {
                     Button(action: {
                         if music?.filePath != nil {
                             isPlay.toggle()
+                        } else {
+                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray)
                         }
                     }, label: {
                         if isPlay {
@@ -153,7 +159,7 @@ struct PlayingView: View {
                     .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        
+                        pc.moveNextMusic()
                     }, label: {
                         Image(systemName: "forward.fill")
                     })
@@ -164,6 +170,14 @@ struct PlayingView: View {
                 Spacer()
             }.padding()
         }
+    }
+    func secToMin(sec: TimeInterval) -> String {
+        let dateFormatter = DateComponentsFormatter()
+        dateFormatter.unitsStyle = .positional
+        if sec < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
+        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
+        dateFormatter.zeroFormattingBehavior = .pad
+        return dateFormatter.string(from: sec)!
     }
     func testPrint() {
         print("tapped")
