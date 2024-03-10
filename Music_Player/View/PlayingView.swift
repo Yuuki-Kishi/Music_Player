@@ -172,6 +172,7 @@ struct PlayingView: View {
         }
     }
     func secToMin(sec: TimeInterval) -> String {
+        //commit用
         let dateFormatter = DateComponentsFormatter()
         dateFormatter.unitsStyle = .positional
         if sec < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
