@@ -91,7 +91,12 @@ struct PlayingView: View {
                 }
                 .padding(.horizontal)
                 Spacer()
-                Slider(value: $seekPosition, in: 0 ... (music?.musicLength ?? 300))
+                Slider(value: $seekPosition, in: 0 ... (music?.musicLength ?? 300), onEditingChanged: { bool in
+                    if !bool {
+                        pc.setSeek()
+                        
+                    }
+                })
                     .tint(.purple)
                     .padding(.horizontal)
                 HStack {
@@ -107,10 +112,8 @@ struct PlayingView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Button(action: {
-                        
-                    }, label: {
-                        Image(systemName: "shuffle")
+                    Button(action: {pc.changePlayMode()}, label: {
+                        Image(systemName: playModeImage())
                     })
                     .foregroundStyle(.purple)
                     Spacer()
@@ -172,13 +175,23 @@ struct PlayingView: View {
         }
     }
     func secToMin(sec: TimeInterval) -> String {
-        //commit用
         let dateFormatter = DateComponentsFormatter()
         dateFormatter.unitsStyle = .positional
         if sec < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
         else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
         dateFormatter.zeroFormattingBehavior = .pad
         return dateFormatter.string(from: sec)!
+    }
+    func playModeImage() -> String {
+        let playMode = pc.loadPlayMode()
+        switch playMode {
+        case .shuffle:
+            return "shuffle"
+        case .order:
+            return "repeat"
+        case .sameRepeat:
+            return "repeat.1"
+        }
     }
     func testPrint() {
         print("tapped")

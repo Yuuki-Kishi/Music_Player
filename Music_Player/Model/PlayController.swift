@@ -13,6 +13,7 @@ class PlayController: ObservableObject {
     static let shared = PlayController()
     private let audioEngine: AVAudioEngine = .init()
     private let playerNode: AVAudioPlayerNode = .init()
+    private var cachedSeekBarSeconds = 0.0
     @Published var didPlayMusics = [Music]()
     @Published var willPlayMusics = [Music]()
     @Published var music: Music? = nil
@@ -27,11 +28,12 @@ class PlayController: ObservableObject {
             }
         }
     }
-    @Published var isAutoProceduleOn: Bool = true
-    enum playModeEnum {
-        case shuffle, order, sameRepeat
+    @Published var timer: Timer!
+    enum playModeEnum: String {
+        case shuffle
+        case order
+        case sameRepeat
     }
-    var timer: Timer!
     
     init() {
         // 接続するオーディオノードをAudioEngineにアタッチする
@@ -59,6 +61,7 @@ class PlayController: ObservableObject {
         case .sameRepeat:
             break
         }
+//        UserDefaults.standard.setValue(playModeEnum.rawValue, forKey: "playMode")
     }
     
     func setScheduleFile() {
@@ -72,13 +75,13 @@ class PlayController: ObservableObject {
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
             audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
             // 再生準備
-            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered) { _ in
-                if self.isAutoProceduleOn {
-                    DispatchQueue.main.async {
-                        self.moveNextMusic()
-                    }
-                }
-            }
+            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered) /*{ _ in*/
+//                if self.isEndOfFile() ?? false {
+//                    DispatchQueue.main.async {
+//                        self.moveNextMusic()
+//                    }
+//                }
+//            }
         }
         catch let error {
             print(error.localizedDescription)
@@ -86,21 +89,22 @@ class PlayController: ObservableObject {
         }
     }
     
-    func isEndOfFile() -> Bool? {
-        guard let filePath = music?.filePath else { return nil }
+    func isEndOfFile() {
+        guard let filePath = music?.filePath else { return }
         let assetURL = URL(fileURLWithPath: filePath)
-        guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return nil }
+        guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
         //ファイルの長さ
-        let fileDuration = Double(audioFile.length) / audioFile.fileFormat.sampleRate
+        let fileDuration = Double(music?.musicLength ?? 300)
         //現在再生している時間
-        guard let nodeTime = playerNode.lastRenderTime else { return nil }
-        guard let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else { return nil }
-        let currentTime = Double(playerTime.sampleRate) / Double(playerTime.sampleTime)
+        guard let nodeTime = playerNode.lastRenderTime else { return }
+        guard let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else { return }
+        let currentTime = (Double(playerTime.sampleTime) / Double(playerTime.sampleRate)) + cachedSeekBarSeconds
         
         if currentTime >= fileDuration {
-            return true
+            self.moveNextMusic()
+            return
         } else {
-            return false
+            return
         }
     }
     
@@ -113,12 +117,35 @@ class PlayController: ObservableObject {
         let sampleRate = playerTime.sampleRate
         let sampleTime = playerTime.sampleTime
         // 秒数を取得し保持する ④
-        let time = Double(sampleTime) / sampleRate
+        let time = Double(sampleTime) / sampleRate + cachedSeekBarSeconds
+        isEndOfFile()
         seekPosition = time
     }
     
+    func setSeek() {
+        let time = seekPosition
+        guard let filePath = music?.filePath else { return }
+        let assetURL = URL(fileURLWithPath: filePath)
+        guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
+        // サンプルレートを取得する
+        let sampleRate = audioFile.processingFormat.sampleRate
+        // 変更する秒数のSampleTimeを取得する
+        let startSampleTime = AVAudioFramePosition(sampleRate * time)
+        // 変更した後の曲の残り時間とそのSampleTimeを取得する(曲の秒数-変更する秒数)
+        let length = music?.musicLength ?? 300 - time
+        let remainSampleTime = AVAudioFrameCount(length * Double(sampleRate))
+        // 変更した秒数をキャッシュしておく
+        cachedSeekBarSeconds = Double(time)
+        // 変更した秒数から曲を再生し直すため、AudioEngineとPlayerNodeを停止する
+        stop()
+        // 曲の再生秒数の変更メソッド
+        playerNode.scheduleSegment(audioFile, startingFrame: startSampleTime, frameCount: remainSampleTime, at: nil)
+        // 停止状態なので再生する
+        isPlay = true
+    }
+    
     func setTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { (timer) in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: {_ in
             self.updateSeekPosition()
         })
     }
@@ -146,14 +173,19 @@ class PlayController: ObservableObject {
     
     func moveNextMusic() {
         seekPosition = 0.0
+        cachedSeekBarSeconds = 0.0
         if let music = willPlayMusics.first {
-            isAutoProceduleOn = isEndOfFile() ?? false
-            setMusic(music: music)
-            willPlayMusics.removeFirst()
-            setScheduleFile()
-            isPlay = true
-            setTimer()
-            isAutoProceduleOn = true
+            if loadPlayMode() != .sameRepeat {
+                setMusic(music: music)
+                willPlayMusics.removeFirst()
+                setScheduleFile()
+                isPlay = true
+                setTimer()
+            } else {
+                setScheduleFile()
+                isPlay = true
+                setTimer()
+            }
         } else {
             music = nil
             stop()
@@ -162,12 +194,53 @@ class PlayController: ObservableObject {
     }
     
     func musicChoosed(music: Music, musicArray: [Music]) {
-        isAutoProceduleOn = isEndOfFile() ?? false
         setMusic(music: music)
         setScheduleFile()
         setNextMusics(playMode: .shuffle, musicArray: musicArray)
         isPlay = true
         setTimer()
-        isAutoProceduleOn = true
+    }
+    
+    func changePlayMode() {
+        let nowPlayMode = loadPlayMode()
+        switch nowPlayMode {
+        case .shuffle:
+            savePlayMode(playMode: .order)
+            willPlayMusics.sort {$0.musicName < $1.musicName}
+        case .order:
+            savePlayMode(playMode: .sameRepeat)
+            break
+        case .sameRepeat:
+            savePlayMode(playMode: .shuffle)
+            willPlayMusics.shuffle()
+        }
+    }
+    
+    func savePlayMode(playMode: playModeEnum) {
+        let userDefaults = UserDefaults.standard
+        switch playMode {
+        case .shuffle:
+            userDefaults.setValue("shuffle", forKey: "playMode")
+        case .order:
+            userDefaults.setValue("order", forKey: "playMode")
+        case .sameRepeat:
+            userDefaults.setValue("sameRepeat", forKey: "playMode")
+        }
+    }
+    
+    func loadPlayMode() -> playModeEnum {
+        let saveData = UserDefaults.standard.string(forKey: "playMode") ?? "shuffle"
+        var playMode: playModeEnum = .shuffle
+        switch saveData {
+        case "shuffle":
+            playMode = .shuffle
+        case "order":
+            playMode = .order
+        case "sameRepeat":
+            playMode = .sameRepeat
+        default:
+            break
+        }
+        return playMode
     }
 }
