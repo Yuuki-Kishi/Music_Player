@@ -29,7 +29,7 @@ struct SelectMusicView: View {
         VStack {
             List(selection: $selectionValue) {
                 ForEach(musicArray, id: \.self) { music in
-                    Text(music.musicName)
+                    Text(music.musicName!)
                 }
             }
             .environment(\.editMode, .constant(.active))

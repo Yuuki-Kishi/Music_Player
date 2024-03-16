@@ -6,15 +6,22 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct PlayingView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Binding public var music: Music?
     @Binding private var seekPosition: TimeInterval
+    @State private var seekPositionDisplay: TimeInterval = 0.0
+    @State private var isEditingSeekPosition: Bool = false
     @Binding private var isPlay: Bool
+    @Query private var FMArray: [FMD]
     @State private var toMusicInfo = false
-    @Environment(\.presentationMode) var presentation
+    @State private var isFavorite = false
+    @State private var isShowAddLastAlert = false
+    @State private var isShowAddFirstAlert = false
+    @Environment(\.modelContext) private var modelContext
     
     init(mds: MusicDataStore, pc: PlayController, music: Binding<Music?>, seekPosition: Binding<TimeInterval>, isPlay: Binding<Bool>) {
         self.mds = mds
@@ -27,13 +34,6 @@ struct PlayingView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Button(action: {
-                    presentation.wrappedValue.dismiss()
-                }, label: {
-                    Image(systemName: "chevron.down")
-                        .foregroundStyle(.purple)
-                        .font(.system(size: 25, weight: .semibold))
-                })
                 Spacer()
                 Image(systemName: "music.note")
                     .resizable()
@@ -57,54 +57,32 @@ struct PlayingView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                     }
-                    Menu {
-                        Button(action: {testPrint()}) {
-                            Label("プレイリストに追加", systemImage: "text.badge.plus")
-                        }
-                        Button(action: {testPrint()}) {
-                            Label("ラブ", systemImage: "heart")
-                        }
-                        NavigationLink(destination: MusicInfoView(pc: pc, music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
-                            Label("曲の情報", systemImage: "info.circle")
-                        })
-                        Divider()
-                        Button(action: {testPrint()}) {
-                            Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-                        }
-                        Button(action: {testPrint()}) {
-                            Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-                        }
-                        Divider()
-                        Button(role: .destructive, action: {testPrint()}) {
-                            Label("ファイルを削除", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .frame(width: 40, height: 40)
-                    }
-                    .menuOrder(.fixed)
+                    musicMenu()
                     .font(.system(size: 20, weight: .semibold))
                     .frame(width: 30, height: 30)
                     .background(Color(UIColor.systemGray5))
-                    .foregroundStyle(.purple)
                     .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
                 }
                 .padding(.horizontal)
                 Spacer()
-                Slider(value: $seekPosition, in: 0 ... (music?.musicLength ?? 300), onEditingChanged: { bool in
-                    if !bool {
+                Slider(value: $seekPositionDisplay, in: 0 ... (music?.musicLength ?? 300), onEditingChanged: { isEditing in
+                    isEditingSeekPosition = isEditing
+                    if !isEditing {
+                        pc.seekPosition = seekPositionDisplay
                         pc.setSeek()
-                        
                     }
                 })
-                    .tint(.purple)
-                    .padding(.horizontal)
+                .onChange(of: seekPosition) {
+                    if !isEditingSeekPosition { self.seekPositionDisplay = seekPosition }
+                }
+                .tint(.purple)
+                .padding(.horizontal)
                 HStack {
-                    Text(secToMin(sec: seekPosition))
+                    Text(secToMin(sec: seekPositionDisplay))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                     Spacer()
-                    Text(secToMin(sec: seekPosition - (music?.musicLength ?? 300)))
+                    Text(secToMin(sec: seekPositionDisplay - (music?.musicLength ?? 300)))
                         .font(.system(size: 12.5))
                         .foregroundStyle(.gray)
                 }
@@ -118,27 +96,23 @@ struct PlayingView: View {
                     .foregroundStyle(.purple)
                     Spacer()
                     Spacer()
-                    Button(action: {
-                        
-                    }, label: {
-                        Image(systemName: "heart")
+                    Button(action: { isFavoriteToggle() }, label: {
+                        if isFavorite { Image(systemName: "heart.fill") }
+                        else { Image(systemName: "heart")}
                     })
                     .foregroundStyle(.purple)
                     Spacer()
                     Spacer()
-                    Button(action: {
-                        
-                    }, label: {
+                    NavigationLink(destination: WillPlayMusicView(mds: mds, pc: pc), label: {
                         Image(systemName: "list.bullet")
                     })
-                    .foregroundStyle(.purple)
                     Spacer()
                 }
                 Spacer()
                 HStack {
                     Spacer()
                     Button(action: {
-                        
+                        pc.moveBeforeMusic()
                     }, label: {
                         Image(systemName: "backward.fill")
                     })
@@ -149,7 +123,7 @@ struct PlayingView: View {
                         if music?.filePath != nil {
                             isPlay.toggle()
                         } else {
-                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray)
+                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray, playingView: .music)
                         }
                     }, label: {
                         if isPlay {
@@ -171,8 +145,54 @@ struct PlayingView: View {
                     Spacer()
                 }
                 Spacer()
-            }.padding()
+            }
+            .navigationTitle("再生中の曲")
+            .navigationBarTitleDisplayMode(.inline)
+            .padding()
         }
+        .onAppear() {
+            isFavorite = FMArray.contains(where: {$0.musicName == music?.musicName!})
+        }
+    }
+    func musicMenu() -> some View {
+        Menu {
+            NavigationLink(destination: AddPlaylistView(music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
+                Label("プレイリストに追加", systemImage: "text.badge.plus")
+            })
+            NavigationLink(destination: MusicInfoView(pc: pc, music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
+                Label("曲の情報", systemImage: "info.circle")
+            })
+            Divider()
+            Button(action: {
+                guard music != nil else { return }
+                pc.addWPMFirst(music: music!)
+                isShowAddFirstAlert = true
+            }) {
+                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            Button(action: {
+                guard music != nil else { return }
+                pc.addWPMLast(music: music!)
+                isShowAddLastAlert = true
+            }) {
+                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(Color.purple)
+                .frame(width: 40, height: 40)
+        }
+        .menuOrder(.fixed)
+        .alert("設定完了", isPresented: $isShowAddFirstAlert, actions: {
+            Button("OK") { isShowAddFirstAlert = false }
+        }, message: {
+            Text("再生予定曲の先頭に追加しました。")
+        })
+        .alert("設定完了", isPresented: $isShowAddLastAlert, actions: {
+            Button("OK") { isShowAddLastAlert = false }
+        }, message: {
+            Text("再生予定曲の末尾に追加しました。")
+        })
     }
     func secToMin(sec: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()
@@ -192,6 +212,16 @@ struct PlayingView: View {
         case .sameRepeat:
             return "repeat.1"
         }
+    }
+    func isFavoriteToggle() {
+        if isFavorite {
+            let item = FMArray.first(where: {$0.musicName == music?.musicName!})!
+            modelContext.delete(item)
+        } else { 
+            let FMD = FMD(musicName: music?.musicName ?? "不明な曲", artistName: music?.artistName ?? "不明なアーティスト", albumName: music?.albumName ?? "不明なアルバム", editedDate: music?.editedDate ?? Date(), fileSize: music?.fileSize ?? "0MB", musicLength: music?.musicLength ?? 0, filePath: music?.filePath ?? "filePath")
+            modelContext.insert(FMD)
+        }
+        isFavorite.toggle()
     }
     func testPrint() {
         print("tapped")

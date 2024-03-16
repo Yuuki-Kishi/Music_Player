@@ -11,19 +11,23 @@ struct MusicCellView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @State var music: Music
+    @Binding private var musicArray: [Music]
     @State private var isShowAlert = false
     @State private var deleteTarget: Music?
+    @State private var playingView: PlayController.playingView
     
-    init(mds: MusicDataStore, pc: PlayController, music: Music) {
+    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, music: Music, playingView: PlayController.playingView) {
         self.mds = mds
         self.pc = pc
+        self._musicArray = musicArray
         _music = State(initialValue: music)
+        _playingView = State(initialValue: playingView)
     }
     
     var body: some View {
         HStack {
             VStack {
-                Text(music.musicName)
+                Text(music.musicName!)
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -42,7 +46,7 @@ struct MusicCellView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                pc.musicChoosed(music: music, musicArray: mds.musicArray)
+                pc.musicChoosed(music: music, musicArray: musicArray, playingView: playingView)
             }
             Spacer()
             Text(secToMin(second:music.musicLength!))
@@ -63,17 +67,14 @@ struct MusicCellView: View {
             Button(action: {testPrint()}) {
                 Label("プレイリストに追加", systemImage: "text.badge.plus")
             }
-            Button(action: {testPrint()}) {
-                Label("ラブ", systemImage: "heart")
-            }
             NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
                 Label("曲の情報", systemImage: "info.circle")
             })
             Divider()
-            Button(action: {testPrint()}) {
+            Button(action: {pc.addWPMFirst(music: music.wrappedValue)}) {
                 Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
             }
-            Button(action: {testPrint()}) {
+            Button(action: {pc.addWPMLast(music: music.wrappedValue)}) {
                 Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
             }
             Divider()
@@ -90,11 +91,7 @@ struct MusicCellView: View {
         }
         .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
             Button(role: .destructive, action: {
-                if let deleteTarget {
-                    Task {
-                        await mds.fileDelete(filePath: deleteTarget.filePath)
-                    }
-                }
+                if let deleteTarget { Task { await mds.fileDelete(filePath: deleteTarget.filePath) }}
             }, label: {
                 Text("削除")
             })

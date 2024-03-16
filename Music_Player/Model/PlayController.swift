@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import SwiftData
 
 @MainActor
 class PlayController: ObservableObject {
@@ -29,11 +30,8 @@ class PlayController: ObservableObject {
         }
     }
     @Published var timer: Timer!
-    enum playModeEnum: String {
-        case shuffle
-        case order
-        case sameRepeat
-    }
+    enum playMode { case shuffle, order, sameRepeat }
+    enum playingView { case music, favorite, didPlay, artist, album, playlist, folder, willPlay }
     
     init() {
         // 接続するオーディオノードをAudioEngineにアタッチする
@@ -46,8 +44,9 @@ class PlayController: ObservableObject {
         didPlayMusics.append(music)
     }
     
-    func setNextMusics(playMode: playModeEnum, musicArray: [Music]) {
+    func setNextMusics(musicArray: [Music]) {
         willPlayMusics = []
+        let playMode = loadPlayMode()
         switch playMode {
         case .shuffle:
             willPlayMusics = musicArray
@@ -61,7 +60,6 @@ class PlayController: ObservableObject {
         case .sameRepeat:
             break
         }
-//        UserDefaults.standard.setValue(playModeEnum.rawValue, forKey: "playMode")
     }
     
     func setScheduleFile() {
@@ -75,13 +73,7 @@ class PlayController: ObservableObject {
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
             audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
             // 再生準備
-            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered) /*{ _ in*/
-//                if self.isEndOfFile() ?? false {
-//                    DispatchQueue.main.async {
-//                        self.moveNextMusic()
-//                    }
-//                }
-//            }
+            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered)
         }
         catch let error {
             print(error.localizedDescription)
@@ -155,6 +147,7 @@ class PlayController: ObservableObject {
             // 再生処理
             try audioEngine.start()
             playerNode.play()
+            UserDefaults.standard.setValue(music?.musicName!, forKey: "plaingMusicName")
         }
         catch let error {
             print(error.localizedDescription)
@@ -188,17 +181,52 @@ class PlayController: ObservableObject {
             }
         } else {
             music = nil
+            UserDefaults.standard.removeObject(forKey: "plaingMusicName")
             stop()
             isPlay = false
         }
     }
     
-    func musicChoosed(music: Music, musicArray: [Music]) {
+    func moveBeforeMusic() {
+        seekPosition = 0.0
+        cachedSeekBarSeconds = 0.0
+        guard let nowMusic = music else { return }
+        if didPlayMusics.count >= 2 {
+            let music = didPlayMusics[1]
+            if loadPlayMode() != .sameRepeat {
+                willPlayMusics.insert(nowMusic, at: 0)
+                setMusic(music: music)
+                didPlayMusics.removeLast()
+                setScheduleFile()
+                isPlay = true
+                setTimer()
+            } else {
+                setScheduleFile()
+                isPlay = true
+                setTimer()
+            }
+        } else {
+            music = nil
+            stop()
+            isPlay = false
+        }
+    }
+    
+    func musicChoosed(music: Music, musicArray: [Music], playingView: playingView) {
         setMusic(music: music)
         setScheduleFile()
-        setNextMusics(playMode: .shuffle, musicArray: musicArray)
+        setNextMusics(musicArray: musicArray)
+        savePlayingView(playingView: playingView)
         isPlay = true
         setTimer()
+    }
+    
+    func addWPMFirst(music: Music) {
+        willPlayMusics.insert(music, at: 0)
+    }
+    
+    func addWPMLast(music: Music) {
+        willPlayMusics.append(music)
     }
     
     func changePlayMode() {
@@ -206,7 +234,7 @@ class PlayController: ObservableObject {
         switch nowPlayMode {
         case .shuffle:
             savePlayMode(playMode: .order)
-            willPlayMusics.sort {$0.musicName < $1.musicName}
+            willPlayMusics = orderSort()
         case .order:
             savePlayMode(playMode: .sameRepeat)
             break
@@ -216,7 +244,21 @@ class PlayController: ObservableObject {
         }
     }
     
-    func savePlayMode(playMode: playModeEnum) {
+    func orderSort() -> Array<Music> {
+        var musics = willPlayMusics
+        musics.append(music!)
+        musics.sort {$0.musicName! < $1.musicName!}
+        let index = musics.firstIndex(of: music!)!
+        for i in 0 ..< index {
+            let music = musics.first
+            musics.removeFirst()
+            musics.append(music!)
+        }
+        musics.removeFirst()
+        return musics
+    }
+    
+    func savePlayMode(playMode: playMode) {
         let userDefaults = UserDefaults.standard
         switch playMode {
         case .shuffle:
@@ -228,9 +270,9 @@ class PlayController: ObservableObject {
         }
     }
     
-    func loadPlayMode() -> playModeEnum {
+    func loadPlayMode() -> playMode {
         let saveData = UserDefaults.standard.string(forKey: "playMode") ?? "shuffle"
-        var playMode: playModeEnum = .shuffle
+        var playMode: playMode = .shuffle
         switch saveData {
         case "shuffle":
             playMode = .shuffle
@@ -242,5 +284,63 @@ class PlayController: ObservableObject {
             break
         }
         return playMode
+    }
+    
+    func savePlayingView(playingView: playingView) {
+        let userDefaults = UserDefaults.standard
+        switch playingView {
+        case .music:
+            userDefaults.setValue("music", forKey: "playingView")
+        case .favorite:
+            userDefaults.setValue("favorite", forKey: "playingView")
+        case .didPlay:
+            userDefaults.setValue("didPlay", forKey: "playingView")
+        case .artist:
+            userDefaults.setValue("artist", forKey: "playingView")
+        case .album:
+            userDefaults.setValue("album", forKey: "playingView")
+        case .playlist:
+            userDefaults.setValue("playlist", forKey: "playingView")
+        case .folder:
+            userDefaults.setValue("folder", forKey: "playingView")
+        case .willPlay:
+            userDefaults.setValue("willPlay", forKey: "playingView")
+        }
+    }
+    
+    func loadPlayingView() -> playingView {
+        let saveData = UserDefaults.standard.string(forKey: "playingView") ?? "music"
+        var playingView: playingView = .music
+        switch saveData {
+        case "music":
+            playingView = .music
+        case "favorite":
+            playingView = .favorite
+        case "didPlay":
+            playingView = .didPlay
+        case "artist":
+            playingView = .artist
+        case "album":
+            playingView = .album
+        case "playlist":
+            playingView = .playlist
+        case "folder":
+            playingView = .folder
+        case "willPlay":
+            playingView = .willPlay
+        default:
+            break
+        }
+        return playingView
+    }
+    
+    func setPlayingMusic(musicArray: [Music]) {
+        if let musicName = UserDefaults.standard.string(forKey: "plaingMusicName") {
+            if let music = musicArray.first(where: {$0.musicName == musicName}) {
+                setMusic(music: music)
+                setScheduleFile()
+                setNextMusics(musicArray: musicArray)
+            }
+        }
     }
 }

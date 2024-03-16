@@ -67,14 +67,16 @@ struct PlayingMusicView: View {
                         print("OK")
                         showSheet.toggle()
                     }
-                    .fullScreenCover(isPresented: $showSheet) {
-                        PlayingView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                    .sheet(isPresented: $showSheet) {
+                        if pc.music != nil {
+                            PlayingView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                        }
                     }
                 Button(action: {
                     if music?.filePath != nil {
                         isPlay.toggle()
                     } else {
-                        pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray)
+                        pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray, playingView: .music)
                     }
                 }, label: {
                     if isPlay {

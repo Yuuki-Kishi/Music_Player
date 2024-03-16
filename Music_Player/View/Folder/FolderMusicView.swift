@@ -23,7 +23,7 @@ struct FolderMusicView: View {
     var body: some View {
         VStack {
             List($listMusicArray) { $folder in
-                MusicCellView(mds: mds, pc: pc, music: folder)
+                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: folder, playingView: .folder)
             }
             PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }

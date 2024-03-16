@@ -53,6 +53,7 @@ class MusicDataStore: ObservableObject {
                 artistArray.append(artist)
             }
         }
+        artistArray.sort {$0.artistName < $1.artistName}
     }
     
     func collectArtistMusic(artist: String) {
@@ -76,6 +77,7 @@ class MusicDataStore: ObservableObject {
                 albumArray.append(artist)
             }
         }
+        albumArray.sort {$0.albumName < $1.albumName}
     }
     
     func collectAlbumMusic(album: String) {
@@ -109,9 +111,9 @@ class MusicDataStore: ObservableObject {
     func musicSort(method: musicSortMode) {
         switch method {
         case .nameAscending:
-            musicArray.sort {$0.musicName < $1.musicName}
+            musicArray.sort {$0.musicName! < $1.musicName!}
         case .nameDescending:
-            musicArray.sort {$0.musicName > $1.musicName}
+            musicArray.sort {$0.musicName! > $1.musicName!}
         case .dateAscending:
             musicArray.sort {$0.editedDate ?? Date() < $1.editedDate ?? Date()}
         case .dateDescending:
@@ -119,6 +121,18 @@ class MusicDataStore: ObservableObject {
         }
     }
     
+    func listMusicSort(method: musicSortMode) {
+        switch method {
+        case .nameAscending:
+            listMusicArray.sort {$0.musicName! < $1.musicName!}
+        case .nameDescending:
+            listMusicArray.sort {$0.musicName! > $1.musicName!}
+        case .dateAscending:
+            listMusicArray.sort {$0.editedDate ?? Date() < $1.editedDate ?? Date()}
+        case .dateDescending:
+            listMusicArray.sort {$0.editedDate ?? Date() > $1.editedDate ?? Date()}
+        }
+    }
     
     func artistSort(method: artistSortMode) {
         switch method {

@@ -46,7 +46,7 @@ struct PlaylistMusicView: View {
                 }
             }
             List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, music: music)
+                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: music, playingView: .playlist)
             }
             PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
@@ -122,7 +122,7 @@ struct PlaylistMusicView: View {
             navigationTitle = playlistArray[index].playlistName
             if !playlistArray[index].musics.isEmpty {
                 listMusicArray = playlistArray[index].musics
-                listMusicArray.sort {$0.musicName < $1.musicName}
+                listMusicArray.sort {$0.musicName! < $1.musicName!}
             }
         }
     }

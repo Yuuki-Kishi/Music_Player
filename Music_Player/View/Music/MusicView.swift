@@ -29,7 +29,9 @@ struct MusicView: View {
                     ZStack {
                         HStack {
                             Button(action: {
-                                pc.musicChoosed(music: musicArray[Int.random(in: 0 ..< musicArray.count)], musicArray: musicArray)
+                                if !musicArray.isEmpty {
+                                    pc.musicChoosed(music: musicArray[Int.random(in: 0 ..< musicArray.count)], musicArray: musicArray, playingView: .music)
+                                }
                             }){
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.purple)
@@ -41,7 +43,7 @@ struct MusicView: View {
                     }
                     .padding(.horizontal)
                     List($musicArray) { $music in
-                        MusicCellView(mds: mds, pc: pc, music: music)
+                        MusicCellView(mds: mds, pc: pc, musicArray: $musicArray, music: music, playingView: .music)
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
@@ -68,6 +70,9 @@ struct MusicView: View {
                         }) {
                             Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
                         }
+                        NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc, musicArray: $musicArray), label: {
+                            Label("お気に入り", systemImage: "heart.fill")
+                        })
                         Menu {
                             Button(action: { mds.musicSort(method: .nameAscending) }, label: {
                                 Text("曲名昇順")
@@ -92,13 +97,11 @@ struct MusicView: View {
             .onAppear() {
                 Task {
                     await mds.getFile()
+                    if !pc.isPlay { pc.setPlayingMusic(musicArray: musicArray) }
                     isShowsProgressView = false
                 }
             }
         }
-    }
-    func testPrint() {
-        print("すべて再生")
     }
 }
 

@@ -38,9 +38,29 @@ struct AlbumMusicView: View {
                 }
             }
             List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, music: music)
+                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: music, playingView: .album)
             }
             .navigationTitle(navigationTitle)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing, content: {
+                    Menu {
+                        Button(action: { mds.listMusicSort(method: .nameAscending) }, label: {
+                            Text("曲名昇順")
+                        })
+                        Button(action: { mds.listMusicSort(method: .nameDescending) }, label: {
+                            Text("曲名降順")
+                        })
+                        Button(action: { mds.listMusicSort(method: .dateAscending) }, label: {
+                            Text("追加日昇順")
+                        })
+                        Button(action: { mds.listMusicSort(method: .dateDescending) }, label: {
+                            Text("追加日降順")
+                        })
+                    } label: {
+                        Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+                    }
+                })
+            }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
             .onAppear() {
