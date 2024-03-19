@@ -42,6 +42,7 @@ class PlayController: ObservableObject {
     func setMusic(music: Music) {
         self.music = music
         didPlayMusics.append(music)
+        let didPlayMusic = DPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
     }
     
     func setNextMusics(musicArray: [Music]) {
@@ -210,6 +211,10 @@ class PlayController: ObservableObject {
             stop()
             isPlay = false
         }
+    }
+    
+    func playAll(musicArray: [Music], playingView: playingView) {
+        
     }
     
     func musicChoosed(music: Music, musicArray: [Music], playingView: playingView) {

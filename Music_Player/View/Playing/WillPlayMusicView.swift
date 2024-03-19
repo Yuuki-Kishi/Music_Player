@@ -20,7 +20,6 @@ struct WillPlayMusicView: View {
         List($pc.willPlayMusics) { $music in
             MusicCellView(mds: mds, pc: pc, musicArray: $pc.willPlayMusics, music: music, playingView: .willPlay)
         }
-        
         .listStyle(.plain)
         .background(Color.clear)
         .navigationTitle("再生予定曲")

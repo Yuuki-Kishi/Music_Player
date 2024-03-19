@@ -27,6 +27,8 @@ struct FolderMusicView: View {
             }
             PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
+        .listStyle(.plain)
+        .navigationTitle("Documents")
         .onAppear() {
             mds.collectFolderMusic(folder: navigationTitle)
         }

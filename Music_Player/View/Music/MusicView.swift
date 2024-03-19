@@ -73,6 +73,9 @@ struct MusicView: View {
                         NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc, musicArray: $musicArray), label: {
                             Label("お気に入り", systemImage: "heart.fill")
                         })
+                        NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc, musicArray: $musicArray), label: {
+                            Label("再生履歴", systemImage: "clock.arrow.circlepath")
+                        })
                         Menu {
                             Button(action: { mds.musicSort(method: .nameAscending) }, label: {
                                 Text("曲名昇順")

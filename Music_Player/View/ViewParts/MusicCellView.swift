@@ -64,9 +64,9 @@ struct MusicCellView: View {
     }
     func musicMenu(music: Binding<Music>) -> some View {
         Menu {
-            Button(action: {testPrint()}) {
+            NavigationLink(destination: AddPlaylistView(music: music), label: {
                 Label("プレイリストに追加", systemImage: "text.badge.plus")
-            }
+            })
             NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
                 Label("曲の情報", systemImage: "info.circle")
             })
@@ -101,8 +101,5 @@ struct MusicCellView: View {
         }, message: {
                 Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
         })
-    }
-    func testPrint() {
-        print("OK")
     }
 }
