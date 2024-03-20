@@ -1,16 +1,16 @@
 //
-//  DPMDService.swift
+//  WPMDService.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/18.
+//  Created by 岸　優樹 on 2024/03/20.
 //
 
 import Foundation
 import SwiftData
 
-class DPMDPersistance {
+class WPMDPersistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([DPMD.self])
+        let schema = Schema([WPMD.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -22,7 +22,7 @@ class DPMDPersistance {
     
 }
 
-actor DPMDPersistanceActor: ModelActor {
+actor WPMDPersistanceActor: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
     
@@ -51,23 +51,23 @@ actor DPMDPersistanceActor: ModelActor {
     }
 }
 
-final class DPMDService {
-    static let shared = DPMDService()
+final class WPMDService {
+    static let shared = WPMDService()
     lazy var actor = {
-        return DPMDPersistanceActor(modelContainer: DPMDPersistance.sharedModelContainer)
+        return WPMDPersistanceActor(modelContainer: WPMDPersistance.sharedModelContainer)
     }()
     
     func createDPMD(music: Music) async {
-        let DPMD = DPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.insert(DPMD)
+        let WPMD = WPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+        await actor.insert(WPMD)
     }
     
-    func deleteDPMD(DPMD: DPMD) async {
-        await actor.delete(DPMD)
+    func deleteDPMD(WPMD: WPMD) async {
+        await actor.delete(WPMD)
     }
     
-    func getAllDPMDs() async -> [DPMD] {
-        let predicate = #Predicate<DPMD> { todo in
+    func getAllDPMDs() async -> [WPMD] {
+        let predicate = #Predicate<WPMD> { todo in
             return true
         }
         let descriptor = FetchDescriptor(predicate: predicate)

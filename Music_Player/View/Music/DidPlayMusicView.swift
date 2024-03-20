@@ -12,9 +12,10 @@ struct DidPlayMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Environment(\.modelContext) private var modelContext
-    @Query private var DPMArray: [DPMD]
+    @State private var DPMArray = [DPMD]()
     @Binding private var musicArray: [Music]
     @State private var listMusicArray = [Music]()
+    private var DPMDS = DPMDService.shared
     
     init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
         self.mds = mds
@@ -29,10 +30,13 @@ struct DidPlayMusicView: View {
         .listStyle(.plain)
         .navigationTitle("再生履歴")
         .onAppear() {
-            print("DPMArray:", DPMArray)
-            for DPMusic in DPMArray {
-                if let music = musicArray.first(where: {$0.musicName == DPMusic.musicName}) {
-                    listMusicArray.append(music)
+            Task {
+                DPMArray = await DPMDS.getAllDPMDs()
+                print(DPMArray)
+                for DPMusic in DPMArray {
+                    if let music = musicArray.first(where: {$0.musicName == DPMusic.musicName}) {
+                        listMusicArray.append(music)
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ class PlayController: ObservableObject {
     private let audioEngine: AVAudioEngine = .init()
     private let playerNode: AVAudioPlayerNode = .init()
     private var cachedSeekBarSeconds = 0.0
+    private var DPMDS = DPMDService.shared
     @Published var didPlayMusics = [Music]()
     @Published var willPlayMusics = [Music]()
     @Published var music: Music? = nil
@@ -41,8 +42,24 @@ class PlayController: ObservableObject {
     
     func setMusic(music: Music) {
         self.music = music
-        didPlayMusics.append(music)
-        let didPlayMusic = DPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+    }
+    
+    func setScheduleFile() {
+        //currentItem.itemはMPMediaItemクラス
+        guard let filePath = music?.filePath else { return }
+        let fileURL = URL(fileURLWithPath: filePath)
+        do {
+            // Source fileを取得する
+            let audioFile = try AVAudioFile(forReading: fileURL)
+            // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
+            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+            // 再生準備
+            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered)
+        }
+        catch let error {
+            print(error.localizedDescription)
+            return
+        }
     }
     
     func setNextMusics(musicArray: [Music]) {
@@ -58,47 +75,26 @@ class PlayController: ObservableObject {
             willPlayMusics = musicArray
             let index = willPlayMusics.firstIndex(of: music!)!
             willPlayMusics.remove(at: index)
+            willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
         case .sameRepeat:
             break
         }
     }
     
-    func setScheduleFile() {
-        // 楽曲のURLを取得する
-        // currentItem.itemはMPMediaItemクラス
-        guard let filePath = music?.filePath else { return }
-        let assetURL = URL(fileURLWithPath: filePath)
-        do {
-            // Source fileを取得する
-            let audioFile = try AVAudioFile(forReading: assetURL)
-            // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
-            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
-            // 再生準備
-            playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered)
-        }
-        catch let error {
-            print(error.localizedDescription)
-            return
-        }
+    func musicChoosed(music: Music, musicArray: [Music], playingView: playingView) {
+        setMusic(music: music)
+        setScheduleFile()
+        setNextMusics(musicArray: musicArray)
+        savePlayingView(playingView: playingView)
+        isPlay = true
+        Task { await DPMDS.createDPMD(music: music) }
+        setTimer()
     }
     
-    func isEndOfFile() {
-        guard let filePath = music?.filePath else { return }
-        let assetURL = URL(fileURLWithPath: filePath)
-        guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
-        //ファイルの長さ
-        let fileDuration = Double(music?.musicLength ?? 300)
-        //現在再生している時間
-        guard let nodeTime = playerNode.lastRenderTime else { return }
-        guard let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else { return }
-        let currentTime = (Double(playerTime.sampleTime) / Double(playerTime.sampleRate)) + cachedSeekBarSeconds
-        
-        if currentTime >= fileDuration {
-            self.moveNextMusic()
-            return
-        } else {
-            return
-        }
+    func setTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: {_ in
+            self.updateSeekPosition()
+        })
     }
     
     func updateSeekPosition() {
@@ -113,6 +109,21 @@ class PlayController: ObservableObject {
         let time = Double(sampleTime) / sampleRate + cachedSeekBarSeconds
         isEndOfFile()
         seekPosition = time
+    }
+    
+    func isEndOfFile() {
+        //ファイルの長さ
+        let fileDuration = Double(music?.musicLength ?? 300)
+        //現在再生している時間
+        guard let nodeTime = playerNode.lastRenderTime else { return }
+        guard let playerTime = playerNode.playerTime(forNodeTime: nodeTime) else { return }
+        let currentTime = (Double(playerTime.sampleTime) / Double(playerTime.sampleRate)) + cachedSeekBarSeconds
+        if currentTime >= fileDuration {
+            self.moveNextMusic()
+            return
+        } else {
+            return
+        }
     }
     
     func setSeek() {
@@ -135,12 +146,6 @@ class PlayController: ObservableObject {
         playerNode.scheduleSegment(audioFile, startingFrame: startSampleTime, frameCount: remainSampleTime, at: nil)
         // 停止状態なので再生する
         isPlay = true
-    }
-    
-    func setTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: {_ in
-            self.updateSeekPosition()
-        })
     }
     
     func play() {
@@ -174,6 +179,7 @@ class PlayController: ObservableObject {
                 willPlayMusics.removeFirst()
                 setScheduleFile()
                 isPlay = true
+                Task { await DPMDS.createDPMD(music:music) }
                 setTimer()
             } else {
                 setScheduleFile()
@@ -200,6 +206,7 @@ class PlayController: ObservableObject {
                 didPlayMusics.removeLast()
                 setScheduleFile()
                 isPlay = true
+                Task { await DPMDS.createDPMD(music:music) }
                 setTimer()
             } else {
                 setScheduleFile()
@@ -217,14 +224,7 @@ class PlayController: ObservableObject {
         
     }
     
-    func musicChoosed(music: Music, musicArray: [Music], playingView: playingView) {
-        setMusic(music: music)
-        setScheduleFile()
-        setNextMusics(musicArray: musicArray)
-        savePlayingView(playingView: playingView)
-        isPlay = true
-        setTimer()
-    }
+    
     
     func addWPMFirst(music: Music) {
         willPlayMusics.insert(music, at: 0)
@@ -242,7 +242,7 @@ class PlayController: ObservableObject {
             willPlayMusics = orderSort()
         case .order:
             savePlayMode(playMode: .sameRepeat)
-            break
+            willPlayMusics = []
         case .sameRepeat:
             savePlayMode(playMode: .shuffle)
             willPlayMusics.shuffle()
@@ -337,6 +337,19 @@ class PlayController: ObservableObject {
             break
         }
         return playingView
+    }
+    
+    func savePlayingMusic(music: Music?) {
+        if let saveMusic = music {
+            UserDefaults.standard.setValue(saveMusic, forKey: "playingMusicName")
+        }
+    }
+    
+    func loadPlayingMusic() -> Music? {
+        if let music = UserDefaults.standard.value(forKey: "playingMusicName") {
+            return music as? Music
+        }
+        return nil
     }
     
     func setPlayingMusic(musicArray: [Music]) {

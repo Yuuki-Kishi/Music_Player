@@ -32,6 +32,8 @@
 		DEC4CFF82B984CA4009F5296 /* MusicCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC4CFF72B984CA4009F5296 /* MusicCellView.swift */; };
 		DEC4CFFB2B98A40A009F5296 /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC4CFFA2B98A40A009F5296 /* FolderView.swift */; };
 		DEC4CFFD2B98A785009F5296 /* FolderMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC4CFFC2B98A785009F5296 /* FolderMusicView.swift */; };
+		DEC8CCC42BAA838600FA9D98 /* WPMDService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC32BAA838600FA9D98 /* WPMDService.swift */; };
+		DEC8CCC62BAAECF900FA9D98 /* WPMD.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC52BAAECF900FA9D98 /* WPMD.swift */; };
 		DED9FD632B7243770008B127 /* MusicDataStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD622B7243770008B127 /* MusicDataStoreViewModel.swift */; };
 		DED9FD692B7730860008B127 /* PlaylistData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD682B7730860008B127 /* PlaylistData.swift */; };
 		DED9FD6F2B8012FD0008B127 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD6E2B8012FD0008B127 /* Music.swift */; };
@@ -74,6 +76,8 @@
 		DEC4CFF72B984CA4009F5296 /* MusicCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCellView.swift; sourceTree = "<group>"; };
 		DEC4CFFA2B98A40A009F5296 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		DEC4CFFC2B98A785009F5296 /* FolderMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMusicView.swift; sourceTree = "<group>"; };
+		DEC8CCC32BAA838600FA9D98 /* WPMDService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WPMDService.swift; sourceTree = "<group>"; };
+		DEC8CCC52BAAECF900FA9D98 /* WPMD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WPMD.swift; sourceTree = "<group>"; };
 		DED9FD622B7243770008B127 /* MusicDataStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicDataStoreViewModel.swift; sourceTree = "<group>"; };
 		DED9FD682B7730860008B127 /* PlaylistData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistData.swift; sourceTree = "<group>"; };
 		DED9FD6E2B8012FD0008B127 /* Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
@@ -255,9 +259,10 @@
 			isa = PBXGroup;
 			children = (
 				DE49827A2B70D3E60005A407 /* FileService.swift */,
+				DEC8CCC32BAA838600FA9D98 /* WPMDService.swift */,
+				DEAEEC0C2BA84E1F00DE892D /* DPMDService.swift */,
 				DED9FD702B80A7E30008B127 /* MusicDataStore.swift */,
 				DED9FD762B80DE860008B127 /* PlayController.swift */,
-				DEAEEC0C2BA84E1F00DE892D /* DPMDService.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -267,6 +272,7 @@
 			children = (
 				DED9FD682B7730860008B127 /* PlaylistData.swift */,
 				DE6A17662BA1EECE004BC71D /* FMD.swift */,
+				DEC8CCC52BAAECF900FA9D98 /* WPMD.swift */,
 				DE6A17772BA53EBA004BC71D /* DPMD.swift */,
 			);
 			path = SwiftData;
@@ -347,6 +353,7 @@
 				DED9FD692B7730860008B127 /* PlaylistData.swift in Sources */,
 				DE6A177A2BA5B48F004BC71D /* AddPlaylistView.swift in Sources */,
 				DE9DB2B42B8A32F1007CE8FB /* ArtistMusicView.swift in Sources */,
+				DEC8CCC42BAA838600FA9D98 /* WPMDService.swift in Sources */,
 				DED9FD712B80A7E30008B127 /* MusicDataStore.swift in Sources */,
 				DE6A17702BA47BA7004BC71D /* Folder.swift in Sources */,
 				DE6A176E2BA47B93004BC71D /* Playlist.swift in Sources */,
@@ -357,6 +364,7 @@
 				DEE5AC512AE8A1A50082069C /* ArtistView.swift in Sources */,
 				DEBC749A2B3EA2920012973B /* PlayingView.swift in Sources */,
 				DEE5AC552AE8ABE50082069C /* PlaylistView.swift in Sources */,
+				DEC8CCC62BAAECF900FA9D98 /* WPMD.swift in Sources */,
 				DE9DB2B62B8A3622007CE8FB /* AlbumMusicView.swift in Sources */,
 				DEBC74982B3E570A0012973B /* PlayingMusicView.swift in Sources */,
 				DE62458C2B849BEB003E856D /* MusicInfoView.swift in Sources */,
