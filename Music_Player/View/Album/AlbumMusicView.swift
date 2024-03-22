@@ -25,20 +25,20 @@ struct AlbumMusicView: View {
     
     var body: some View {
         VStack {
-                HStack {
-                    Button(action: {
-                        if !listMusicArray.isEmpty {
-                            pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .album)
-                        }
-                    }){
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                            .foregroundStyle(.primary)
+            HStack {
+                Button(action: {
+                    if !listMusicArray.isEmpty {
+                        pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .album)
                     }
-                    Spacer()
+                }){
+                    Image(systemName: "play.circle")
+                        .foregroundStyle(.purple)
+                    Text("すべて再生 " + String(listMusicArray.count) + "曲")
+                        .foregroundStyle(.primary)
                 }
-                .padding(.horizontal)
+                Spacer()
+            }
+            .padding(.horizontal)
             List($listMusicArray) { $music in
                 MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .album)
             }

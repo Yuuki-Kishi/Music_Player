@@ -30,21 +30,19 @@ struct PlaylistMusicView: View {
     
     var body: some View {
         VStack {
-            ZStack {
-                HStack {
-                    Button(action: {
-                        if !listMusicArray.isEmpty {
-                            pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .playlist)
-                        }
-                    }){
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                        Spacer()
+            HStack {
+                Button(action: {
+                    if !listMusicArray.isEmpty {
+                        pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .playlist)
                     }
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal)
+                }){
+                    Image(systemName: "play.circle")
+                        .foregroundStyle(.purple)
+                    Text("すべて再生 " + String(listMusicArray.count) + "曲")
+                    Spacer()
                 }
+                .foregroundStyle(.primary)
+                .padding(.horizontal)
             }
             List($listMusicArray) { $music in
                 MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .playlist)
