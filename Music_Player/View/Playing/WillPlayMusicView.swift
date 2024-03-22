@@ -18,7 +18,7 @@ struct WillPlayMusicView: View {
     
     var body: some View {
         List($pc.willPlayMusics) { $music in
-            MusicCellView(mds: mds, pc: pc, musicArray: $pc.willPlayMusics, music: music, playingView: .willPlay)
+            MusicCellView(mds: mds, pc: pc, musics: pc.willPlayMusics, music: music, playingView: .willPlay)
         }
         .listStyle(.plain)
         .background(Color.clear)

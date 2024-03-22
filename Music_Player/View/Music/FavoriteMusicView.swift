@@ -11,7 +11,6 @@ import SwiftData
 struct FavoriteMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Query private var favoriteMusicArray: [FavoriteMusicData]
     @State private var listMusicArray = [Music]()
     
     init(mds: MusicDataStore, pc: PlayController) {
@@ -27,7 +26,7 @@ struct FavoriteMusicView: View {
             }
             .padding(.horizontal)
             List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: music, playingView: .favorite)
+                MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .favorite)
             }
             .listStyle(.plain)
             .background(Color.clear)
@@ -42,10 +41,7 @@ struct FavoriteMusicView: View {
             })
         }
         .onAppear() {
-            for favoriteMusic in favoriteMusicArray {
-                let music = Music(musicName: favoriteMusic.musicName, artistName: favoriteMusic.artistName, albumName: favoriteMusic.albumName, editedDate: favoriteMusic.editedDate, fileSize: favoriteMusic.fileSize, musicLength: favoriteMusic.musicLength, filePath: favoriteMusic.filePath)
-                listMusicArray.append(music)
-            }
+            Task { listMusicArray = await FavoriteMusicDataService.shared.getAllFavoriteMusicDatas() }
         }
     }
 }

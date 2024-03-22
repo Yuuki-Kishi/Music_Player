@@ -35,6 +35,8 @@
 		DEC8CCC42BAA838600FA9D98 /* WillPlayMusicDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC32BAA838600FA9D98 /* WillPlayMusicDataService.swift */; };
 		DEC8CCC62BAAECF900FA9D98 /* WillPlayMusicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC52BAAECF900FA9D98 /* WillPlayMusicData.swift */; };
 		DEC8CCC82BAD4CBB00FA9D98 /* Persistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC72BAD4CBB00FA9D98 /* Persistance.swift */; };
+		DEC8CCCA2BADC04800FA9D98 /* FavoriteMusicDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC92BADC04800FA9D98 /* FavoriteMusicDataService.swift */; };
+		DEC8CCCC2BADCC4A00FA9D98 /* PlaylistDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCCB2BADCC4A00FA9D98 /* PlaylistDataService.swift */; };
 		DED9FD632B7243770008B127 /* MusicDataStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD622B7243770008B127 /* MusicDataStoreViewModel.swift */; };
 		DED9FD692B7730860008B127 /* PlaylistData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD682B7730860008B127 /* PlaylistData.swift */; };
 		DED9FD6F2B8012FD0008B127 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD6E2B8012FD0008B127 /* Music.swift */; };
@@ -80,6 +82,8 @@
 		DEC8CCC32BAA838600FA9D98 /* WillPlayMusicDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WillPlayMusicDataService.swift; sourceTree = "<group>"; };
 		DEC8CCC52BAAECF900FA9D98 /* WillPlayMusicData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WillPlayMusicData.swift; sourceTree = "<group>"; };
 		DEC8CCC72BAD4CBB00FA9D98 /* Persistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistance.swift; sourceTree = "<group>"; };
+		DEC8CCC92BADC04800FA9D98 /* FavoriteMusicDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteMusicDataService.swift; sourceTree = "<group>"; };
+		DEC8CCCB2BADCC4A00FA9D98 /* PlaylistDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistDataService.swift; sourceTree = "<group>"; };
 		DED9FD622B7243770008B127 /* MusicDataStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicDataStoreViewModel.swift; sourceTree = "<group>"; };
 		DED9FD682B7730860008B127 /* PlaylistData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistData.swift; sourceTree = "<group>"; };
 		DED9FD6E2B8012FD0008B127 /* Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
@@ -261,6 +265,8 @@
 			isa = PBXGroup;
 			children = (
 				DE49827A2B70D3E60005A407 /* FileService.swift */,
+				DEC8CCCB2BADCC4A00FA9D98 /* PlaylistDataService.swift */,
+				DEC8CCC92BADC04800FA9D98 /* FavoriteMusicDataService.swift */,
 				DEC8CCC32BAA838600FA9D98 /* WillPlayMusicDataService.swift */,
 				DEAEEC0C2BA84E1F00DE892D /* DidPlayMusicDataService.swift */,
 				DED9FD702B80A7E30008B127 /* MusicDataStore.swift */,
@@ -376,6 +382,7 @@
 				DEE5AC4F2AE8A1280082069C /* MusicView.swift in Sources */,
 				DEC4CFFD2B98A785009F5296 /* FolderMusicView.swift in Sources */,
 				DEC4CFFB2B98A40A009F5296 /* FolderView.swift in Sources */,
+				DEC8CCCC2BADCC4A00FA9D98 /* PlaylistDataService.swift in Sources */,
 				DEE5AC532AE8A1B30082069C /* AlbumView.swift in Sources */,
 				DED9FD632B7243770008B127 /* MusicDataStoreViewModel.swift in Sources */,
 				DE6A17762BA53ACE004BC71D /* WillPlayMusicView.swift in Sources */,
@@ -384,6 +391,7 @@
 				DEAEEC0D2BA84E1F00DE892D /* DidPlayMusicDataService.swift in Sources */,
 				DE6A177C2BA5D8EF004BC71D /* DidPlayMusicView.swift in Sources */,
 				DE6A176A2BA47B6C004BC71D /* Artist.swift in Sources */,
+				DEC8CCCA2BADC04800FA9D98 /* FavoriteMusicDataService.swift in Sources */,
 				DE6A176C2BA47B7A004BC71D /* Album.swift in Sources */,
 				DED9FD792B80DF7F0008B127 /* PlayControllerViewModel.swift in Sources */,
 				DEC8CCC82BAD4CBB00FA9D98 /* Persistance.swift in Sources */,

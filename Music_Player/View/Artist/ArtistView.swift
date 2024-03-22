@@ -47,22 +47,7 @@ struct ArtistView: View {
                 .scrollContentBackground(.hidden)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing, content: {
-                        Menu {
-                            Button(action: { mds.artistSort(method: .nameAscending) }, label: {
-                                Text("アーティスト名昇順")
-                            })
-                            Button(action: { mds.artistSort(method: .nameDescending) }, label: {
-                                Text("アーティスト名降順")
-                            })
-                            Button(action: { mds.artistSort(method: .countAscending) }, label: {
-                                Text("曲数昇順")
-                            })
-                            Button(action: { mds.artistSort(method: .countDescending) }, label: {
-                                Text("曲数降順")
-                            })
-                        } label: {
-                            Image(systemName: "arrow.up.arrow.down.circle")
-                        }
+                        toolBarMenu()
                     })
                 }
                 PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
@@ -72,6 +57,24 @@ struct ArtistView: View {
         }
         .onAppear() {
             mds.artistSelection()
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: { mds.artistSort(method: .nameAscending) }, label: {
+                Text("アーティスト名昇順")
+            })
+            Button(action: { mds.artistSort(method: .nameDescending) }, label: {
+                Text("アーティスト名降順")
+            })
+            Button(action: { mds.artistSort(method: .countAscending) }, label: {
+                Text("曲数昇順")
+            })
+            Button(action: { mds.artistSort(method: .countDescending) }, label: {
+                Text("曲数降順")
+            })
+        } label: {
+            Image(systemName: "arrow.up.arrow.down.circle")
         }
     }
 }

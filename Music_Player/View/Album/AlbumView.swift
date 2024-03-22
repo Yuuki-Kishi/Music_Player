@@ -26,9 +26,9 @@ struct AlbumView: View {
                         .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
-                        .padding(.horizontal)
                     Spacer()
                 }
+                .padding(.horizontal)
                 List($albumArray) { album in
                     NavigationLink(value: album.albumName.wrappedValue, label: {
                         HStack {
@@ -46,22 +46,7 @@ struct AlbumView: View {
                 .scrollContentBackground(.hidden)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing, content: {
-                        Menu {
-                            Button(action: { mds.albumSort(method: .nameAscending) }, label: {
-                                Text("アルバム名昇順")
-                            })
-                            Button(action: { mds.albumSort(method: .nameDescending) }, label: {
-                                Text("アルバム名降順")
-                            })
-                            Button(action: { mds.albumSort(method: .countAscending) }, label: {
-                                Text("曲数昇順")
-                            })
-                            Button(action: { mds.albumSort(method: .countDescending) }, label: {
-                                Text("曲数降順")
-                            })
-                        } label: {
-                            Image(systemName: "arrow.up.arrow.down.circle")
-                        }
+                        toolBarMenu()
                     })
                 }
                 PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
@@ -71,6 +56,24 @@ struct AlbumView: View {
         }
         .onAppear() {
             mds.albumSelection()
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: { mds.albumSort(method: .nameAscending) }, label: {
+                Text("アルバム名昇順")
+            })
+            Button(action: { mds.albumSort(method: .nameDescending) }, label: {
+                Text("アルバム名降順")
+            })
+            Button(action: { mds.albumSort(method: .countAscending) }, label: {
+                Text("曲数昇順")
+            })
+            Button(action: { mds.albumSort(method: .countDescending) }, label: {
+                Text("曲数降順")
+            })
+        } label: {
+            Image(systemName: "arrow.up.arrow.down.circle")
         }
     }
 }

@@ -12,7 +12,7 @@ struct PlaylistView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Query private var playlistArray: [PlaylistData]
+    @State private var playlistArray = [PlaylistData]()
     @State private var isShowAlert = false
     @State private var toPlaylistMusicView = false
     @State private var text = ""
@@ -33,18 +33,18 @@ struct PlaylistView: View {
                         .padding(.horizontal)
                     Spacer()
                 }
-                List(playlistArray) { playlist in
-                    NavigationLink(value: playlist, label: {
+                List($playlistArray) { $playlistData in
+                    NavigationLink(value: playlistData, label: {
                         HStack {
-                            Text(playlist.playlistName)
+                            Text(playlistData.playlistName)
                             Spacer()
-                            Text(String(playlist.musicCount) + "曲")
+                            Text(String(playlistData.musicCount) + "曲")
                                 .foregroundStyle(Color.gray)
                         }
                     })
                 }
                 .navigationDestination(for: PlaylistData.self) { playlist in
-                    PlaylistMusicView(mds: mds, pc: pc, navigationTitle: playlist.playlistName, playlistId: playlist.playlistId)
+                    PlaylistMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, playlistData: playlist)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -59,19 +59,24 @@ struct PlaylistView: View {
                     })
                     .alert("プレイリストを作成する", isPresented: $isShowAlert, actions: {
                         TextField("プレイリスト名", text: $text)
-                        
                         Button("キャンセル", role: .cancel) {}
                         Button("作成") {
-                            let playlist = PlaylistData(playlistName: text)
-                            modelContext.insert(playlist)
-                            text = ""
-                            isShowAlert = false
+                            Task {
+                                await PlaylistDataService.shared.createPlaylistData(playlistName: text)
+                                getPlaylistArray()
+                            }
                         }
                     }, message: {
                         Text("作成するプレイリストの名前を入力してください。")
                     })
                 })
             }
+            .onAppear() {
+                getPlaylistArray()
+            }
         }
+    }
+    func getPlaylistArray() {
+        Task { playlistArray = await PlaylistDataService.shared.getAllFavoriteMusicDatas() }
     }
 }

@@ -50,24 +50,27 @@ struct FolderView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
-                    Menu {
-                        Button(action: { mds.folderSort(method: .nameAscending) }, label: {
-                            Text("フォルダ名昇順")
-                        })
-                        Button(action: { mds.folderSort(method: .nameDescending) }, label: {
-                            Text("フォルダ名降順")
-                        })
-                        Button(action: { mds.folderSort(method: .countAscending) }, label: {
-                            Text("曲数昇順")
-                        })
-                        Button(action: { mds.folderSort(method: .countDescending) }, label: {
-                            Text("曲数降順")
-                        })
-                    } label: {
-                        Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
-                    }
+                    toolBarMenu()
                 })
             }
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: { mds.folderSort(method: .nameAscending) }, label: {
+                Text("フォルダ名昇順")
+            })
+            Button(action: { mds.folderSort(method: .nameDescending) }, label: {
+                Text("フォルダ名降順")
+            })
+            Button(action: { mds.folderSort(method: .countAscending) }, label: {
+                Text("曲数昇順")
+            })
+            Button(action: { mds.folderSort(method: .countDescending) }, label: {
+                Text("曲数降順")
+            })
+        } label: {
+            Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
         }
     }
 }

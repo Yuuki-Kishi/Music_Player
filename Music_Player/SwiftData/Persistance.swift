@@ -10,7 +10,7 @@ import SwiftData
 
 class Persistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([PlaylistData.self, FavoriteMusicData.self, DidPlayMusicData.self])
+        let schema = Schema([PlaylistData.self, FavoriteMusicData.self, WillPlayMusicData.self, DidPlayMusicData.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -32,8 +32,21 @@ actor PersistanceActor: ModelActor {
         modelExecutor = DefaultSerialModelExecutor(modelContext: context)
     }
     
+    func save() {
+        do {
+            try modelContext.save()
+        }catch {
+            print("error save")
+        }
+    }
+    
     func insert<T:PersistentModel>(_ value:T) {
-        modelContext.insert(value)
+        do {
+            modelContext.insert(value)
+            try modelContext.save()
+        } catch {
+            print(error)
+        }
     }
     
     func delete<T:PersistentModel>(_ value:T) {

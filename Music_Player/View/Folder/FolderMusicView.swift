@@ -22,13 +22,13 @@ struct FolderMusicView: View {
     
     var body: some View {
         VStack {
-            List($listMusicArray) { $folder in
-                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: folder, playingView: .folder)
+            List($listMusicArray) { $music in
+                MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .folder)
             }
             PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
         .listStyle(.plain)
-        .navigationTitle("Documents")
+        .navigationTitle(navigationTitle)
         .onAppear() {
             mds.collectFolderMusic(folder: navigationTitle)
         }

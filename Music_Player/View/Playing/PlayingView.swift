@@ -123,7 +123,7 @@ struct PlayingView: View {
                         if music?.filePath != nil {
                             isPlay.toggle()
                         } else {
-                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musicArray: mds.musicArray, playingView: .music)
+                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musics: mds.musicArray, playingView: .music)
                         }
                     }, label: {
                         if isPlay {

@@ -43,6 +43,7 @@ class PlayController: ObservableObject {
     
     func setMusic(music: Music) {
         self.music = music
+        savePlayingMusic(music: music)
     }
     
     func setScheduleFile() {
@@ -63,29 +64,31 @@ class PlayController: ObservableObject {
         }
     }
     
-    func setNextMusics(musicArray: [Music]) {
+    func setNextMusics(musics: [Music]) {
         willPlayMusics = []
         let playMode = loadPlayMode()
         switch playMode {
         case .shuffle:
-            willPlayMusics = musicArray
+            willPlayMusics = musics
             let index = willPlayMusics.firstIndex(of: music!)!
             willPlayMusics.remove(at: index)
             willPlayMusics.shuffle()
+            saveWillPlayMusicArray(musics: willPlayMusics)
         case .order:
-            willPlayMusics = musicArray
+            willPlayMusics = musics
             let index = willPlayMusics.firstIndex(of: music!)!
             willPlayMusics.remove(at: index)
             willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+            saveWillPlayMusicArray(musics: willPlayMusics)
         case .sameRepeat:
             break
         }
     }
     
-    func musicChoosed(music: Music, musicArray: [Music], playingView: playingView) {
+    func musicChoosed(music: Music, musics: [Music], playingView: playingView) {
         setMusic(music: music)
         setScheduleFile()
-        setNextMusics(musicArray: musicArray)
+        setNextMusics(musics: musics)
         savePlayingView(playingView: playingView)
         isPlay = true
         Task { await DidPlayMusicData.createDidPlayMusicData(music: music) }
@@ -276,6 +279,12 @@ class PlayController: ObservableObject {
         }
     }
     
+    func saveWillPlayMusicArray(musics: [Music]) {
+        for music in musics {
+            Task { await WillPlayMusicDataService.shared.createWillPlayMusicData(music: music) }
+        }
+    }
+    
     func loadPlayMode() -> playMode {
         let saveData = UserDefaults.standard.string(forKey: "playMode") ?? "shuffle"
         var playMode: playMode = .shuffle
@@ -342,24 +351,33 @@ class PlayController: ObservableObject {
     
     func savePlayingMusic(music: Music?) {
         if let saveMusic = music {
-            UserDefaults.standard.setValue(saveMusic, forKey: "playingMusicName")
+            let musicDictionary: [String: Any] = ["musicName": saveMusic.musicName!, "artistName": saveMusic.artistName!, "albumName": saveMusic.albumName!, "editedDate": saveMusic.editedDate!, "fileSize": saveMusic.fileSize!, "musicLength": saveMusic.musicLength!, "filePath": saveMusic.filePath!]
+            UserDefaults.standard.setValue(musicDictionary, forKey: "playingMusicName")
         }
     }
     
     func loadPlayingMusic() -> Music? {
-        if let music = UserDefaults.standard.value(forKey: "playingMusicName") {
-            return music as? Music
+        if let musicDictionary = UserDefaults.standard.dictionary(forKey: "playingMusicName") {
+            let music = Music(musicName: musicDictionary["musicName"] as? String, artistName: musicDictionary["artistName"] as? String, albumName: musicDictionary["albumName"] as? String, editedDate: musicDictionary["editedDate"] as? Date, fileSize: musicDictionary["fileSize"] as? String, musicLength: musicDictionary["musicLength"] as? TimeInterval, filePath: musicDictionary["filePath"] as? String)
+            return music
         }
         return nil
     }
     
-    func setPlayingMusic(musicArray: [Music]) {
-        if let musicName = UserDefaults.standard.string(forKey: "plaingMusicName") {
-            if let music = musicArray.first(where: {$0.musicName == musicName}) {
-                setMusic(music: music)
-                setScheduleFile()
-                setNextMusics(musicArray: musicArray)
+    func setPlayingMusic() async {
+        if var music = loadPlayingMusic() {
+            guard let filePath = music.filePath else { return }
+            let newPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+            var oldFilePathPieces = URL(fileURLWithPath: filePath).pathComponents
+            guard let index = oldFilePathPieces.firstIndex(where: {$0 == "Documents"}) else { return }
+            for i in 0 ... index {
+                oldFilePathPieces.removeFirst()
             }
+            let newFilePath = newPath + "/" + oldFilePathPieces.joined(separator: "/")
+            music.filePath = newFilePath
+            willPlayMusics = await WillPlayMusicDataService.shared.getAllWillPlayMusicDatas()
+            setMusic(music: music)
+            setScheduleFile()
         }
     }
 }

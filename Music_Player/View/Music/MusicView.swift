@@ -12,6 +12,7 @@ struct MusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @Binding private var musicArray: [Music]
+    @State private var isFirstAppear = false
     @State private var isShowsProgressView = true
     @State private var isShowAlert = false
     @State private var deleteTarget: Music?
@@ -30,7 +31,7 @@ struct MusicView: View {
                         HStack {
                             Button(action: {
                                 if !musicArray.isEmpty {
-                                    pc.musicChoosed(music: musicArray[Int.random(in: 0 ..< musicArray.count)], musicArray: musicArray, playingView: .music)
+                                    pc.musicChoosed(music: musicArray.randomElement()!, musics: musicArray, playingView: .music)
                                 }
                             }){
                                 Image(systemName: "play.circle")
@@ -43,7 +44,7 @@ struct MusicView: View {
                     }
                     .padding(.horizontal)
                     List($musicArray) { $music in
-                        MusicCellView(mds: mds, pc: pc, musicArray: $musicArray, music: music, playingView: .music)
+                        MusicCellView(mds: mds, pc: pc, musics: musicArray, music: music, playingView: .music)
                     }
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
@@ -60,50 +61,53 @@ struct MusicView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
-                    Menu {
-                        Button(action: {
-                            Task {
-                                isShowsProgressView = true
-                                await mds.getFile()
-                                isShowsProgressView = false
-                            }
-                        }) {
-                            Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
-                        }
-                        NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc), label: {
-                            Label("お気に入り", systemImage: "heart.fill")
-                        })
-                        NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc), label: {
-                            Label("再生履歴", systemImage: "clock.arrow.circlepath")
-                        })
-                        Menu {
-                            Button(action: { mds.musicSort(method: .nameAscending) }, label: {
-                                Text("曲名昇順")
-                            })
-                            Button(action: { mds.musicSort(method: .nameDescending) }, label: {
-                                Text("曲名降順")
-                            })
-                            Button(action: { mds.musicSort(method: .dateAscending) }, label: {
-                                Text("追加日昇順")
-                            })
-                            Button(action: { mds.musicSort(method: .dateDescending) }, label: {
-                                Text("追加日降順")
-                            })
-                        } label: {
-                            Label("並び替え", systemImage: "arrow.up.arrow.down")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
+                    toolBarMenu()
                 })
             }
             .onAppear() {
                 Task {
                     if musicArray.isEmpty { await mds.getFile() }
-                    if !pc.isPlay { pc.setPlayingMusic(musicArray: musicArray) }
+                    if !isFirstAppear { await pc.setPlayingMusic() }
                     isShowsProgressView = false
                 }
             }
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: {
+                Task {
+                    isShowsProgressView = true
+                    await mds.getFile()
+                    isShowsProgressView = false
+                }
+            }) {
+                Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
+            }
+            NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc), label: {
+                Label("お気に入り", systemImage: "heart.fill")
+            })
+            NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc), label: {
+                Label("再生履歴", systemImage: "clock.arrow.circlepath")
+            })
+            Menu {
+                Button(action: { mds.musicSort(method: .nameAscending) }, label: {
+                    Text("曲名昇順")
+                })
+                Button(action: { mds.musicSort(method: .nameDescending) }, label: {
+                    Text("曲名降順")
+                })
+                Button(action: { mds.musicSort(method: .dateAscending) }, label: {
+                    Text("追加日昇順")
+                })
+                Button(action: { mds.musicSort(method: .dateDescending) }, label: {
+                    Text("追加日降順")
+                })
+            } label: {
+                Label("並び替え", systemImage: "arrow.up.arrow.down")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
         }
     }
 }

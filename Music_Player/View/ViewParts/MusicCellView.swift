@@ -11,15 +11,15 @@ struct MusicCellView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @State var music: Music
-    @Binding private var musicArray: [Music]
+    @State private var musics: [Music]
     @State private var isShowAlert = false
     @State private var deleteTarget: Music?
     @State private var playingView: PlayController.playingView
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>, music: Music, playingView: PlayController.playingView) {
+    init(mds: MusicDataStore, pc: PlayController, musics: [Music], music: Music, playingView: PlayController.playingView) {
         self.mds = mds
         self.pc = pc
-        self._musicArray = musicArray
+        _musics = State(initialValue: musics)
         _music = State(initialValue: music)
         _playingView = State(initialValue: playingView)
     }
@@ -46,7 +46,7 @@ struct MusicCellView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                pc.musicChoosed(music: music, musicArray: musicArray, playingView: playingView)
+                if playingView != .didPlay { pc.musicChoosed(music: music, musics: musics, playingView: playingView) }
             }
             Spacer()
             Text(secToMin(second:music.musicLength!))

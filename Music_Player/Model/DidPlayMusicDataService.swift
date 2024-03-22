@@ -15,12 +15,13 @@ final class DidPlayMusicDataService {
     }()
     
     func createDidPlayMusicData(music: Music) async {
-        let DidPlayMusicData = DidPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.insert(DidPlayMusicData)
+        let didPlayMusicData = DidPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+        await actor.insert(didPlayMusicData)
     }
     
-    func deleteDidPlayMusicData(DidPlayMusicData: DidPlayMusicData) async {
-        await actor.delete(DidPlayMusicData)
+    func deleteDidPlayMusicData(music: Music) async {
+        let didPlayMusic = DidPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+        await actor.delete(didPlayMusic)
     }
     
     func getAllDidPlayMusicDatas() async -> [DidPlayMusicData] {
