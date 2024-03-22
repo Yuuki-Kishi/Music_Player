@@ -27,17 +27,17 @@ struct MusicCellView: View {
     var body: some View {
         HStack {
             VStack {
-                Text(music.musicName!)
+                Text(music.musicName ?? "不明なミュージック")
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack {
-                    Text(music.artistName!)
+                    Text(music.artistName ?? "不明なアーティスト")
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundStyle(Color.gray)
-                    Text(music.albumName!)
+                    Text(music.albumName ?? "不明なアルバム")
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity,alignment: .leading)

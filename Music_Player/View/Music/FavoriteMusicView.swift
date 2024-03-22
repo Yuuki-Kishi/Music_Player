@@ -11,15 +11,12 @@ import SwiftData
 struct FavoriteMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Environment(\.modelContext) private var modelContext
-    @Query private var FMArray: [FMD]
-    @Binding private var musicArray: [Music]
+    @Query private var favoriteMusicArray: [FavoriteMusicData]
     @State private var listMusicArray = [Music]()
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+    init(mds: MusicDataStore, pc: PlayController) {
         self.mds = mds
         self.pc = pc
-        self._musicArray = musicArray
     }
     
     var body: some View {
@@ -45,10 +42,9 @@ struct FavoriteMusicView: View {
             })
         }
         .onAppear() {
-            for FMMusic in FMArray {
-                if let music = musicArray.first(where: {$0.musicName == FMMusic.musicName}) {
-                    listMusicArray.append(music)
-                }
+            for favoriteMusic in favoriteMusicArray {
+                let music = Music(musicName: favoriteMusic.musicName, artistName: favoriteMusic.artistName, albumName: favoriteMusic.albumName, editedDate: favoriteMusic.editedDate, fileSize: favoriteMusic.fileSize, musicLength: favoriteMusic.musicLength, filePath: favoriteMusic.filePath)
+                listMusicArray.append(music)
             }
         }
     }

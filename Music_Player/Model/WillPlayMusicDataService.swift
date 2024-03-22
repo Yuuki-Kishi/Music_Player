@@ -1,16 +1,16 @@
 //
-//  DPMDService.swift
+//  WPMDService.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/18.
+//  Created by 岸　優樹 on 2024/03/20.
 //
 
 import Foundation
 import SwiftData
 
-class DPMDPersistance {
+class WillPlayMusicDataPersistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([DPMD.self])
+        let schema = Schema([WillPlayMusicData.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -22,7 +22,7 @@ class DPMDPersistance {
     
 }
 
-actor DPMDPersistanceActor: ModelActor {
+actor WillPlayMusicDataPersistanceActor: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
     
@@ -51,23 +51,23 @@ actor DPMDPersistanceActor: ModelActor {
     }
 }
 
-final class DPMDService {
-    static let shared = DPMDService()
+final class WillPlayMusicDataService {
+    static let shared = WillPlayMusicDataService()
     lazy var actor = {
-        return DPMDPersistanceActor(modelContainer: DPMDPersistance.sharedModelContainer)
+        return WillPlayMusicDataPersistanceActor(modelContainer: WillPlayMusicDataPersistance.sharedModelContainer)
     }()
     
     func createDPMD(music: Music) async {
-        let DPMD = DPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.insert(DPMD)
+        let WillPlayMusicData = WillPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+        await actor.insert(WillPlayMusicData)
     }
     
-    func deleteDPMD(DPMD: DPMD) async {
-        await actor.delete(DPMD)
+    func deleteDPMD(WillPlayMusicData: WillPlayMusicData) async {
+        await actor.delete(WillPlayMusicData)
     }
     
-    func getAllDPMDs() async -> [DPMD] {
-        let predicate = #Predicate<DPMD> { todo in
+    func getAllDPMDs() async -> [WillPlayMusicData] {
+        let predicate = #Predicate<WillPlayMusicData> { WillPlayMusicData in
             return true
         }
         let descriptor = FetchDescriptor(predicate: predicate)

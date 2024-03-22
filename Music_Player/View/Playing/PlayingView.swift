@@ -16,7 +16,7 @@ struct PlayingView: View {
     @State private var seekPositionDisplay: TimeInterval = 0.0
     @State private var isEditingSeekPosition: Bool = false
     @Binding private var isPlay: Bool
-    @Query private var FMArray: [FMD]
+    @Query private var FMArray: [FavoriteMusicData]
     @State private var toMusicInfo = false
     @State private var isFavorite = false
     @State private var isShowAddLastAlert = false
@@ -218,8 +218,8 @@ struct PlayingView: View {
             let item = FMArray.first(where: {$0.musicName == music?.musicName!})!
             modelContext.delete(item)
         } else { 
-            let FMD = FMD(musicName: music?.musicName ?? "不明な曲", artistName: music?.artistName ?? "不明なアーティスト", albumName: music?.albumName ?? "不明なアルバム", editedDate: music?.editedDate ?? Date(), fileSize: music?.fileSize ?? "0MB", musicLength: music?.musicLength ?? 0, filePath: music?.filePath ?? "filePath")
-            modelContext.insert(FMD)
+            let FavoriteMusicData = FavoriteMusicData(musicName: music?.musicName ?? "不明な曲", artistName: music?.artistName ?? "不明なアーティスト", albumName: music?.albumName ?? "不明なアルバム", editedDate: music?.editedDate ?? Date(), fileSize: music?.fileSize ?? "0MB", musicLength: music?.musicLength ?? 0, filePath: music?.filePath ?? "filePath")
+            modelContext.insert(FavoriteMusicData)
         }
         isFavorite.toggle()
     }

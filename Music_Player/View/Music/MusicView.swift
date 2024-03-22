@@ -70,10 +70,10 @@ struct MusicView: View {
                         }) {
                             Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
                         }
-                        NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc, musicArray: $musicArray), label: {
+                        NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc), label: {
                             Label("お気に入り", systemImage: "heart.fill")
                         })
-                        NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc, musicArray: $musicArray), label: {
+                        NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc), label: {
                             Label("再生履歴", systemImage: "clock.arrow.circlepath")
                         })
                         Menu {
@@ -99,7 +99,7 @@ struct MusicView: View {
             }
             .onAppear() {
                 Task {
-                    await mds.getFile()
+                    if musicArray.isEmpty { await mds.getFile() }
                     if !pc.isPlay { pc.setPlayingMusic(musicArray: musicArray) }
                     isShowsProgressView = false
                 }

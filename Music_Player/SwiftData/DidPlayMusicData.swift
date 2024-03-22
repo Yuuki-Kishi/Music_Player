@@ -1,15 +1,15 @@
 //
-//  FavoriteMusicData.swift
+//  DPMD.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/13.
+//  Created by 岸　優樹 on 2024/03/16.
 //
 
 import Foundation
 import SwiftData
 
 @Model
-final class FMD: Identifiable {
+final class DidPlayMusicData: Identifiable {
     @Attribute(.unique) var musicId: UUID
     var musicName: String?
     var artistName: String?

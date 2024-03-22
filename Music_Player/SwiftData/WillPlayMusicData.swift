@@ -1,15 +1,15 @@
 //
-//  DPMD.swift
+//  WPMD.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/16.
+//  Created by 岸　優樹 on 2024/03/20.
 //
 
 import Foundation
 import SwiftData
 
 @Model
-final class DPMD: Identifiable {
+final class WillPlayMusicData: Identifiable {
     @Attribute(.unique) var musicId: UUID
     var musicName: String?
     var artistName: String?

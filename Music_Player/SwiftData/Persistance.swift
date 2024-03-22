@@ -1,16 +1,16 @@
 //
-//  WPMDService.swift
+//  Persistance.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/20.
+//  Created by 岸　優樹 on 2024/03/22.
 //
 
 import Foundation
 import SwiftData
 
-class WPMDPersistance {
+class Persistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([WPMD.self])
+        let schema = Schema([PlaylistData.self, FavoriteMusicData.self, DidPlayMusicData.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -22,7 +22,7 @@ class WPMDPersistance {
     
 }
 
-actor WPMDPersistanceActor: ModelActor {
+actor PersistanceActor: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
     
@@ -48,29 +48,5 @@ actor WPMDPersistanceActor: ModelActor {
             print("error get")
         }
         return fetched
-    }
-}
-
-final class WPMDService {
-    static let shared = WPMDService()
-    lazy var actor = {
-        return WPMDPersistanceActor(modelContainer: WPMDPersistance.sharedModelContainer)
-    }()
-    
-    func createDPMD(music: Music) async {
-        let WPMD = WPMD(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.insert(WPMD)
-    }
-    
-    func deleteDPMD(WPMD: WPMD) async {
-        await actor.delete(WPMD)
-    }
-    
-    func getAllDPMDs() async -> [WPMD] {
-        let predicate = #Predicate<WPMD> { todo in
-            return true
-        }
-        let descriptor = FetchDescriptor(predicate: predicate)
-        return await actor.get(descriptor) ?? []
     }
 }

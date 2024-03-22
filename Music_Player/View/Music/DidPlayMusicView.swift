@@ -1,5 +1,5 @@
 //
-//  DidPlayMusicView.swift
+//  didPlayMusicView.swift
 //  Music_Player
 //
 //  Created by 岸　優樹 on 2024/03/16.
@@ -11,32 +11,33 @@ import SwiftData
 struct DidPlayMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
-    @Environment(\.modelContext) private var modelContext
-    @State private var DPMArray = [DPMD]()
-    @Binding private var musicArray: [Music]
+    @State private var didPlayMusicArray = [DidPlayMusicData]()
     @State private var listMusicArray = [Music]()
-    private var DPMDS = DPMDService.shared
     
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
+    init(mds: MusicDataStore, pc: PlayController) {
         self.mds = mds
         self.pc = pc
-        self._musicArray = musicArray
     }
     
     var body: some View {
-        List($listMusicArray) { $music in
-            MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: music, playingView: .didPlay)
+        VStack {
+            HStack {
+                Text(String(listMusicArray.count) + "曲の再生履歴")
+                    .padding(.horizontal)
+                Spacer()
+            }
+            List($listMusicArray) { $music in
+                MusicCellView(mds: mds, pc: pc, musicArray: $listMusicArray, music: music, playingView: .didPlay)
+            }
+            .listStyle(.plain)
         }
-        .listStyle(.plain)
         .navigationTitle("再生履歴")
         .onAppear() {
             Task {
-                DPMArray = await DPMDS.getAllDPMDs()
-                print(DPMArray)
-                for DPMusic in DPMArray {
-                    if let music = musicArray.first(where: {$0.musicName == DPMusic.musicName}) {
-                        listMusicArray.append(music)
-                    }
+                didPlayMusicArray = await DidPlayMusicDataService.shared.getAllDidPlayMusicDatas()
+                for didPlayMusic in didPlayMusicArray {
+                    let music = Music(musicName: didPlayMusic.musicName, artistName: didPlayMusic.artistName, albumName: didPlayMusic.albumName, editedDate: didPlayMusic.editedDate, fileSize: didPlayMusic.fileSize, musicLength: didPlayMusic.musicLength, filePath: didPlayMusic.filePath)
+                    listMusicArray.append(music)
                 }
             }
         }

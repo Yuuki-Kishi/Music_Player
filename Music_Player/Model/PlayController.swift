@@ -15,7 +15,7 @@ class PlayController: ObservableObject {
     private let audioEngine: AVAudioEngine = .init()
     private let playerNode: AVAudioPlayerNode = .init()
     private var cachedSeekBarSeconds = 0.0
-    private var DPMDS = DPMDService.shared
+    private var DidPlayMusicData = DidPlayMusicDataService.shared
     @Published var didPlayMusics = [Music]()
     @Published var willPlayMusics = [Music]()
     @Published var music: Music? = nil
@@ -37,6 +37,7 @@ class PlayController: ObservableObject {
     init() {
         // 接続するオーディオノードをAudioEngineにアタッチする
         audioEngine.attach(playerNode)
+        audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
         isPlay = false
     }
     
@@ -87,7 +88,7 @@ class PlayController: ObservableObject {
         setNextMusics(musicArray: musicArray)
         savePlayingView(playingView: playingView)
         isPlay = true
-        Task { await DPMDS.createDPMD(music: music) }
+        Task { await DidPlayMusicData.createDidPlayMusicData(music: music) }
         setTimer()
     }
     
@@ -179,7 +180,7 @@ class PlayController: ObservableObject {
                 willPlayMusics.removeFirst()
                 setScheduleFile()
                 isPlay = true
-                Task { await DPMDS.createDPMD(music:music) }
+                Task { await DidPlayMusicData.createDidPlayMusicData(music:music) }
                 setTimer()
             } else {
                 setScheduleFile()
@@ -206,7 +207,7 @@ class PlayController: ObservableObject {
                 didPlayMusics.removeLast()
                 setScheduleFile()
                 isPlay = true
-                Task { await DPMDS.createDPMD(music:music) }
+                Task { await DidPlayMusicData.createDidPlayMusicData(music:music) }
                 setTimer()
             } else {
                 setScheduleFile()

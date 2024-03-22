@@ -111,9 +111,9 @@ class MusicDataStore: ObservableObject {
     func musicSort(method: musicSortMode) {
         switch method {
         case .nameAscending:
-            musicArray.sort {$0.musicName! < $1.musicName!}
+            musicArray.sort {$0.musicName ?? "" < $1.musicName ?? ""}
         case .nameDescending:
-            musicArray.sort {$0.musicName! > $1.musicName!}
+            musicArray.sort {$0.musicName ?? "" > $1.musicName ?? ""}
         case .dateAscending:
             musicArray.sort {$0.editedDate ?? Date() < $1.editedDate ?? Date()}
         case .dateDescending:

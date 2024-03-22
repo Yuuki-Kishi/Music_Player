@@ -121,9 +121,13 @@ final class FileService {
     }
     
     func getMusicLength(fileURL: URL) -> TimeInterval? {
-        let audioPlayer: AVAudioPlayer = try! AVAudioPlayer(contentsOf: fileURL)
-        let duration = audioPlayer.duration
-        return duration
+        do {
+            let audioPlayer: AVAudioPlayer = try! AVAudioPlayer(contentsOf: fileURL)
+            let duration = audioPlayer.duration
+            return duration
+        } catch {
+            return nil
+        }
     }
     
     func fileDelete(filePath: String?) {

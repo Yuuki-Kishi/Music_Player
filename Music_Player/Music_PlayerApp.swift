@@ -16,8 +16,7 @@ struct Music_PlayerApp: App {
         WindowGroup {
             ContentView(mds: MusicDataStore.shared, pc: PlayController.shared)
         }
-        .modelContainer(for: [PlaylistData.self, FMD.self])
-        .modelContainer(DPMDPersistance.sharedModelContainer)
+        .modelContainer(Persistance.sharedModelContainer)
     }
 }
 
