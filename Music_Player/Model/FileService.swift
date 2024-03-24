@@ -85,12 +85,22 @@ final class FileService {
         let musicName = try? await metadata.first(where: {$0.commonKey == .commonKeyTitle})?.load(.stringValue)
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
         let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
-        let filePath = fileURL.path(percentEncoded: false)
-        let editedDate = getEditedDate(filePath: filePath)
-        let fileSize = getFileSize(filePath: filePath)
+        let fullFilePath = fileURL.path(percentEncoded: false)
+        let filePath = getEditedFilePath(fileURL: fileURL)
+        let editedDate = getEditedDate(filePath: fullFilePath)
+        let fileSize = getFileSize(filePath: fullFilePath)
         let musicLength = getMusicLength(fileURL: fileURL)
         let music = Music(musicName: musicName, artistName: artistName, albumName: albumName, editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, filePath: filePath)
         return music
+    }
+    
+    func getEditedFilePath(fileURL: URL) -> String {
+        var filePathPieces = fileURL.pathComponents
+        let index = filePathPieces.firstIndex(where: {$0 == "Documents"})!
+        for i in 0 ... index {
+            filePathPieces.removeFirst()
+        }
+        return filePathPieces.joined(separator: "/")
     }
     
     func getEditedDate(filePath: String) -> Date? {

@@ -11,33 +11,15 @@ import SwiftData
 @Model
 final class FavoriteMusicData: Identifiable {
     @Attribute(.unique) var musicId: UUID
-    var musicName: String?
-    var artistName: String?
-    var albumName: String?
-    var editedDate: Date?
-    var fileSize: String?
-    var musicLength: TimeInterval?
-    var filePath: String?
+    var music: Music
     
-    init(musicId: UUID, musicName: String?, artistName: String?, albumName: String?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, filePath: String?) {
+    init(musicId: UUID, music: Music) {
         self.musicId = musicId
-        self.musicName = musicName
-        self.artistName = artistName
-        self.albumName = albumName
-        self.editedDate = editedDate
-        self.fileSize = fileSize
-        self.musicLength = musicLength
-        self.filePath = filePath
+        self.music = music
     }
     
-    init(musicName: String?, artistName: String?, albumName: String?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, filePath: String?) {
+    init (music: Music) {
         self.musicId = UUID()
-        self.musicName = musicName
-        self.artistName = artistName
-        self.albumName = albumName
-        self.editedDate = editedDate
-        self.fileSize = fileSize
-        self.musicLength = musicLength
-        self.filePath = filePath
+        self.music = music
     }
 }

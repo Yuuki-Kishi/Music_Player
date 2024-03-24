@@ -76,7 +76,9 @@ struct PlayingMusicView: View {
                     if music?.filePath != nil {
                         isPlay.toggle()
                     } else {
-                        pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musics: mds.musicArray, playingView: .music)
+                        if !mds.musicArray.isEmpty {
+                            pc.musicChoosed(music: mds.musicArray.randomElement()!, musics: mds.musicArray, playingView: .music)
+                        }
                     }
                 }, label: {
                     if isPlay {

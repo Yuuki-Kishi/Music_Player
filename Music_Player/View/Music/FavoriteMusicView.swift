@@ -41,7 +41,7 @@ struct FavoriteMusicView: View {
             })
         }
         .onAppear() {
-            Task { listMusicArray = await FavoriteMusicDataService.shared.getAllFavoriteMusicDatas() }
+            Task { listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics() }
         }
     }
 }

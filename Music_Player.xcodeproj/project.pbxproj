@@ -247,7 +247,6 @@
 				DEC4CFF62B9848C2009F5296 /* ViewParts */,
 				DE6A17712BA498CA004BC71D /* Playing */,
 				DE6A17742BA53AA9004BC71D /* NavigationView */,
-				DE7BA5F12B3DA95100FB78DD /* ListMusicView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -255,6 +254,7 @@
 		DED9FD652B74D4880008B127 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				DE7BA5F12B3DA95100FB78DD /* ListMusicView.swift */,
 				DED9FD622B7243770008B127 /* MusicDataStoreViewModel.swift */,
 				DED9FD782B80DF7F0008B127 /* PlayControllerViewModel.swift */,
 			);
@@ -534,6 +534,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Music-Player-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "File Musician";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -566,6 +567,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Music-Player-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "File Musician";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

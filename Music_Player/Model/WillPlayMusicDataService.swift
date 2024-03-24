@@ -14,27 +14,59 @@ final class WillPlayMusicDataService {
         return PersistanceActor(modelContainer: Persistance.sharedModelContainer)
     }()
     
-    func createWillPlayMusicData(music: Music) async {
-        let willPlayMusicData = WillPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+    func createWillPlayMusicData(music: Music, index: Int) async {
+        let willPlayMusicData = WillPlayMusicData(music: music, index: index)
         await actor.insert(willPlayMusicData)
     }
     
-    func deleteWillPlayMusicData(music: Music) async {
-        let willPlayMusic = WillPlayMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.delete(willPlayMusic)
+    func insertFirst(music: Music) async {
+        let willPlayMusics = await readWillPlayMusics()
+        await deleteAllWillPlayMusicData()
+        await createWillPlayMusicData(music: music, index: 0)
+        for willPlayMusic in willPlayMusics {
+            await createWillPlayMusicData(music: willPlayMusic, index: willPlayMusics.count + 1)
+        }
     }
     
-    func getAllWillPlayMusicDatas() async -> [Music] {
+    func readWillPlayMusics() async -> [Music] {
         let predicate = #Predicate<WillPlayMusicData> { WillPlayMusicData in
             return true
         }
         let descriptor = FetchDescriptor(predicate: predicate)
-        let willPlayMusicArray = await actor.get(descriptor) ?? []
+        var willPlayMusicDatas = await actor.get(descriptor) ?? []
+        willPlayMusicDatas.sort {$0.index < $1.index}
         var musics = [Music]()
-        for willPlayMusic in willPlayMusicArray {
-            let music = Music(musicName: willPlayMusic.musicName, artistName: willPlayMusic.artistName, albumName: willPlayMusic.albumName, editedDate: willPlayMusic.editedDate, fileSize: willPlayMusic.fileSize, musicLength: willPlayMusic.musicLength, filePath: willPlayMusic.filePath)
+        for willPlayMusicData in willPlayMusicDatas {
+            let music = willPlayMusicData.music
             musics.append(music)
         }
         return musics
+    }
+    
+    func readWillPlayMusicDatas() async -> [WillPlayMusicData] {
+        let predicate = #Predicate<WillPlayMusicData> { WillPlayMusicData in
+            return true
+        }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        return await actor.get(descriptor) ?? []
+    }
+    
+    func updateWillPlayMusicData(oldMusic: Music, newMusic: Music) async {
+        if let willPlayMusicData = await readWillPlayMusicDatas().first(where: {$0.music.filePath == oldMusic.filePath}) {
+            willPlayMusicData.music = newMusic
+            await actor.save()
+        }
+    }
+    
+    func deleteWillPlayMusicData(music: Music) async {
+        if let willPlayMusicData = await readWillPlayMusicDatas().first(where: {$0.music.filePath == music.filePath}) {
+            await actor.delete(willPlayMusicData)
+        }
+    }
+    
+    func deleteAllWillPlayMusicData() async {
+        for willPlayMusic in await readWillPlayMusics() {
+            await deleteWillPlayMusicData(music: willPlayMusic)
+        }
     }
 }

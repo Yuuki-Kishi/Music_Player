@@ -16,12 +16,11 @@ struct PlayingView: View {
     @State private var seekPositionDisplay: TimeInterval = 0.0
     @State private var isEditingSeekPosition: Bool = false
     @Binding private var isPlay: Bool
-    @Query private var FMArray: [FavoriteMusicData]
+    @State private var favoriteMusics = [Music]()
     @State private var toMusicInfo = false
     @State private var isFavorite = false
     @State private var isShowAddLastAlert = false
     @State private var isShowAddFirstAlert = false
-    @Environment(\.modelContext) private var modelContext
     
     init(mds: MusicDataStore, pc: PlayController, music: Binding<Music?>, seekPosition: Binding<TimeInterval>, isPlay: Binding<Bool>) {
         self.mds = mds
@@ -111,9 +110,7 @@ struct PlayingView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Button(action: {
-                        pc.moveBeforeMusic()
-                    }, label: {
+                    Button(action: { pc.moveBeforeMusic() }, label: {
                         Image(systemName: "backward.fill")
                     })
                     .font(.system(size: 25.0))
@@ -123,21 +120,16 @@ struct PlayingView: View {
                         if music?.filePath != nil {
                             isPlay.toggle()
                         } else {
-                            pc.musicChoosed(music: mds.musicArray[Int.random(in: 0 ..< mds.musicArray.count)], musics: mds.musicArray, playingView: .music)
+                            pc.randomPlay(musics: mds.musicArray, playingView: .music)
                         }
                     }, label: {
-                        if isPlay {
-                            Image(systemName: "pause.fill")
-                        } else {
-                            Image(systemName: "play.fill")
-                        }
+                        if isPlay { Image(systemName: "pause.fill") }
+                        else { Image(systemName: "play.fill") }
                     })
                     .font(.system(size: 40.0))
                     .foregroundStyle(.primary)
                     Spacer()
-                    Button(action: {
-                        pc.moveNextMusic()
-                    }, label: {
+                    Button(action: { pc.moveNextMusic() }, label: {
                         Image(systemName: "forward.fill")
                     })
                     .font(.system(size: 25.0))
@@ -151,7 +143,10 @@ struct PlayingView: View {
             .padding()
         }
         .onAppear() {
-            isFavorite = FMArray.contains(where: {$0.musicName == music?.musicName!})
+            Task {
+                favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
+                isFavorite = favoriteMusics.contains(where: {$0.filePath == music?.filePath})
+            }
         }
     }
     func musicMenu() -> some View {
@@ -214,16 +209,13 @@ struct PlayingView: View {
         }
     }
     func isFavoriteToggle() {
-        if isFavorite {
-            let item = FMArray.first(where: {$0.musicName == music?.musicName!})!
-            modelContext.delete(item)
-        } else { 
-            let FavoriteMusicData = FavoriteMusicData(musicName: music?.musicName ?? "不明な曲", artistName: music?.artistName ?? "不明なアーティスト", albumName: music?.albumName ?? "不明なアルバム", editedDate: music?.editedDate ?? Date(), fileSize: music?.fileSize ?? "0MB", musicLength: music?.musicLength ?? 0, filePath: music?.filePath ?? "filePath")
-            modelContext.insert(FavoriteMusicData)
+        if let music = music {
+            if isFavorite {
+                Task { await FavoriteMusicDataService.shared.deleteFavoriteMusicData(music: music) }
+            } else {
+                Task { await FavoriteMusicDataService.shared.createFavoriteMusicData(music: music) }
+            }
+            isFavorite.toggle()
         }
-        isFavorite.toggle()
-    }
-    func testPrint() {
-        print("tapped")
     }
 }

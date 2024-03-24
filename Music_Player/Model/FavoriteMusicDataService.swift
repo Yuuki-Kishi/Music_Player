@@ -15,16 +15,11 @@ final class FavoriteMusicDataService {
     }()
     
     func createFavoriteMusicData(music: Music) async {
-        let favoriteMusicData = FavoriteMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
+        let favoriteMusicData = FavoriteMusicData(music: music)
         await actor.insert(favoriteMusicData)
     }
     
-    func deleteFavoriteMusicData(music: Music) async {
-        let favoriteMusic = FavoriteMusicData(musicName: music.musicName, artistName: music.artistName, albumName: music.albumName, editedDate: music.editedDate, fileSize: music.fileSize, musicLength: music.musicLength, filePath: music.filePath)
-        await actor.delete(favoriteMusic)
-    }
-    
-    func getAllFavoriteMusicDatas() async -> [Music] {
+    func readFavoriteMusics() async -> [Music] {
         let predicate = #Predicate<FavoriteMusicData> { favoriteMusicData in
             return true
         }
@@ -32,9 +27,30 @@ final class FavoriteMusicDataService {
         let favoriteMusicArray = await actor.get(descriptor) ?? []
         var musics = [Music]()
         for favoriteMusic in favoriteMusicArray {
-            let music = Music(musicName: favoriteMusic.musicName, artistName: favoriteMusic.artistName, albumName: favoriteMusic.albumName, editedDate: favoriteMusic.editedDate, fileSize: favoriteMusic.fileSize, musicLength: favoriteMusic.musicLength, filePath: favoriteMusic.filePath)
+            let music = favoriteMusic.music
             musics.append(music)
         }
         return musics
+    }
+    
+    func readFavoriteMusicDatas() async -> [FavoriteMusicData] {
+        let predicate = #Predicate<FavoriteMusicData> { favoriteMusicData in
+            return true
+        }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        return await actor.get(descriptor) ?? []
+    }
+    
+    func updateFavoriteMusicData(oldMusic: Music, newMusic: Music) async {
+        if let favoriteMusicData = await readFavoriteMusicDatas().first(where: {$0.music.filePath == oldMusic.filePath}) {
+            favoriteMusicData.music = newMusic
+            await actor.save()
+        }
+    }
+    
+    func deleteFavoriteMusicData(music: Music) async {
+        if let favoriteMusicData = await readFavoriteMusicDatas().first(where: {$0.music.filePath == music.filePath}) {
+            await actor.delete(favoriteMusicData)
+        }
     }
 }

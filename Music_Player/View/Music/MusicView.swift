@@ -27,7 +27,6 @@ struct MusicView: View {
         NavigationStack {
             ZStack {
                 VStack {
-                    ZStack {
                         HStack {
                             Button(action: {
                                 if !musicArray.isEmpty {
@@ -41,7 +40,6 @@ struct MusicView: View {
                             }
                             .foregroundStyle(.primary)
                         }
-                    }
                     .padding(.horizontal)
                     List($musicArray) { $music in
                         MusicCellView(mds: mds, pc: pc, musics: musicArray, music: music, playingView: .music)
@@ -67,7 +65,7 @@ struct MusicView: View {
             .onAppear() {
                 Task {
                     if musicArray.isEmpty { await mds.getFile() }
-                    if !isFirstAppear { await pc.setPlayingMusic() }
+                    if !isFirstAppear { pc.setPlayingMusic(); isFirstAppear = true }
                     isShowsProgressView = false
                 }
             }
