@@ -61,11 +61,9 @@ struct SelectMusicView: View {
         }
     }
     func addMusics() async {
-        var musics = [Music]()
         for music in selectionValue {
-            musics.append(music)
+            await PlaylistDataService.shared.addMusicToPlaylist(playlistId: playlistData.playlistId, music: music)
         }
-        await PlaylistDataService.shared.updatePlaylistData(playlistId: playlistData.playlistId, playlistName: playlistData.playlistName, musics: musics)
         presentation.wrappedValue.dismiss()
     }
 }

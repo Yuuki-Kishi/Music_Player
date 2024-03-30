@@ -27,19 +27,19 @@ struct MusicView: View {
         NavigationStack {
             ZStack {
                 VStack {
-                        HStack {
-                            Button(action: {
-                                if !musicArray.isEmpty {
-                                    pc.musicChoosed(music: musicArray.randomElement()!, musics: musicArray, playingView: .music)
-                                }
-                            }){
-                                Image(systemName: "play.circle")
-                                    .foregroundStyle(.purple)
-                                Text("すべて再生 " + String(musicArray.count) + "曲")
-                                Spacer()
+                    HStack {
+                        Button(action: {
+                            if !musicArray.isEmpty {
+                                pc.musicChoosed(music: musicArray.randomElement()!, musics: musicArray, playingView: .music)
                             }
-                            .foregroundStyle(.primary)
+                        }){
+                            Image(systemName: "play.circle")
+                                .foregroundStyle(.purple)
+                            Text("すべて再生 " + String(musicArray.count) + "曲")
+                            Spacer()
                         }
+                        .foregroundStyle(.primary)
+                    }
                     .padding(.horizontal)
                     List($musicArray) { $music in
                         MusicCellView(mds: mds, pc: pc, musics: musicArray, music: music, playingView: .music)
@@ -85,7 +85,7 @@ struct MusicView: View {
             NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc), label: {
                 Label("お気に入り", systemImage: "heart.fill")
             })
-            NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc), label: {
+            NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc, didPlayMusicArray: $pc.didPlayMusics), label: {
                 Label("再生履歴", systemImage: "clock.arrow.circlepath")
             })
             Menu {

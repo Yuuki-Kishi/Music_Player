@@ -95,17 +95,18 @@ class MusicDataStore: ObservableObject {
             let fileURL = URL(filePath: filePath!)
             var pathPeces = fileURL.pathComponents
             pathPeces.removeLast()
+            if pathPeces.count == 1 { pathPeces.append("Documents") }
             let directoryName = pathPeces.last
             if directoryName == folder { listMusicArray.append(music)}
         }
     }
     
     func fileDelete(filePath: String?) async {
-        fileService.fileDelete(filePath: filePath)
-        musicArray = []
-        let fileURLs = fileService.getFiles()
-        musicArray = await fileService.collectFile(fileURLs: fileURLs)
-        musicSort(method: .nameAscending)
+        if let index = musicArray.firstIndex(where: {$0.filePath == filePath}) {
+            fileService.fileDelete(shortFilePath: filePath)
+            musicArray.remove(at: index)
+            musicSort(method: .nameAscending)
+        }
     }
     
     func musicSort(method: musicSortMode) {

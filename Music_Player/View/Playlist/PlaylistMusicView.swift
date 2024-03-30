@@ -45,7 +45,7 @@ struct PlaylistMusicView: View {
                 .padding(.horizontal)
             }
             List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .playlist)
+                PlaylistMusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playlistData: playlistData)
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
@@ -58,7 +58,10 @@ struct PlaylistMusicView: View {
             })
         }
         .onAppear() {
-            listMusicArray = playlistData.musics
+            Task {
+                listMusicArray = await PlaylistDataService.shared.readPlaylistMusics(playlistId: playlistData.playlistId)
+                listMusicArray.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+            }
         }
     }
     func toolBarMenu() -> some View{

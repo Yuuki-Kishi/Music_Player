@@ -14,8 +14,8 @@ final class DidPlayMusicDataService {
         return PersistanceActor(modelContainer: Persistance.sharedModelContainer)
     }()
     
-    func createDidPlayMusicData(music: Music, index: Int) async {
-        let didPlayMusicData = DidPlayMusicData(music: music, index: index)
+    func createDidPlayMusicData(music: Music) async {
+        let didPlayMusicData = DidPlayMusicData(music: music)
         await actor.insert(didPlayMusicData)
     }
     
@@ -24,7 +24,8 @@ final class DidPlayMusicDataService {
             return true
         }
         let descriptor = FetchDescriptor(predicate: predicate)
-        let didPlayMusicDatas = await actor.get(descriptor) ?? []
+        var didPlayMusicDatas = await actor.get(descriptor) ?? []
+        didPlayMusicDatas.sort {$0.addedTime < $1.addedTime}
         var musics = [Music]()
         for didPlayMusic in didPlayMusicDatas {
             let music = didPlayMusic.music
@@ -39,13 +40,6 @@ final class DidPlayMusicDataService {
         }
         let descriptor = FetchDescriptor(predicate: predicate)
         return await actor.get(descriptor) ?? []
-    }
-    
-    func updateDidPlayMusic(oldMusic: Music, newMusic: Music) async {
-        if let didPlayMusicData = await readDidPlayMusicDatas().first(where: {$0.music.filePath == oldMusic.filePath}) {
-            didPlayMusicData.music = newMusic
-            await actor.save()
-        }
     }
     
     func deleteDidPlayMusicData(music: Music) async {

@@ -50,7 +50,7 @@ class PlayController: ObservableObject {
         //currentItem.itemはMPMediaItemクラス
         let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
         guard let filePath = music?.filePath else { return }
-        let fullFilePath = "/private" + directoryPath + "/" + filePath
+        let fullFilePath = directoryPath + "/" + filePath
         let fileURL = URL(fileURLWithPath: fullFilePath)
         do {
             // Source fileを取得する
@@ -67,50 +67,30 @@ class PlayController: ObservableObject {
     }
     
     func setNextMusics(musics: [Music]) {
-        willPlayMusics = []
         Task {
+            willPlayMusics = []
             await deleteAllWillPlayMusic()
-            await deleteAllDidPlayMusic()
-        }
-        let playMode = loadPlayMode()
-        switch playMode {
-        case .shuffle:
-            willPlayMusics = musics
-            let index = willPlayMusics.firstIndex(of: music!)!
-            willPlayMusics.remove(at: index)
-            willPlayMusics.shuffle()
-            for willPlayMusic in willPlayMusics {
-                Task { await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!) }
+            let playMode = loadPlayMode()
+            switch playMode {
+            case .shuffle:
+                willPlayMusics = musics
+                let index = willPlayMusics.firstIndex(of: music!)!
+                willPlayMusics.remove(at: index)
+                willPlayMusics.shuffle()
+                for willPlayMusic in willPlayMusics {
+                    await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
+                }
+            case .order:
+                willPlayMusics = musics
+                let index = willPlayMusics.firstIndex(of: music!)!
+                willPlayMusics.remove(at: index)
+                willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+                for willPlayMusic in willPlayMusics {
+                    await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
+                }
+            case .sameRepeat:
+                break
             }
-        case .order:
-            willPlayMusics = musics
-            let index = willPlayMusics.firstIndex(of: music!)!
-            willPlayMusics.remove(at: index)
-            willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
-            for willPlayMusic in willPlayMusics {
-                Task { await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!) }
-            }
-        case .sameRepeat:
-            break
-        }
-    }
-    
-    func musicChoosed(music: Music, musics: [Music], playingView: playingView) {
-        setMusic(music: music)
-        setScheduleFile()
-        setNextMusics(musics: musics)
-        savePlayingView(playingView: playingView)
-        isPlay = true
-        Task {
-            let index = await DidPlayMusicDataService.shared.readDidPlayMusics().count
-            await DidPlayMusicData.createDidPlayMusicData(music: music, index: index + 1)
-        }
-        setTimer()
-    }
-    
-    func randomPlay(musics: [Music], playingView: playingView) {
-        if !musics.isEmpty {
-            musicChoosed(music: musics.randomElement()!, musics: musics, playingView: playingView)
         }
     }
     
@@ -193,37 +173,77 @@ class PlayController: ObservableObject {
         playerNode.stop()
     }
     
+    func musicChoosed(music: Music, musics: [Music], playingView: playingView) {
+        Task {
+            setMusic(music: music)
+            setScheduleFile()
+            setNextMusics(musics: musics)
+            savePlayingView(playingView: playingView)
+            isPlay = true
+            setTimer()
+            await createDidPlayMusic(music: music)
+            await readDidPlayMusics()
+        }
+    }
+    
+    func randomPlay(musics: [Music], playingView: playingView) {
+        if !musics.isEmpty {
+            musicChoosed(music: musics.randomElement()!, musics: musics, playingView: playingView)
+        }
+    }
+    
+    func choosedWillPlayMusic(music: Music) {
+        Task {
+            for willPlayMusic in willPlayMusics {
+                if willPlayMusic == music {
+                    setMusic(music: willPlayMusic)
+                    setScheduleFile()
+                    savePlayingMusic(music: willPlayMusic)
+                    isPlay = true
+                    setTimer()
+                    await createDidPlayMusic(music: music)
+                    await readDidPlayMusics()
+                    break
+                }
+                await deleteWillPlayMusic(music: willPlayMusic)
+            }
+            await deleteWillPlayMusic(music: music)
+            await readWillPlayMusics()
+        }
+    }
+    
+    func choosedDidPlayMusic(music: Music) {
+        
+    }
+    
     func moveNextMusic() {
         pause()
         seekPosition = 0.0
         cachedSeekBarSeconds = 0.0
-        if let music = self.music {
-            Task {
-                let index = await DidPlayMusicDataService.shared.readDidPlayMusics().count
-                await createDidPlayMusic(music: music, index: index + 1)
-                await readDidPlayMusics()
-            }
-        }
-        if let music = willPlayMusics.first {
-            if loadPlayMode() != .sameRepeat {
-                Task {
-                    setMusic(music: music)
-                    await deleteWillPlayMusic(music: music)
-                    await readWillPlayMusics()
-                    setScheduleFile()
-                    isPlay = true
-                    setTimer()
+        Task {
+            if let music = self.music {
+                if let music = willPlayMusics.first {
+                    if loadPlayMode() != .sameRepeat {
+                        await createDidPlayMusic(music: music)
+                        await readDidPlayMusics()
+                        setMusic(music: music)
+                        await deleteWillPlayMusic(music: music)
+                        await readWillPlayMusics()
+                        setScheduleFile()
+                        isPlay = true
+                        setTimer()
+                    } else {
+                        setScheduleFile()
+                        isPlay = true
+                        setTimer()
+                    }
+                } else {
+                    self.music = nil
+                    UserDefaults.standard.removeObject(forKey: "playingMusicDictionary")
+                    stop()
+                    isPlay = false
                 }
-            } else {
-                setScheduleFile()
-                isPlay = true
-                setTimer()
             }
-        } else {
-            music = nil
-            UserDefaults.standard.removeObject(forKey: "playingMusicDictionary")
-            stop()
-            isPlay = false
         }
     }
     
@@ -235,10 +255,14 @@ class PlayController: ObservableObject {
             if !didPlayMusics.isEmpty {
                 Task {
                     await insertFirst(music: music)
-                    savePlayingMusic(music: music)
+                    savePlayingMusic(music: didPlayMusics.last!)
                     setMusic(music: didPlayMusics.last!)
                     await deleteDidPlayMusic(music: didPlayMusics.last!)
                     await readDidPlayMusics()
+                    print("")
+                    for didPlayMusic in didPlayMusics {
+                        print(didPlayMusic.musicName)
+                    }
                     setScheduleFile()
                     isPlay = true
                     setTimer()
@@ -264,13 +288,15 @@ class PlayController: ObservableObject {
         switch nowPlayMode {
         case .shuffle:
             savePlayMode(playMode: .order)
-            willPlayMusics = orderSort()
+            willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
         case .order:
             savePlayMode(playMode: .sameRepeat)
             willPlayMusics = []
         case .sameRepeat:
-            savePlayMode(playMode: .shuffle)
-            willPlayMusics.shuffle()
+            Task {
+                savePlayMode(playMode: .shuffle)
+                await readWillPlayMusics()
+            }
         }
     }
     
@@ -324,16 +350,12 @@ class PlayController: ObservableObject {
         await WillPlayMusicDataService.shared.deleteAllWillPlayMusicData()
     }
     
-    func createDidPlayMusic(music: Music, index: Int) async {
-        await DidPlayMusicDataService.shared.createDidPlayMusicData(music: music, index: index)
+    func createDidPlayMusic(music: Music) async {
+        await DidPlayMusicDataService.shared.createDidPlayMusicData(music: music)
     }
     
     func readDidPlayMusics() async {
         didPlayMusics = await DidPlayMusicDataService.shared.readDidPlayMusics()
-    }
-    
-    func updateDidPlayMusicData(oldMusic: Music, newMusic: Music) async {
-        await DidPlayMusicDataService.shared.updateDidPlayMusic(oldMusic: oldMusic, newMusic: newMusic)
     }
     
     func deleteDidPlayMusic(music: Music) async {
@@ -427,6 +449,15 @@ class PlayController: ObservableObject {
         if let music = loadPlayingMusic() {
             Task {
                 await readWillPlayMusics()
+                switch loadPlayMode() {
+                case .shuffle:
+                    break
+                case .order:
+                    willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+                case .sameRepeat:
+                    willPlayMusics.removeAll()
+                }
+                await readDidPlayMusics()
                 setMusic(music: music)
                 setScheduleFile()
             }

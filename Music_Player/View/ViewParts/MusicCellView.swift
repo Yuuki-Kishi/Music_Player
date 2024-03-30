@@ -12,7 +12,8 @@ struct MusicCellView: View {
     @ObservedObject var pc: PlayController
     @State var music: Music
     @State private var musics: [Music]
-    @State private var isShowAlert = false
+    @State private var isShowMusicAlert = false
+    @State private var isShowWillPlayMusicAlert = false
     @State private var deleteTarget: Music?
     @State private var playingView: PlayController.playingView
     
@@ -46,12 +47,23 @@ struct MusicCellView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                if playingView != .didPlay { pc.musicChoosed(music: music, musics: musics, playingView: playingView) }
+                tapped()
             }
             Spacer()
             Text(secToMin(second:music.musicLength!))
                 .foregroundStyle(Color.gray)
-            musicMenu(music: $music)
+            if playingView == .willPlay { willPlayMenu(music: $music) }
+            else { musicMenu(music: $music) }
+        }
+    }
+    func tapped() {
+        switch playingView {
+        case .willPlay:
+            pc.choosedWillPlayMusic(music: music)
+        case .didPlay:
+            pc.choosedDidPlayMusic(music: music)
+        default:
+            pc.musicChoosed(music: music, musics: musics, playingView: playingView)
         }
     }
     func secToMin(second: TimeInterval) -> String {
@@ -79,7 +91,7 @@ struct MusicCellView: View {
             }
             Divider()
             Button(role: .destructive, action: {
-                isShowAlert = true
+                isShowMusicAlert = true
                 deleteTarget = music.wrappedValue
             }) {
                 Label("ファイルを削除", systemImage: "trash")
@@ -89,7 +101,7 @@ struct MusicCellView: View {
                 .foregroundStyle(Color.primary)
                 .frame(width: 40, height: 40)
         }
-        .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
+        .alert("本当に削除しますか？", isPresented: $isShowMusicAlert, actions: {
             Button(role: .destructive, action: {
                 if let deleteTarget { Task { await mds.fileDelete(filePath: deleteTarget.filePath) }}
             }, label: {
@@ -102,4 +114,91 @@ struct MusicCellView: View {
                 Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
         })
     }
+    func willPlayMenu(music: Binding<Music>) -> some View {
+        Menu {
+            NavigationLink(destination: AddPlaylistView(music: music), label: {
+                Label("プレイリストに追加", systemImage: "text.badge.plus")
+            })
+            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
+                Label("曲の情報", systemImage: "info.circle")
+            })
+            Divider()
+            Button(role: .destructive, action: {
+                isShowWillPlayMusicAlert = true
+                deleteTarget = music.wrappedValue
+            }) {
+                Label("ファイルを削除", systemImage: "trash")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
+                .foregroundStyle(Color.primary)
+                .frame(width: 40, height: 40)
+        }
+        .alert("本当に削除しますか？", isPresented: $isShowWillPlayMusicAlert, actions: {
+            Button(role: .destructive, action: {
+                if let deleteTarget { Task { await mds.fileDelete(filePath: deleteTarget.filePath) }}
+            }, label: {
+                Text("削除")
+            })
+            Button(role: .cancel, action: {}, label: {
+                Text("キャンセル")
+            })
+        })
+    }
+//    func playlistMenu(music: Binding<Music>) -> some View {
+//        Menu {
+//            NavigationLink(destination: AddPlaylistView(music: music), label: {
+//                Label("プレイリストに追加", systemImage: "text.badge.plus")
+//            })
+//            NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
+//                Label("曲の情報", systemImage: "info.circle")
+//            })
+//            Divider()
+//            Button(action: {pc.addWPMFirst(music: music.wrappedValue)}) {
+//                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+//            }
+//            Button(action: {pc.addWPMLast(music: music.wrappedValue)}) {
+//                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
+//            }
+//            Divider()
+//            Button(role: .destructive, action: {
+//                isShowPlaylistAlert = true
+//                deleteTarget = music.wrappedValue
+//            }, label: {
+//                Label("プレイリストから削除", systemImage: "text.badge.minus")
+//            })
+//            Button(role: .destructive, action: {
+//                isShowMusicAlert = true
+//                deleteTarget = music.wrappedValue
+//            }) {
+//                Label("ファイルを削除", systemImage: "trash")
+//            }
+//        } label: {
+//            Image(systemName: "ellipsis")
+//                .foregroundStyle(Color.primary)
+//                .frame(width: 40, height: 40)
+//        }
+//        .alert("本当に除外しますか？", isPresented: $isShowPlaylistAlert, actions: {
+//            Button(role: .destructive, action: {
+//                if let deleteTarget { deletePlaylistMusic(music: deleteTarget) }
+//            }, label: {
+//                Text("削除")
+//            })
+//            Button(role: .cancel, action: {}, label: {
+//                Text("キャンセル")
+//            })
+//        })
+//        .alert("本当に削除しますか？", isPresented: $isShowMusicAlert, actions: {
+//            Button(role: .destructive, action: {
+//                if let deleteTarget { Task { await mds.fileDelete(filePath: deleteTarget.filePath) }}
+//            }, label: {
+//                Text("削除")
+//            })
+//            Button(role: .cancel, action: {}, label: {
+//                Text("キャンセル")
+//            })
+//        }, message: {
+//                Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
+//        })
+//    }
 }

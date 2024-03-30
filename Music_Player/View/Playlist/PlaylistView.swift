@@ -77,6 +77,6 @@ struct PlaylistView: View {
         }
     }
     func getPlaylistArray() {
-        Task { playlistArray = await PlaylistDataService.shared.getAllFavoriteMusicDatas() }
+        Task { playlistArray = await PlaylistDataService.shared.readPlaylistDatas() }
     }
 }

@@ -17,11 +17,51 @@ struct WillPlayMusicView: View {
     }
     
     var body: some View {
-        List($pc.willPlayMusics) { $music in
-            MusicCellView(mds: mds, pc: pc, musics: pc.willPlayMusics, music: music, playingView: .willPlay)
+        List {
+            ForEach($pc.willPlayMusics, id: \.self) { $music in
+                MusicCellView(mds: mds, pc: pc, musics: pc.willPlayMusics, music: music, playingView: .willPlay)
+            }
+            .onDelete(perform: delete)
+            .onMove(perform: move)
+        }
+        .toolbar {
+            MyEditButton()
         }
         .listStyle(.plain)
-        .background(Color.clear)
         .navigationTitle("再生予定曲")
+    }
+    func delete(at offsets: IndexSet) {
+        Task {
+            pc.willPlayMusics.remove(atOffsets: offsets)
+            await WillPlayMusicDataService.shared.resaveWillPlayMusicDatas(musics: pc.willPlayMusics)
+        }
+    }
+    func move(from source: IndexSet, to destination: Int) {
+        Task {
+            pc.willPlayMusics.move(fromOffsets: source, toOffset: destination)
+            await WillPlayMusicDataService.shared.resaveWillPlayMusicDatas(musics: pc.willPlayMusics)
+        }
+    }
+}
+
+struct MyEditButton: View {
+    @Environment(\.editMode) var editMode
+    
+    var body: some View {
+        Button(action: {
+            withAnimation() {
+                if editMode?.wrappedValue.isEditing == true {
+                    editMode?.wrappedValue = .inactive
+                } else {
+                    editMode?.wrappedValue = .active
+                }
+            }
+        }) {
+            if editMode?.wrappedValue.isEditing == true {
+                Text("完了")
+            } else {
+                Text("編集")
+            }
+        }
     }
 }

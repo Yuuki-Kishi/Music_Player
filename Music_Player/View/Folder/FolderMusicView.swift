@@ -31,9 +31,9 @@ struct FolderMusicView: View {
                     Image(systemName: "play.circle")
                         .foregroundStyle(.purple)
                     Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                        .foregroundStyle(.primary)
+                    Spacer()
                 }
-                Spacer()
+                .foregroundStyle(Color.primary)
             }
             .padding(.horizontal)
             List($listMusicArray) { $music in

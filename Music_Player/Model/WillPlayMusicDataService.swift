@@ -28,6 +28,14 @@ final class WillPlayMusicDataService {
         }
     }
     
+    func resaveWillPlayMusicDatas(musics: [Music]) async {
+        await deleteAllWillPlayMusicData()
+        for music in musics {
+            let index = musics.firstIndex(where: {$0.filePath == music.filePath})!
+            await createWillPlayMusicData(music: music, index: index)
+        }
+    }
+    
     func readWillPlayMusics() async -> [Music] {
         let predicate = #Predicate<WillPlayMusicData> { WillPlayMusicData in
             return true
@@ -54,7 +62,6 @@ final class WillPlayMusicDataService {
     func updateWillPlayMusicData(oldMusic: Music, newMusic: Music) async {
         if let willPlayMusicData = await readWillPlayMusicDatas().first(where: {$0.music.filePath == oldMusic.filePath}) {
             willPlayMusicData.music = newMusic
-            await actor.save()
         }
     }
     

@@ -50,7 +50,12 @@ actor PersistanceActor: ModelActor {
     }
     
     func delete<T:PersistentModel>(_ value:T) {
-        modelContext.delete(value)
+        do {
+            modelContext.delete(value)
+            try modelContext.save()
+        } catch {
+            print(error)
+        }
     }
     
     func get<T:PersistentModel>(_ descriptor:FetchDescriptor<T>)->[T]? {

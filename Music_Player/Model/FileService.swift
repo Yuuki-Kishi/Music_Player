@@ -140,10 +140,14 @@ final class FileService {
         }
     }
     
-    func fileDelete(filePath: String?) {
+    func fileDelete(shortFilePath: String?) {
         do {
-            let url = URL(fileURLWithPath: filePath!)
-            try fileManager.trashItem(at: url, resultingItemURL: nil)
+            if let path = shortFilePath {
+                let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+                let filePath = documentsPath +  "/" +  path
+                let url = URL(fileURLWithPath: filePath)
+                try fileManager.trashItem(at: url, resultingItemURL: nil)
+            }
         } catch let error {
             print(error.localizedDescription)
         }

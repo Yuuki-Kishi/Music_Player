@@ -12,17 +12,17 @@ import SwiftData
 final class DidPlayMusicData: Identifiable {
     @Attribute(.unique) var musicId: UUID
     var music: Music
-    var index: Int
+    var addedTime: Date
     
-    init(musicId: UUID, music: Music, index: Int) {
+    init(musicId: UUID, music: Music, addedTime: Date) {
         self.musicId = musicId
         self.music = music
-        self.index = index
+        self.addedTime = addedTime
     }
     
-    init(music: Music, index: Int) {
+    init(music: Music) {
         self.musicId = UUID()
         self.music = music
-        self.index = index
+        self.addedTime = Date()
     }
 }
