@@ -14,6 +14,7 @@ struct MusicCellView: View {
     @State private var musics: [Music]
     @State private var isShowMusicAlert = false
     @State private var isShowWillPlayMusicAlert = false
+    @State private var isShowAddPlaylist = false
     @State private var deleteTarget: Music?
     @State private var playingView: PlayController.playingView
     
@@ -76,7 +77,9 @@ struct MusicCellView: View {
     }
     func musicMenu(music: Binding<Music>) -> some View {
         Menu {
-            NavigationLink(destination: AddPlaylistView(music: music), label: {
+            Button(action: {
+                isShowAddPlaylist = true
+            }, label: {
                 Label("プレイリストに追加", systemImage: "text.badge.plus")
             })
             NavigationLink(destination: MusicInfoView(pc: pc, music: music), label: {
@@ -112,6 +115,10 @@ struct MusicCellView: View {
             })
         }, message: {
                 Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
+        })
+        .sheet(isPresented: $isShowAddPlaylist, content: {
+            AddPlaylistView(music: music)
+                .presentationDetents([.medium])
         })
     }
     func willPlayMenu(music: Binding<Music>) -> some View {

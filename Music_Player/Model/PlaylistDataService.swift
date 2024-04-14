@@ -19,13 +19,20 @@ final class PlaylistDataService {
         await actor.insert(playlistData)
     }
     
+    func createPlaylistDataWithMusics(playlistName: String, musics: [Music]) async {
+        let playlistData = PlaylistData(playlistName: playlistName, musicCount: musics.count, musics: musics)
+        await actor.insert(playlistData)
+    }
+    
     func addMusicToPlaylist(playlistId: UUID, music: Music) async {
         if let playlist = await readPlaylistDatas().first(where: {$0.playlistId == playlistId}) {
             var musics = playlist.musics
-            musics.append(music)
-            playlist.musics = musics
-            playlist.musicCount += 1
-            await actor.save()
+            if !returnIsContain(music: music, musics: musics) {
+                musics.append(music)
+                playlist.musics = musics
+                playlist.musicCount += 1
+                await actor.save()
+            }
         }
     }
     
@@ -58,5 +65,15 @@ final class PlaylistDataService {
     
     func deletePlaylistData(playlistData: PlaylistData) async {
         await actor.delete(playlistData)
+    }
+    
+    func returnIsContain(music: Music, musics: [Music]) -> Bool {
+        var isContain = false
+        for contentMusic in musics {
+            if music.filePath == contentMusic.filePath {
+                isContain = true
+            }
+        }
+        return isContain
     }
 }

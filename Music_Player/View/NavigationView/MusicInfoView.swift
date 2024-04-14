@@ -12,7 +12,6 @@ struct MusicInfoView: View {
     @Binding private var music: Music
     @State private var infoArray = [(title: String, value: String)]()
     @State private var isShowAlert = false
-    @Environment(\.presentationMode) var presentation
     
     init(pc: PlayController, music: Binding<Music>) {
         self.pc = pc

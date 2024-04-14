@@ -63,7 +63,7 @@ struct PlaylistView: View {
                         Button("作成") {
                             Task {
                                 await PlaylistDataService.shared.createPlaylistData(playlistName: text)
-                                getPlaylistArray()
+                                await getPlaylistArray()
                             }
                         }
                     }, message: {
@@ -72,11 +72,11 @@ struct PlaylistView: View {
                 })
             }
             .onAppear() {
-                getPlaylistArray()
+                Task { await getPlaylistArray() }
             }
         }
     }
-    func getPlaylistArray() {
-        Task { playlistArray = await PlaylistDataService.shared.readPlaylistDatas() }
+    func getPlaylistArray() async {
+        playlistArray = await PlaylistDataService.shared.readPlaylistDatas()
     }
 }

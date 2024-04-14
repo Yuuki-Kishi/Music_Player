@@ -259,10 +259,6 @@ class PlayController: ObservableObject {
                     setMusic(music: didPlayMusics.last!)
                     await deleteDidPlayMusic(music: didPlayMusics.last!)
                     await readDidPlayMusics()
-                    print("")
-                    for didPlayMusic in didPlayMusics {
-                        print(didPlayMusic.musicName)
-                    }
                     setScheduleFile()
                     isPlay = true
                     setTimer()

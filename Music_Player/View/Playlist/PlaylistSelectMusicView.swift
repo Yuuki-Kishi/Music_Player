@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct SelectMusicView: View {
+struct PlaylistSelectMusicView: View {
     @ObservedObject var mds: MusicDataStore
     @ObservedObject var pc: PlayController
     @State private var playlistData: PlaylistData
@@ -22,20 +22,18 @@ struct SelectMusicView: View {
     }
     
     var body: some View {
-        VStack {
-            List(selection: $selectionValue) {
-                ForEach($mds.musicArray, id: \.self) { $music in
-                    Text(music.musicName ?? "不明なミュージック")
-                }
+        List(selection: $selectionValue) {
+            ForEach($mds.musicArray, id: \.self) { $music in
+                Text(music.musicName ?? "不明なミュージック")
             }
-            .environment(\.editMode, .constant(.active))
-            .listStyle(.plain)
-            .navigationTitle("追加する曲を選択")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    toolBarMenu()
-                })
-            }
+        }
+        .environment(\.editMode, .constant(.active))
+        .listStyle(.plain)
+        .navigationTitle("追加する曲を選択")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing, content: {
+                toolBarMenu()
+            })
         }
     }
     func toolBarMenu() -> some View {

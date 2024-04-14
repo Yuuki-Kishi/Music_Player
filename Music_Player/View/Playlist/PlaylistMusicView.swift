@@ -66,7 +66,7 @@ struct PlaylistMusicView: View {
     }
     func toolBarMenu() -> some View{
         Menu {
-            NavigationLink(destination: SelectMusicView(mds: mds, pc: pc, playlistData: playlistData), label: {
+            NavigationLink(destination: PlaylistSelectMusicView(mds: mds, pc: pc, playlistData: playlistData), label: {
                 Label("曲を追加", systemImage: "plus")
             })
             Button(action: { text = playlistData.playlistName; isShowRenameAlert.toggle() }, label: {

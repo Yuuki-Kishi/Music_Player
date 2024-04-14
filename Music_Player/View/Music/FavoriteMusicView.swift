@@ -35,13 +35,16 @@ struct FavoriteMusicView: View {
         .navigationTitle("お気に入り")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
-                Button(action: {}, label: {
+                NavigationLink(destination: FavoriteMusicSelectionMusic(mds: mds, pc: pc), label: {
                     Image(systemName: "plus")
                 })
             })
         }
         .onAppear() {
-            Task { listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics() }
+            Task { 
+                listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics()
+                listMusicArray.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+            }
         }
     }
 }

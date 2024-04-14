@@ -21,6 +21,7 @@ struct PlayingView: View {
     @State private var isFavorite = false
     @State private var isShowAddLastAlert = false
     @State private var isShowAddFirstAlert = false
+    @State private var isShowAddPlaylist = false
     
     init(mds: MusicDataStore, pc: PlayController, music: Binding<Music?>, seekPosition: Binding<TimeInterval>, isPlay: Binding<Bool>) {
         self.mds = mds
@@ -110,7 +111,10 @@ struct PlayingView: View {
                 Spacer()
                 HStack {
                     Spacer()
-                    Button(action: { pc.moveBeforeMusic() }, label: {
+                    Button(action: {
+                        pc.moveBeforeMusic()
+                        decideIsFavorite()
+                    }, label: {
                         Image(systemName: "backward.fill")
                     })
                     .font(.system(size: 25.0))
@@ -129,7 +133,10 @@ struct PlayingView: View {
                     .font(.system(size: 40.0))
                     .foregroundStyle(.primary)
                     Spacer()
-                    Button(action: { pc.moveNextMusic() }, label: {
+                    Button(action: {
+                        pc.moveNextMusic()
+                        decideIsFavorite()
+                    }, label: {
                         Image(systemName: "forward.fill")
                     })
                     .font(.system(size: 25.0))
@@ -143,15 +150,14 @@ struct PlayingView: View {
             .padding()
         }
         .onAppear() {
-            Task {
-                favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
-                isFavorite = favoriteMusics.contains(where: {$0.filePath == music?.filePath})
-            }
+            decideIsFavorite()
         }
     }
     func musicMenu() -> some View {
         Menu {
-            NavigationLink(destination: AddPlaylistView(music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
+            Button(action: {
+                isShowAddPlaylist = true
+            }, label: {
                 Label("プレイリストに追加", systemImage: "text.badge.plus")
             })
             NavigationLink(destination: MusicInfoView(pc: pc, music: Binding(get: { music ?? Music() }, set: { music = $0 })), label: {
@@ -188,6 +194,10 @@ struct PlayingView: View {
         }, message: {
             Text("再生予定曲の末尾に追加しました。")
         })
+        .sheet(isPresented: $isShowAddPlaylist, content: {
+            AddPlaylistView(music: music)
+                .presentationDetents([.medium])
+        })
     }
     func secToMin(sec: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()
@@ -216,6 +226,12 @@ struct PlayingView: View {
                 Task { await FavoriteMusicDataService.shared.createFavoriteMusicData(music: music) }
             }
             isFavorite.toggle()
+        }
+    }
+    func decideIsFavorite() {
+        Task {
+            favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
+            isFavorite = favoriteMusics.contains(where: {$0.filePath == music?.filePath})
         }
     }
 }
