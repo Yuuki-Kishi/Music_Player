@@ -32,6 +32,10 @@ struct AlbumView: View {
                 List($albumArray) { album in
                     NavigationLink(value: album.albumName.wrappedValue, label: {
                         HStack {
+                            Image(systemName: "music.note")
+                                .font(.system(size: 40))
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .frame(width: 50, height: 50)
                             Text(album.albumName.wrappedValue)
                             Spacer()
                             Text(String(album.musicCount.wrappedValue) + "曲")

@@ -31,11 +31,11 @@ struct AlbumMusicView: View {
                         pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .album)
                     }
                 }){
-                    Image(systemName: "play.circle")
-                        .foregroundStyle(.purple)
-                    Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                        .foregroundStyle(.primary)
+                        Image(systemName: "play.circle")
+                            .foregroundStyle(.purple)
+                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
                 }
+                .foregroundStyle(Color.primary)
                 Spacer()
             }
             .padding(.horizontal)

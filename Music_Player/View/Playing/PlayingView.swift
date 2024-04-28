@@ -195,7 +195,7 @@ struct PlayingView: View {
             Text("再生予定曲の末尾に追加しました。")
         })
         .sheet(isPresented: $isShowAddPlaylist, content: {
-            AddPlaylistView(music: music)
+            AddPlaylistView(music: Binding(get: { music ?? Music() }, set: { music = $0 }))
                 .presentationDetents([.medium])
         })
     }

@@ -132,7 +132,9 @@ class PlayController: ObservableObject {
     func setSeek() {
         let time = seekPosition
         guard let filePath = music?.filePath else { return }
-        let assetURL = URL(fileURLWithPath: filePath)
+        let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+        let fullFilePath = directoryPath + "/" + filePath
+        let assetURL = URL(fileURLWithPath: fullFilePath)
         guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
         // サンプルレートを取得する
         let sampleRate = audioFile.processingFormat.sampleRate
@@ -179,6 +181,8 @@ class PlayController: ObservableObject {
             setScheduleFile()
             setNextMusics(musics: musics)
             savePlayingView(playingView: playingView)
+            seekPosition = 0.0
+            cachedSeekBarSeconds = 0.0
             isPlay = true
             setTimer()
             await createDidPlayMusic(music: music)
