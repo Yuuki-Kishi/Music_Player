@@ -8,6 +8,7 @@
 import Foundation
 import AVFoundation
 import SwiftData
+import MediaPlayer
 
 @MainActor
 class PlayController: ObservableObject {
@@ -31,6 +32,7 @@ class PlayController: ObservableObject {
         }
     }
     @Published var timer: Timer!
+    @Published var sleepTimer: Timer!
     enum playMode { case shuffle, order, sameRepeat }
     enum playingView { case music, favorite, didPlay, artist, album, playlist, folder, willPlay }
     
@@ -463,4 +465,54 @@ class PlayController: ObservableObject {
             }
         }
     }
+    
+    func timerForSleep(interval: TimeInterval) {
+        print(interval)
+        sleepTimer = Timer.scheduledTimer(withTimeInterval: interval * 60, repeats: false, block: { _ in
+            self.pause()
+            self.sleepTimer.invalidate()
+        })
+    }
+    
+    func initRemoteCommand() {
+        // 再生ボタン
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.playCommand.removeTarget(self)
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [unowned self] event in
+            play()
+            return .success
+        }
+        // 一時停止ボタン
+        commandCenter.pauseCommand.removeTarget(self)
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [unowned self] event in
+            pause()
+            return .success
+        }
+        // 前の曲ボタン
+        commandCenter.previousTrackCommand.removeTarget(self)
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            moveBeforeMusic()
+            return .success
+        }
+        // 次の曲ボタン
+        commandCenter.nextTrackCommand.removeTarget(self)
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            moveNextMusic()
+            return .success
+        }
+        // シークバーでの秒数変更
+        commandCenter.changePlaybackPositionCommand.removeTarget(self)
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+            guard let positionCommandEvent = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            seekPosition = Double(positionCommandEvent.positionTime)
+            setSeek()
+            return .success
+        }
+    }
+
 }

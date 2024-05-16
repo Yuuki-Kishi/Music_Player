@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DE2FBE8C2BF64192007247DE /* SleepTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2FBE8B2BF64192007247DE /* SleepTimer.swift */; };
 		DE49827B2B70D3E60005A407 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE49827A2B70D3E60005A407 /* FileService.swift */; };
 		DE62458C2B849BEB003E856D /* MusicInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE62458B2B849BEB003E856D /* MusicInfoView.swift */; };
 		DE6A17672BA1EECE004BC71D /* FavoriteMusicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6A17662BA1EECE004BC71D /* FavoriteMusicData.swift */; };
@@ -54,6 +55,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DE2FBE8B2BF64192007247DE /* SleepTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimer.swift; sourceTree = "<group>"; };
 		DE49825B2B6E5ED20005A407 /* Music-Player-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Music-Player-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DE49827A2B70D3E60005A407 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
 		DE62458B2B849BEB003E856D /* MusicInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicInfoView.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				DE6A177B2BA5D8EF004BC71D /* DidPlayMusicView.swift */,
 				DE6A17722BA529B0004BC71D /* FavoriteMusicView.swift */,
 				DEC8CCCF2BB8018E00FA9D98 /* FavoriteMusicSelectionMusic.swift */,
+				DE2FBE8B2BF64192007247DE /* SleepTimer.swift */,
 			);
 			path = Music;
 			sourceTree = "<group>";
@@ -379,6 +382,7 @@
 				DE6A17782BA53EBA004BC71D /* DidPlayMusicData.swift in Sources */,
 				DEE5AC512AE8A1A50082069C /* ArtistView.swift in Sources */,
 				DEBC749A2B3EA2920012973B /* PlayingView.swift in Sources */,
+				DE2FBE8C2BF64192007247DE /* SleepTimer.swift in Sources */,
 				DEE5AC552AE8ABE50082069C /* PlaylistView.swift in Sources */,
 				DEC8CCC62BAAECF900FA9D98 /* WillPlayMusicData.swift in Sources */,
 				DEC8CCCE2BB6AC4E00FA9D98 /* PlaylistMusicCellView.swift in Sources */,

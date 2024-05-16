@@ -25,7 +25,7 @@ final class DidPlayMusicDataService {
         }
         let descriptor = FetchDescriptor(predicate: predicate)
         var didPlayMusicDatas = await actor.get(descriptor) ?? []
-        didPlayMusicDatas.sort {$0.addedTime < $1.addedTime}
+        didPlayMusicDatas.sort {$0.addedTime > $1.addedTime}
         var musics = [Music]()
         for didPlayMusic in didPlayMusicDatas {
             let music = didPlayMusic.music

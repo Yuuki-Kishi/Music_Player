@@ -66,6 +66,7 @@ struct MusicView: View {
                 Task {
                     if musicArray.isEmpty { await mds.getFile() }
                     if !isFirstAppear { pc.setPlayingMusic(); isFirstAppear = true }
+                    pc.timerForSleep(interval: 10.0)
                     isShowsProgressView = false
                 }
             }
@@ -87,6 +88,9 @@ struct MusicView: View {
             })
             NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc, didPlayMusicArray: $pc.didPlayMusics), label: {
                 Label("再生履歴", systemImage: "clock.arrow.circlepath")
+            })
+            NavigationLink(destination: SleepTimer(pc: pc), label: {
+                Label("スリープタイマー", systemImage: "timer")
             })
             Menu {
                 Button(action: { mds.musicSort(method: .nameAscending) }, label: {
