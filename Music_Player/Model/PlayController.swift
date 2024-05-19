@@ -39,11 +39,9 @@ class PlayController: ObservableObject {
         // 接続するオーディオノードをAudioEngineにアタッチする
         audioEngine.attach(playerNode)
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
-        RemoteCommand.initRemoteCommand()
-        SetNotification.setNotification()
-//        SetNotification(pc: PlayController.shared).setNotification()
-//        initRemoteCommand()
         isPlay = false
+        initRemoteCommand()
+        setNotification()
     }
     
     func setMusic(music: Music) {
@@ -508,5 +506,94 @@ class PlayController: ObservableObject {
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = music?.musicLength
         // メタデータを設定する
         center.nowPlayingInfo = nowPlayingInfo
+    }
+    
+    func initRemoteCommand() {
+        // 再生ボタン
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.playCommand.removeTarget(self)
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [unowned self] event in
+            play()
+            return .success
+        }
+        // 一時停止ボタン
+        commandCenter.pauseCommand.removeTarget(self)
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [unowned self] event in
+            pause()
+            return .success
+        }
+        // 前の曲ボタン
+        commandCenter.previousTrackCommand.removeTarget(self)
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            moveBeforeMusic()
+            return .success
+        }
+        // 次の曲ボタン
+        commandCenter.nextTrackCommand.removeTarget(self)
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            moveNextMusic()
+            return .success
+        }
+        // シークバーでの秒数変更
+        commandCenter.changePlaybackPositionCommand.removeTarget(self)
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+            guard let positionCommandEvent = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            seekPosition = Double(positionCommandEvent.positionTime)
+            setSeek()
+            return .success
+        }
+    }
+    
+    func setNotification() {
+        NotificationCenter.default.addObserver(self, selector: #selector(onInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(onAudioSessionRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
+    }
+    
+    @objc func onInterruption(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
+        }
+        switch type {
+        case .began:
+            if isPlay {
+                pause()
+            }
+            break
+        case .ended:
+            if !isPlay {
+                play()
+            }
+            break
+        @unknown default:
+            break
+        }
+    }
+    
+    @objc func onAudioSessionRouteChanged(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue:reasonValue) else {
+            return
+        }
+        
+        switch reason {
+        case .newDeviceAvailable:
+            if !isPlay {
+                play()
+            }
+        case .oldDeviceUnavailable:
+            if isPlay {
+                pause()
+            }
+        default:
+            break
+        }
     }
 }

@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		DE2FBE8C2BF64192007247DE /* SleepTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2FBE8B2BF64192007247DE /* SleepTimer.swift */; };
-		DE2FBE922BFA24DD007247DE /* SetNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2FBE912BFA24DD007247DE /* SetNotification.swift */; };
-		DE2FBE942BFA27EA007247DE /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2FBE932BFA27EA007247DE /* RemoteCommand.swift */; };
 		DE49827B2B70D3E60005A407 /* FileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE49827A2B70D3E60005A407 /* FileService.swift */; };
 		DE62458C2B849BEB003E856D /* MusicInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE62458B2B849BEB003E856D /* MusicInfoView.swift */; };
 		DE6A17672BA1EECE004BC71D /* FavoriteMusicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6A17662BA1EECE004BC71D /* FavoriteMusicData.swift */; };
@@ -58,8 +56,6 @@
 
 /* Begin PBXFileReference section */
 		DE2FBE8B2BF64192007247DE /* SleepTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimer.swift; sourceTree = "<group>"; };
-		DE2FBE912BFA24DD007247DE /* SetNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetNotification.swift; sourceTree = "<group>"; };
-		DE2FBE932BFA27EA007247DE /* RemoteCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
 		DE49825B2B6E5ED20005A407 /* Music-Player-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Music-Player-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DE49827A2B70D3E60005A407 /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
 		DE62458B2B849BEB003E856D /* MusicInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicInfoView.swift; sourceTree = "<group>"; };
@@ -284,8 +280,6 @@
 				DEAEEC0C2BA84E1F00DE892D /* DidPlayMusicDataService.swift */,
 				DED9FD702B80A7E30008B127 /* MusicDataStore.swift */,
 				DED9FD762B80DE860008B127 /* PlayController.swift */,
-				DE2FBE912BFA24DD007247DE /* SetNotification.swift */,
-				DE2FBE932BFA27EA007247DE /* RemoteCommand.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -395,8 +389,6 @@
 				DE9DB2B62B8A3622007CE8FB /* AlbumMusicView.swift in Sources */,
 				DEBC74982B3E570A0012973B /* PlayingMusicView.swift in Sources */,
 				DE62458C2B849BEB003E856D /* MusicInfoView.swift in Sources */,
-				DE2FBE942BFA27EA007247DE /* RemoteCommand.swift in Sources */,
-				DE2FBE922BFA24DD007247DE /* SetNotification.swift in Sources */,
 				DE49827B2B70D3E60005A407 /* FileService.swift in Sources */,
 				DEC4CFF82B984CA4009F5296 /* MusicCellView.swift in Sources */,
 				DEE5AC4F2AE8A1280082069C /* MusicView.swift in Sources */,
