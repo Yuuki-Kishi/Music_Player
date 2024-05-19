@@ -79,16 +79,18 @@ class PlayController: ObservableObject {
             switch playMode {
             case .shuffle:
                 willPlayMusics = musics
-                let index = willPlayMusics.firstIndex(of: music!)!
-                willPlayMusics.remove(at: index)
+                if let index = willPlayMusics.firstIndex(of: music ?? Music()) {
+                    willPlayMusics.remove(at: index)
+                }
                 willPlayMusics.shuffle()
                 for willPlayMusic in willPlayMusics {
                     await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
                 }
             case .order:
                 willPlayMusics = musics
-                let index = willPlayMusics.firstIndex(of: music!)!
-                willPlayMusics.remove(at: index)
+                if let index = willPlayMusics.firstIndex(of: music ?? Music()) {
+                    willPlayMusics.remove(at: index)
+                }
                 willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
                 for willPlayMusic in willPlayMusics {
                     await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
@@ -164,7 +166,7 @@ class PlayController: ObservableObject {
             // 再生処理
             try audioEngine.start()
             playerNode.play()
-            UserDefaults.standard.setValue(music?.musicName!, forKey: "plaingMusicName")
+            UserDefaults.standard.setValue(music?.musicName ?? "不明な曲", forKey: "plaingMusicName")
             setNowPlayingInfo()
         }
         catch let error {
@@ -310,13 +312,14 @@ class PlayController: ObservableObject {
     
     func orderSort() -> Array<Music> {
         var musics = willPlayMusics
-        musics.append(music!)
-        musics.sort {$0.musicName! < $1.musicName!}
-        let index = musics.firstIndex(of: music!)!
-        for i in 0 ..< index {
-            let music = musics.first
-            musics.removeFirst()
-            musics.append(music!)
+        musics.append(music ?? Music())
+        musics.sort {$0.musicName ?? "不明な曲" < $1.musicName ?? "不明な曲"}
+        if let index = musics.firstIndex(of: music ?? Music()) {
+            for i in 0 ..< index {
+                let music = musics.first
+                musics.removeFirst()
+                musics.append(music!)
+            }
         }
         musics.removeFirst()
         return musics
@@ -440,7 +443,7 @@ class PlayController: ObservableObject {
     
     func savePlayingMusic(music: Music?) {
         if let saveMusic = music {
-            let musicDictionary: [String: Any] = ["musicName": saveMusic.musicName!, "artistName": saveMusic.artistName!, "albumName": saveMusic.albumName!, "editedDate": saveMusic.editedDate!, "fileSize": saveMusic.fileSize!, "musicLength": saveMusic.musicLength!, "filePath": saveMusic.filePath!]
+            let musicDictionary: [String: Any] = ["musicName": saveMusic.musicName ?? "不明な曲", "artistName": saveMusic.artistName ?? "不明なアーティスト", "albumName": saveMusic.albumName ?? "不明なアルバム", "editedDate": saveMusic.editedDate ?? Date(), "fileSize": saveMusic.fileSize ?? "0MB", "musicLength": saveMusic.musicLength ?? 0.0, "filePath": saveMusic.filePath ?? "不明なパス"]
             UserDefaults.standard.setValue(musicDictionary, forKey: "playingMusicDictionary")
         }
     }
