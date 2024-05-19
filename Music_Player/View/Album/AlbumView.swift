@@ -34,7 +34,7 @@ struct AlbumView: View {
                         HStack {
                             Image(systemName: "music.note")
                                 .scaledToFit()
-                                .background(RoundedRectangle(cornerRadius: 10.0, style: .continuous).fill(Color.gray).frame(width: 50, height: 50))
+                                .background(RoundedRectangle(cornerRadius: 10.0, style: .continuous).fill(Color(UIColor.systemGray6)).frame(width: 50, height: 50))
                                 .padding(.horizontal)
                             Text(album.albumName.wrappedValue)
                                 .lineLimit(1)

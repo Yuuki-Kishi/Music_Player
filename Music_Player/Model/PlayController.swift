@@ -39,6 +39,10 @@ class PlayController: ObservableObject {
         // 接続するオーディオノードをAudioEngineにアタッチする
         audioEngine.attach(playerNode)
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+        RemoteCommand.initRemoteCommand()
+        SetNotification.setNotification()
+//        SetNotification(pc: PlayController.shared).setNotification()
+//        initRemoteCommand()
         isPlay = false
     }
     
@@ -150,6 +154,7 @@ class PlayController: ObservableObject {
         stop()
         // 曲の再生秒数の変更メソッド
         playerNode.scheduleSegment(audioFile, startingFrame: startSampleTime, frameCount: remainSampleTime, at: nil)
+        setNowPlayingInfo()
         // 停止状態なので再生する
         isPlay = true
     }
@@ -170,6 +175,7 @@ class PlayController: ObservableObject {
     func pause() {
         audioEngine.pause()
         playerNode.pause()
+        setNowPlayingInfo()
     }
     
     func stop() {
@@ -471,47 +477,6 @@ class PlayController: ObservableObject {
             self.isPlay = false
         }
     }
-    
-    func initRemoteCommand() {
-        // 再生ボタン
-        let commandCenter = MPRemoteCommandCenter.shared()
-        commandCenter.playCommand.removeTarget(self)
-        commandCenter.playCommand.isEnabled = true
-        commandCenter.playCommand.addTarget { [unowned self] event in
-            play()
-            return .success
-        }
-        // 一時停止ボタン
-        commandCenter.pauseCommand.removeTarget(self)
-        commandCenter.pauseCommand.isEnabled = true
-        commandCenter.pauseCommand.addTarget { [unowned self] event in
-            pause()
-            return .success
-        }
-        // 前の曲ボタン
-        commandCenter.previousTrackCommand.removeTarget(self)
-        commandCenter.previousTrackCommand.isEnabled = true
-        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
-            moveBeforeMusic()
-            return .success
-        }
-        // 次の曲ボタン
-        commandCenter.nextTrackCommand.removeTarget(self)
-        commandCenter.nextTrackCommand.isEnabled = true
-        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
-            moveNextMusic()
-            return .success
-        }
-        // シークバーでの秒数変更
-        commandCenter.changePlaybackPositionCommand.removeTarget(self)
-        commandCenter.changePlaybackPositionCommand.isEnabled = true
-        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
-            guard let positionCommandEvent = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-            seekPosition = Double(positionCommandEvent.positionTime)
-            setSeek()
-            return .success
-        }
-    }
 
     func setNowPlayingInfo() {
         let center = MPNowPlayingInfoCenter.default()
@@ -520,7 +485,7 @@ class PlayController: ObservableObject {
         // タイトル
         nowPlayingInfo[MPMediaItemPropertyTitle] = music?.musicName
         // サムネ
-//        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
+        //        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
         // 現在の再生時間
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = seekPosition + cachedSeekBarSeconds
         // 曲の速さ
