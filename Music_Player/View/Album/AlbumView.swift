@@ -33,10 +33,12 @@ struct AlbumView: View {
                     NavigationLink(value: album.albumName.wrappedValue, label: {
                         HStack {
                             Image(systemName: "music.note")
-                                .font(.system(size: 40))
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                .frame(width: 50, height: 50)
+                                .scaledToFit()
+                                .background(RoundedRectangle(cornerRadius: 10.0, style: .continuous).fill(Color.gray).frame(width: 50, height: 50))
+                                .padding(.horizontal)
                             Text(album.albumName.wrappedValue)
+                                .lineLimit(1)
+                                .padding()
                             Spacer()
                             Text(String(album.musicCount.wrappedValue) + "曲")
                                 .foregroundStyle(Color.gray)

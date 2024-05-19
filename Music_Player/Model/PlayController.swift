@@ -32,7 +32,6 @@ class PlayController: ObservableObject {
         }
     }
     @Published var timer: Timer!
-    @Published var sleepTimer: Timer!
     enum playMode { case shuffle, order, sameRepeat }
     enum playingView { case music, favorite, didPlay, artist, album, playlist, folder, willPlay }
     
@@ -161,6 +160,7 @@ class PlayController: ObservableObject {
             try audioEngine.start()
             playerNode.play()
             UserDefaults.standard.setValue(music?.musicName!, forKey: "plaingMusicName")
+            setNowPlayingInfo()
         }
         catch let error {
             print(error.localizedDescription)
@@ -467,11 +467,9 @@ class PlayController: ObservableObject {
     }
     
     func timerForSleep(interval: TimeInterval) {
-        print(interval)
-        sleepTimer = Timer.scheduledTimer(withTimeInterval: interval * 60, repeats: false, block: { _ in
-            self.pause()
-            self.sleepTimer.invalidate()
-        })
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
+            self.isPlay = false
+        }
     }
     
     func initRemoteCommand() {
@@ -515,4 +513,32 @@ class PlayController: ObservableObject {
         }
     }
 
+    func setNowPlayingInfo() {
+        let center = MPNowPlayingInfoCenter.default()
+        var nowPlayingInfo = center.nowPlayingInfo ?? [String : Any]()
+        
+        // タイトル
+        nowPlayingInfo[MPMediaItemPropertyTitle] = music?.musicName
+        // サムネ
+//        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
+        // 現在の再生時間
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = seekPosition + cachedSeekBarSeconds
+        // 曲の速さ
+        if isPlay {
+            guard let filePath = music?.filePath else { return }
+            let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+            let fullFilePath = directoryPath + "/" + filePath
+            let assetURL = URL(fileURLWithPath: fullFilePath)
+            guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
+            let sampleRate = audioFile.processingFormat.sampleRate
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = sampleRate
+        }
+        else {
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
+        }
+        // 曲の総再生時間
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = music?.musicLength
+        // メタデータを設定する
+        center.nowPlayingInfo = nowPlayingInfo
+    }
 }

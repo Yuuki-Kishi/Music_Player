@@ -48,9 +48,17 @@ struct MusicInfoView: View {
             HStack {
                 Text("ファイルパス")
                 Spacer()
-                Text(music.filePath ?? "不明")
-                    .lineLimit(1)
-                    .truncationMode(.head)
+                if let path = music.filePath {
+                    let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+                    let fullFilePath = directoryPath + "/" + path
+                    Text(fullFilePath)
+                        .lineLimit(1)
+                        .truncationMode(.head)
+                } else {
+                    Text("不明")
+                        .lineLimit(1)
+                        .truncationMode(.head)
+                }
             }
             .onTapGesture {
                 if let filePath = music.filePath {

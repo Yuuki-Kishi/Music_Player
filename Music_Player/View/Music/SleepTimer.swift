@@ -9,7 +9,9 @@ import SwiftUI
 
 struct SleepTimer: View {
     @ObservedObject var pc: PlayController
-    @State var interval: TimeInterval = 60
+    @State var sec: TimeInterval = 0
+    @State var min: TimeInterval = 0
+    @State var hour: TimeInterval = 1
     @State var isShowAlert = false
     @Environment(\.presentationMode) var presentation
     
@@ -22,48 +24,55 @@ struct SleepTimer: View {
             Spacer()
             Text("指定時間経過後、自動で再生を一時停止します。")
             Spacer()
-            Slider(value: $interval, in: 0 ... 60 * 24, onEditingChanged: {_ in
-                
-            })
-            HStack {
-                Text("0時間0分")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.gray)
-                Spacer()
-                Text(restating(min: interval))
-                    .font(.system(size: 20))
-                Spacer()
-                Text("24時間0分")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.gray)
+            VStack {
+                HStack {
+                    Slider(value: $hour, in: 0 ... 23, step: 1.0)
+                    Text(String(Int(hour)) + "時間")
+                        .padding(10)
+                        .frame(width: 75)
+                }
+                HStack {
+                    Slider(value: $min, in: 0 ... 59, step: 1.0)
+                    Text(String(Int(min)) + "分　")
+                        .padding(10)
+                        .frame(width: 75)
+                }
+                HStack {
+                    Slider(value: $sec, in: 0 ... 59, step: 1.0)
+                    Text(String(Int(sec)) + "秒　")
+                        .padding(10)
+                        .frame(width: 75)
+                }
             }
             Spacer()
-            Spacer()
-            Button(action: {
-                pc.timerForSleep(interval: interval)
-                isShowAlert = true
-            }, label: {
+            let time = hour * 3600 + min * 60 + sec
+            if time != 0 {
                 Text("設定")
-                    .foregroundStyle(Color.primary)
-            })
-            .alert("設定しました", isPresented: $isShowAlert, actions: {
-                Button("OK") {
-                    isShowAlert = false
-                    presentation.wrappedValue.dismiss()
-                }
-            })
-            .frame(width: 200, height: 30)
-            .background(RoundedRectangle(cornerRadius: 15.0).fill(Color.purple))
+                    .frame(height: 20)
+                    .background(RoundedRectangle(cornerRadius: 15.0).fill(Color.purple).frame(width: 225, height: 30))
+                    .onTapGesture {
+                        pc.timerForSleep(interval: time)
+                        isShowAlert = true
+                    }
+                .alert("設定しました", isPresented: $isShowAlert, actions: {
+                    Button("OK") {
+                        isShowAlert = false
+                        presentation.wrappedValue.dismiss()
+                    }
+                })
+            } else {
+                Text("設定")
+                    .frame(height: 20)
+                    .background(RoundedRectangle(cornerRadius: 15.0, style: .continuous).fill(Color.gray).frame(width: 225, height: 30))
+            }
             Spacer()
         }
         .navigationTitle("スリープタイマー")
         .navigationBarTitleDisplayMode(.inline)
         .padding()
     }
-    func restating(min: TimeInterval) -> String {
-        let hour = String(Int(min / 60))
-        let min = String(Int(min.truncatingRemainder(dividingBy: 60)))
-        let time: String = hour + "時間" + min + "分"
-        return time
-    }
+}
+
+#Preview {
+    SleepTimer(pc: PlayController.shared)
 }

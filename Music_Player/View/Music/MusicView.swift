@@ -66,7 +66,6 @@ struct MusicView: View {
                 Task {
                     if musicArray.isEmpty { await mds.getFile() }
                     if !isFirstAppear { pc.setPlayingMusic(); isFirstAppear = true }
-                    pc.timerForSleep(interval: 10.0)
                     isShowsProgressView = false
                 }
             }
