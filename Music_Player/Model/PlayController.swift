@@ -193,6 +193,7 @@ class PlayController: ObservableObject {
             cachedSeekBarSeconds = 0.0
             isPlay = true
             setTimer()
+            await deleteAllDidPlayMusic()
             await createDidPlayMusic(music: music)
             await readDidPlayMusics()
         }
@@ -207,25 +208,38 @@ class PlayController: ObservableObject {
     func choosedWillPlayMusic(music: Music) {
         Task {
             for willPlayMusic in willPlayMusics {
+                await deleteWillPlayMusic(music: willPlayMusic)
+                await readWillPlayMusics()
+                await createDidPlayMusic(music: willPlayMusic)
+                await readDidPlayMusics()
                 if willPlayMusic == music {
                     setMusic(music: willPlayMusic)
                     setScheduleFile()
                     savePlayingMusic(music: willPlayMusic)
                     isPlay = true
                     setTimer()
-                    await createDidPlayMusic(music: music)
-                    await readDidPlayMusics()
                     break
                 }
-                await deleteWillPlayMusic(music: willPlayMusic)
             }
-            await deleteWillPlayMusic(music: music)
-            await readWillPlayMusics()
         }
     }
     
     func choosedDidPlayMusic(music: Music) {
-        
+        Task {
+            for didPlayMusic in didPlayMusics {
+                await deleteDidPlayMusic(music: didPlayMusic)
+                await readDidPlayMusics()
+                willPlayMusics = await insertFirst(music: didPlayMusic)
+                if didPlayMusic == music {
+                    setMusic(music: didPlayMusic)
+                    setScheduleFile()
+                    savePlayingMusic(music: didPlayMusic)
+                    isPlay = true
+                    setTimer()
+                    break
+                }
+            }
+        }
     }
     
     func moveNextMusic() {
@@ -264,21 +278,26 @@ class PlayController: ObservableObject {
         seekPosition = 0.0
         cachedSeekBarSeconds = 0.0
         if let music = self.music {
-            if !didPlayMusics.isEmpty {
+            if didPlayMusics.count > 1 {
                 Task {
-                    await insertFirst(music: music)
-                    savePlayingMusic(music: didPlayMusics.last!)
-                    setMusic(music: didPlayMusics.last!)
-                    await deleteDidPlayMusic(music: didPlayMusics.last!)
+                    willPlayMusics = await insertFirst(music: music)
+                    savePlayingMusic(music: didPlayMusics[1])
+                    setMusic(music: didPlayMusics[1])
+                    await deleteDidPlayMusic(music: didPlayMusics.first!)
                     await readDidPlayMusics()
                     setScheduleFile()
                     isPlay = true
                     setTimer()
                 }
             } else {
-                self.music = nil
-                stop()
-                isPlay = false
+                Task {
+                    await deleteAllDidPlayMusic()
+                    await readDidPlayMusics()
+                    self.music = nil
+                    UserDefaults.standard.removeObject(forKey: "playingMusicDictionary")
+                    stop()
+                    isPlay = false
+                }
             }
         }
     }
@@ -339,8 +358,8 @@ class PlayController: ObservableObject {
         await WillPlayMusicDataService.shared.createWillPlayMusicData(music: music, index: index)
     }
     
-    func insertFirst(music: Music) async {
-        await WillPlayMusicDataService.shared.insertFirst(music: music)
+    func insertFirst(music: Music) async -> [Music] {
+        return await WillPlayMusicDataService.shared.insertFirst(music: music)
     }
     
     func readWillPlayMusics() async {
@@ -473,6 +492,10 @@ class PlayController: ObservableObject {
         }
     }
     
+    func deleteImaginaryMusics() {
+         
+    }
+    
     func timerForSleep(interval: TimeInterval) {
         DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
             self.isPlay = false
@@ -485,10 +508,14 @@ class PlayController: ObservableObject {
         
         // タイトル
         nowPlayingInfo[MPMediaItemPropertyTitle] = music?.musicName
+        nowPlayingInfo[MPMediaItemPropertyArtist] = music?.artistName
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = music?.albumName
         // サムネ
         //        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
+        // 再生位置
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = String(seekPosition)
         // 現在の再生時間
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = seekPosition + cachedSeekBarSeconds
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = String(music?.musicLength ?? 300)
         // 曲の速さ
         if isPlay {
             guard let filePath = music?.filePath else { return }
@@ -497,13 +524,11 @@ class PlayController: ObservableObject {
             let assetURL = URL(fileURLWithPath: fullFilePath)
             guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
             let sampleRate = audioFile.processingFormat.sampleRate
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = sampleRate
-        }
-        else {
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
+        } else {
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
         }
-        // 曲の総再生時間
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = music?.musicLength
+        
         // メタデータを設定する
         center.nowPlayingInfo = nowPlayingInfo
     }

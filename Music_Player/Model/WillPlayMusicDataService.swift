@@ -19,13 +19,14 @@ final class WillPlayMusicDataService {
         await actor.insert(willPlayMusicData)
     }
     
-    func insertFirst(music: Music) async {
-        let willPlayMusics = await readWillPlayMusics()
+    func insertFirst(music: Music) async -> [Music] {
+        let willPlayMusicDatas = await readWillPlayMusicDatas()
         await deleteAllWillPlayMusicData()
         await createWillPlayMusicData(music: music, index: 0)
-        for willPlayMusic in willPlayMusics {
-            await createWillPlayMusicData(music: willPlayMusic, index: willPlayMusics.count + 1)
+        for willPlayMusicData in willPlayMusicDatas {
+            await createWillPlayMusicData(music: willPlayMusicData.music, index: willPlayMusicData.index + 1)
         }
+        return await readWillPlayMusics()
     }
     
     func resaveWillPlayMusicDatas(musics: [Music]) async {

@@ -38,7 +38,7 @@ struct PlayingView: View {
                 Image(systemName: "music.note")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.width - 300, height: UIScreen.main.bounds.width - 300)
+                    .frame(width: UIScreen.main.bounds.height - 800, height: UIScreen.main.bounds.height - 800)
                     .padding(100)
                     .foregroundStyle(Color(UIColor.systemGray))
                     .background(Color(UIColor.systemGray3))
@@ -51,7 +51,7 @@ struct PlayingView: View {
                             .font(.system(size: 25).bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
-                        Text(pc.music?.artistName ?? "")
+                        Text(pc.music?.artistName ?? "不明なアーティスト")
                             .lineLimit(1)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -143,7 +143,7 @@ struct PlayingView: View {
                     .foregroundStyle(.primary)
                     Spacer()
                 }
-                Spacer()
+                Spacer(minLength: 50)
             }
             .navigationTitle("再生中の曲")
             .navigationBarTitleDisplayMode(.inline)
