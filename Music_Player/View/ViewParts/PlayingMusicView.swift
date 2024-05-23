@@ -68,9 +68,7 @@ struct PlayingMusicView: View {
                         showSheet.toggle()
                     }
                     .sheet(isPresented: $showSheet) {
-                        if pc.music != nil {
-                            PlayingView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
-                        }
+                        PlayingView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
                     }
                 Button(action: {
                     if music?.filePath != nil {

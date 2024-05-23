@@ -31,6 +31,7 @@ struct PlaylistMusicCellView: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundStyle(musicNameColor())
                 HStack {
                     Text(music.artistName ?? "不明なアーティスト")
                         .lineLimit(1)
@@ -53,6 +54,12 @@ struct PlaylistMusicCellView: View {
                 .foregroundStyle(Color.gray)
             musicMenu(music: $music)
         }
+    }
+    func musicNameColor() -> Color {
+        let pcMusicPath = PlayController.shared.music?.filePath
+        var textColor = Color.primary
+        if pcMusicPath == music.filePath { textColor = .purple }
+        return textColor
     }
     func secToMin(second: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()

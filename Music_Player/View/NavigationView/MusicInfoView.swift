@@ -24,26 +24,41 @@ struct MusicInfoView: View {
                 Text("曲名")
                 Spacer()
                 Text(music.musicName!)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
             }
             HStack {
                 Text("アーティスト名")
                 Spacer()
                 Text(music.artistName ?? "不明")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
             }
             HStack {
                 Text("アルバム名")
                 Spacer()
                 Text(music.albumName ?? "不明")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
             }
             HStack {
                 Text("曲の長さ")
                 Spacer()
                 Text(secToMin(second: music.musicLength ?? 0))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
             }
             HStack {
                 Text("ファイルサイズ")
                 Spacer()
                 Text(music.fileSize ?? "0MB")
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
             }
             HStack {
                 Text("ファイルパス")
@@ -54,10 +69,12 @@ struct MusicInfoView: View {
                     Text(fullFilePath)
                         .lineLimit(1)
                         .truncationMode(.head)
+                        .foregroundStyle(Color.gray)
                 } else {
                     Text("不明")
                         .lineLimit(1)
                         .truncationMode(.head)
+                        .foregroundStyle(Color.gray)
                 }
             }
             .onTapGesture {

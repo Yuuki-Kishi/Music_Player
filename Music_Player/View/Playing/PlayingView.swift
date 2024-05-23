@@ -51,7 +51,7 @@ struct PlayingView: View {
                             .font(.system(size: 25).bold())
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
-                        Text(pc.music?.artistName ?? "不明なアーティスト")
+                        Text(pc.music?.artistName ?? "")
                             .lineLimit(1)
                             .font(.system(size: 20))
                             .frame(maxWidth: .infinity, alignment: .leading)

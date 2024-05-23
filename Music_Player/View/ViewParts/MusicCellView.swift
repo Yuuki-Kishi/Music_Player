@@ -33,6 +33,7 @@ struct MusicCellView: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundStyle(musicNameColor())
                 HStack {
                     Text(music.artistName ?? "不明なアーティスト")
                         .lineLimit(1)
@@ -56,6 +57,12 @@ struct MusicCellView: View {
             if playingView == .willPlay { willPlayMenu(music: $music) }
             else { musicMenu(music: $music) }
         }
+    }
+    func musicNameColor() -> Color {
+        let pcMusic = PlayController.shared.music
+        var textColor = Color.primary
+        if pcMusic == music { textColor = .purple }
+        return textColor
     }
     func tapped() {
         switch playingView {
