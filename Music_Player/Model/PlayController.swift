@@ -539,14 +539,14 @@ class PlayController: ObservableObject {
         commandCenter.playCommand.removeTarget(self)
         commandCenter.playCommand.isEnabled = true
         commandCenter.playCommand.addTarget { [unowned self] event in
-            play()
+            isPlay = true
             return .success
         }
         // 一時停止ボタン
         commandCenter.pauseCommand.removeTarget(self)
         commandCenter.pauseCommand.isEnabled = true
         commandCenter.pauseCommand.addTarget { [unowned self] event in
-            pause()
+            isPlay = false
             return .success
         }
         // 前の曲ボタン

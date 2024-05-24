@@ -97,7 +97,7 @@ struct PlayingView: View {
                     Spacer()
                     Spacer()
                     Button(action: { isFavoriteToggle() }, label: {
-                        if isFavorite { Image(systemName: "heart.fill") }
+                        if decideIsFavorite(music: music) { Image(systemName: "heart.fill") }
                         else { Image(systemName: "heart")}
                     })
                     .foregroundStyle(.purple)
@@ -113,7 +113,6 @@ struct PlayingView: View {
                     Spacer()
                     Button(action: {
                         pc.moveBeforeMusic()
-                        decideIsFavorite()
                     }, label: {
                         Image(systemName: "backward.fill")
                     })
@@ -135,7 +134,6 @@ struct PlayingView: View {
                     Spacer()
                     Button(action: {
                         pc.moveNextMusic()
-                        decideIsFavorite()
                     }, label: {
                         Image(systemName: "forward.fill")
                     })
@@ -150,8 +148,13 @@ struct PlayingView: View {
             .padding()
         }
         .onAppear() {
-            decideIsFavorite()
+            Task {
+                favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
+            }
         }
+        .onChange(of: music, {
+            decideIsFavorite(music: music)
+        })
     }
     func musicMenu() -> some View {
         Menu {
@@ -228,10 +231,16 @@ struct PlayingView: View {
             isFavorite.toggle()
         }
     }
-    func decideIsFavorite() {
-        Task {
-            favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
-            isFavorite = favoriteMusics.contains(where: {$0.filePath == music?.filePath})
+    func decideIsFavorite(music: Music?) -> Bool {
+        var isFavorite = false
+        if let music = music {
+            for favoriteMusic in favoriteMusics {
+                if favoriteMusic.filePath == music.filePath {
+                    isFavorite = true
+                    break
+                }
+            }
         }
+        return isFavorite
     }
 }
