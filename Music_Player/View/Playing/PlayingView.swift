@@ -123,7 +123,7 @@ struct PlayingView: View {
                         if music?.filePath != nil {
                             isPlay.toggle()
                         } else {
-                            pc.randomPlay(musics: mds.musicArray, playingView: .music)
+                            pc.randomPlay(musics: mds.musicArray)
                         }
                     }, label: {
                         if isPlay { Image(systemName: "pause.fill") }
@@ -222,13 +222,16 @@ struct PlayingView: View {
         }
     }
     func isFavoriteToggle() {
-        if let music = music {
-            if isFavorite {
-                Task { await FavoriteMusicDataService.shared.deleteFavoriteMusicData(music: music) }
-            } else {
-                Task { await FavoriteMusicDataService.shared.createFavoriteMusicData(music: music) }
+        Task {
+            if let music = music {
+                if isFavorite {
+                    await FavoriteMusicDataService.shared.deleteFavoriteMusicData(music: music)
+                } else {
+                    await FavoriteMusicDataService.shared.createFavoriteMusicData(music: music)
+                }
+                favoriteMusics = await FavoriteMusicDataService.shared.readFavoriteMusics()
+                isFavorite.toggle()
             }
-            isFavorite.toggle()
         }
     }
     func decideIsFavorite(music: Music?) -> Bool {

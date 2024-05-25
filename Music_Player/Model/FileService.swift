@@ -23,7 +23,7 @@ final class FileService {
     func makeDirectory() {
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
         let fileURL = documentDirectory!.appendingPathComponent("explain.txt")
-        let content = "ここに書いた説明を読めるようにするために、このファイルを「このiPhone内」のフォルダの中に保存できるようにしたい。"
+        let content = "このファイルは、このフォルダを表示させるために保存されている説明用ファイルです。削除しても動作に支障はありません。また、このフォルダが表示されなくなった場合は、一度アプリを起動すると表示されます。このフォルダの中に保存した音声ファイルは、フォルダに入っていても読み込むことができ、フォルダごとに分類することもできます。ファイル形式は、AAC, MP3, WAVに対応しています。その他に関しては、AppStoreの説明欄をご覧ください。"
         do {
             try content.write(to: fileURL, atomically: true, encoding: .utf8)
         } catch {

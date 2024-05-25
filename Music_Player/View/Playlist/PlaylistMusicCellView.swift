@@ -47,7 +47,7 @@ struct PlaylistMusicCellView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                pc.musicChoosed(music: music, musics: musics, playingView: .playlist)
+                pc.musicChoosed(music: music, musics: musics)
             }
             Spacer()
             Text(secToMin(second:music.musicLength!))

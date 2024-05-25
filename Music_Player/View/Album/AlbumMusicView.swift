@@ -28,7 +28,7 @@ struct AlbumMusicView: View {
             HStack {
                 Button(action: {
                     if !listMusicArray.isEmpty {
-                        pc.musicChoosed(music: listMusicArray.randomElement()!, musics: listMusicArray, playingView: .album)
+                        pc.randomPlay(musics: listMusicArray)
                     }
                 }){
                         Image(systemName: "play.circle")

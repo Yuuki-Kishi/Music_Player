@@ -71,7 +71,7 @@ struct MusicCellView: View {
         case .didPlay:
             pc.choosedDidPlayMusic(music: music)
         default:
-            pc.musicChoosed(music: music, musics: musics, playingView: playingView)
+            pc.musicChoosed(music: music, musics: musics)
         }
     }
     func secToMin(second: TimeInterval) -> String {

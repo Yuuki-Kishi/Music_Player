@@ -21,8 +21,17 @@ struct FavoriteMusicView: View {
     var body: some View {
         VStack {
             HStack {
-                Text(String(listMusicArray.count) + "曲のお気に入り")
-                Spacer()
+                Button(action: {
+                    if !listMusicArray.isEmpty {
+                        pc.randomPlay(musics: listMusicArray)
+                    }
+                }){
+                    Image(systemName: "play.circle")
+                        .foregroundStyle(.purple)
+                    Text("すべて再生 " + String(listMusicArray.count) + "曲")
+                    Spacer()
+                }
+                .foregroundStyle(.primary)
             }
             .padding(.horizontal)
             List($listMusicArray) { $music in
@@ -41,10 +50,25 @@ struct FavoriteMusicView: View {
             })
         }
         .onAppear() {
-            Task { 
-                listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics()
-                listMusicArray.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
+            deleteImaginaryFavoriteMusic()
+        }
+    }
+    func deleteImaginaryFavoriteMusic() {
+        Task {
+            listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics()
+            var listMusics = [Music]()
+            for listMusic in listMusicArray {
+                if pc.checkImaginaryMusics(music: listMusic) {
+                    listMusics.append(listMusic)
+                }
             }
+            await FavoriteMusicDataService.shared.deleteAllFavoriteMusicData()
+            for i in 0 ..< listMusics.count {
+                let item = listMusics[i]
+                await FavoriteMusicDataService.shared.createFavoriteMusicData(music: item)
+            }
+            listMusicArray = await FavoriteMusicDataService.shared.readFavoriteMusics()
+            listMusicArray.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
         }
     }
 }

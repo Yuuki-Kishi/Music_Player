@@ -81,8 +81,8 @@ class PlayController: ObservableObject {
                     willPlayMusics.remove(at: index)
                 }
                 willPlayMusics.shuffle()
-                for willPlayMusic in willPlayMusics {
-                    await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
+                for i in 0 ..< willPlayMusics.count {
+                    await createWillPlayMusic(music: willPlayMusics[i], index: i)
                 }
             case .order:
                 willPlayMusics = musics
@@ -90,8 +90,8 @@ class PlayController: ObservableObject {
                     willPlayMusics.remove(at: index)
                 }
                 willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
-                for willPlayMusic in willPlayMusics {
-                    await createWillPlayMusic(music: willPlayMusic, index: willPlayMusics.firstIndex(of: willPlayMusic)!)
+                for i in 0 ..< willPlayMusics.count {
+                    await createWillPlayMusic(music: willPlayMusics[i], index: i)
                 }
             case .sameRepeat:
                 break
@@ -183,25 +183,23 @@ class PlayController: ObservableObject {
         playerNode.stop()
     }
     
-    func musicChoosed(music: Music, musics: [Music], playingView: playingView) {
+    func musicChoosed(music: Music, musics: [Music]) {
         Task {
             setMusic(music: music)
             setScheduleFile()
             setNextMusics(musics: musics)
-            savePlayingView(playingView: playingView)
             seekPosition = 0.0
             cachedSeekBarSeconds = 0.0
             isPlay = true
             setTimer()
-            await deleteAllDidPlayMusic()
             await createDidPlayMusic(music: music)
             await readDidPlayMusics()
         }
     }
     
-    func randomPlay(musics: [Music], playingView: playingView) {
+    func randomPlay(musics: [Music]) {
         if !musics.isEmpty {
-            musicChoosed(music: musics.randomElement()!, musics: musics, playingView: playingView)
+            musicChoosed(music: musics.randomElement()!, musics: musics)
         }
     }
     
@@ -410,54 +408,6 @@ class PlayController: ObservableObject {
         return playMode
     }
     
-    func savePlayingView(playingView: playingView) {
-        let userDefaults = UserDefaults.standard
-        switch playingView {
-        case .music:
-            userDefaults.setValue("music", forKey: "playingView")
-        case .favorite:
-            userDefaults.setValue("favorite", forKey: "playingView")
-        case .didPlay:
-            userDefaults.setValue("didPlay", forKey: "playingView")
-        case .artist:
-            userDefaults.setValue("artist", forKey: "playingView")
-        case .album:
-            userDefaults.setValue("album", forKey: "playingView")
-        case .playlist:
-            userDefaults.setValue("playlist", forKey: "playingView")
-        case .folder:
-            userDefaults.setValue("folder", forKey: "playingView")
-        case .willPlay:
-            userDefaults.setValue("willPlay", forKey: "playingView")
-        }
-    }
-    
-    func loadPlayingView() -> playingView {
-        let saveData = UserDefaults.standard.string(forKey: "playingView") ?? "music"
-        var playingView: playingView = .music
-        switch saveData {
-        case "music":
-            playingView = .music
-        case "favorite":
-            playingView = .favorite
-        case "didPlay":
-            playingView = .didPlay
-        case "artist":
-            playingView = .artist
-        case "album":
-            playingView = .album
-        case "playlist":
-            playingView = .playlist
-        case "folder":
-            playingView = .folder
-        case "willPlay":
-            playingView = .willPlay
-        default:
-            break
-        }
-        return playingView
-    }
-    
     func savePlayingMusic(music: Music?) {
         if let saveMusic = music {
             let musicDictionary: [String: Any] = ["musicName": saveMusic.musicName ?? "不明な曲", "artistName": saveMusic.artistName ?? "不明なアーティスト", "albumName": saveMusic.albumName ?? "不明なアルバム", "editedDate": saveMusic.editedDate ?? Date(), "fileSize": saveMusic.fileSize ?? "0MB", "musicLength": saveMusic.musicLength ?? 0.0, "filePath": saveMusic.filePath ?? "不明なパス"]
@@ -475,25 +425,50 @@ class PlayController: ObservableObject {
     
     func setPlayingMusic() {
         if let music = loadPlayingMusic() {
+            if checkImaginaryMusics(music: music) {
+                setMusic(music: music)
+            } else {
+                self.music = nil
+            }
             Task {
                 await readWillPlayMusics()
-                switch loadPlayMode() {
-                case .shuffle:
-                    break
-                case .order:
-                    willPlayMusics.sort {$0.musicName ?? "不明" < $1.musicName ?? "不明"}
-                case .sameRepeat:
-                    willPlayMusics.removeAll()
+                var willMusics = [Music]()
+                for willPlayMusic in willPlayMusics {
+                    if checkImaginaryMusics(music: willPlayMusic) {
+                        willMusics.append(willPlayMusic)
+                    }
+                }
+                await deleteAllWillPlayMusic()
+                for i in 0 ..< willMusics.count {
+                    let item = willMusics[i]
+                    await createWillPlayMusic(music: item, index: i)
+                }
+                await readWillPlayMusics()
+                
+                await readDidPlayMusics()
+                var didMusics = [Music]()
+                for didPlayMusic in didPlayMusics {
+                    if checkImaginaryMusics(music: didPlayMusic) {
+                        didMusics.append(didPlayMusic)
+                    }
+                }
+                await deleteAllDidPlayMusic()
+                for i in 0 ..< didMusics.count {
+                    let item = didMusics[i]
+                    await createDidPlayMusic(music: item)
                 }
                 await readDidPlayMusics()
-                setMusic(music: music)
-                setScheduleFile()
             }
         }
     }
     
-    func deleteImaginaryMusics() {
-         
+    func checkImaginaryMusics(music: Music) -> Bool {
+        guard let filePath = music.filePath else { return false }
+        let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+        let fullFilePath = directoryPath + "/" + filePath
+        let isExsist = FileManager.default.fileExists(atPath: fullFilePath)
+        if isExsist { return true }
+        else { return false }
     }
     
     func timerForSleep(interval: TimeInterval) {

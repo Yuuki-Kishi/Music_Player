@@ -30,7 +30,7 @@ struct MusicView: View {
                     HStack {
                         Button(action: {
                             if !musicArray.isEmpty {
-                                pc.musicChoosed(music: musicArray.randomElement()!, musics: musicArray, playingView: .music)
+                                pc.randomPlay(musics: musicArray)
                             }
                         }){
                             Image(systemName: "play.circle")

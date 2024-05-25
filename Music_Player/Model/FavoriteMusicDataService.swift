@@ -53,4 +53,10 @@ final class FavoriteMusicDataService {
             await actor.delete(favoriteMusicData)
         }
     }
+    
+    func deleteAllFavoriteMusicData() async {
+        for favoriteMusic in await readFavoriteMusics() {
+            await deleteFavoriteMusicData(music: favoriteMusic)
+        }
+    }
 }

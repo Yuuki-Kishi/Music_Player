@@ -75,7 +75,7 @@ struct PlayingMusicView: View {
                         isPlay.toggle()
                     } else {
                         if !mds.musicArray.isEmpty {
-                            pc.musicChoosed(music: mds.musicArray.randomElement()!, musics: mds.musicArray, playingView: .music)
+                            pc.randomPlay(musics: mds.musicArray)
                         }
                     }
                 }, label: {
