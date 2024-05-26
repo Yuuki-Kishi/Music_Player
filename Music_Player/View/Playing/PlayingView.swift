@@ -38,7 +38,7 @@ struct PlayingView: View {
                 Image(systemName: "music.note")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.height - 800, height: UIScreen.main.bounds.height - 800)
+                    .frame(width: UIScreen.main.bounds.width * 0.3, height: UIScreen.main.bounds.width * 0.3)
                     .padding(100)
                     .foregroundStyle(Color(UIColor.systemGray))
                     .background(Color(UIColor.systemGray3))

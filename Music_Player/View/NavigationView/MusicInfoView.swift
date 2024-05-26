@@ -23,7 +23,7 @@ struct MusicInfoView: View {
             HStack {
                 Text("曲名")
                 Spacer()
-                Text(music.musicName!)
+                Text(music.musicName ?? "不明")
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
