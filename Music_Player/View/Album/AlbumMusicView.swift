@@ -8,70 +8,78 @@
 import SwiftUI
 
 struct AlbumMusicView: View {
-    @ObservedObject var mds: MusicDataStore
-    @ObservedObject var pc: PlayController
-    @Binding private var listMusicArray: [Music]
-    @State private var navigationTitle: String
-    @State private var isShowAlert = false
-    @State private var deleteTarget: Music?
-    @Environment(\.presentationMode) var presentation
-    
-    init(mds: MusicDataStore, pc: PlayController, listMusicArray: Binding<[Music]>, navigationTitle: String) {
-        self.mds = mds
-        self.pc = pc
-        self._listMusicArray = listMusicArray
-        _navigationTitle = State(initialValue: navigationTitle)
-    }
+    @StateObject var albumDataStore = AlbumDataStore.shared
+    @StateObject var playDataStore = PlayDataStore.shared
+    @StateObject var pathDataStore = PathDataStore.shared
     
     var body: some View {
         VStack {
-            HStack {
+            if albumDataStore.albumMusicArray.isEmpty {
+                Text("表示できる曲がありません")
+            } else {
                 Button(action: {
-                    if !listMusicArray.isEmpty {
-                        pc.randomPlay(musics: listMusicArray)
-                    }
-                }){
+                    randomPlay()
+                }, label: {
+                    HStack {
                         Image(systemName: "play.circle")
-                            .foregroundStyle(.purple)
-                        Text("すべて再生 " + String(listMusicArray.count) + "曲")
-                }
-                .foregroundStyle(Color.primary)
-                Spacer()
-            }
-            .padding(.horizontal)
-            List($listMusicArray) { $music in
-                MusicCellView(mds: mds, pc: pc, musics: listMusicArray, music: music, playingView: .album)
-            }
-            .navigationTitle(navigationTitle)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    toolBarMenu()
+                            .foregroundStyle(.accent)
+                        Text("すべて再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
+                    }
                 })
+                List(albumDataStore.albumMusicArray) { music in
+                    AlbumMusicViewCell(music: music)
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
-            .onAppear() {
-                mds.collectAlbumMusic(album: navigationTitle)
+            PlayWindowView()
+        }
+        .navigationTitle(albumDataStore.selectedAlbum?.albumName ?? "不明なアルバム")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing, content: {
+                toolBarMenu()
+            })
+        }
+        .padding(.horizontal)
+        .onAppear() {
+            Task {
+                albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumDataStore.selectedAlbum?.albumName ?? "不明なアルバム")
             }
-            PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
         }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: { mds.listMusicSort(method: .nameAscending) }, label: {
+            Button(action: {
+                albumDataStore.albumMusicArraySort(mode: .nameAscending)
+            }, label: {
                 Text("曲名昇順")
             })
-            Button(action: { mds.listMusicSort(method: .nameDescending) }, label: {
+            Button(action: {
+                albumDataStore.albumMusicArraySort(mode: .nameDescending)
+            }, label: {
                 Text("曲名降順")
             })
-            Button(action: { mds.listMusicSort(method: .dateAscending) }, label: {
-                Text("追加日昇順")
+            Button(action: {
+                albumDataStore.albumMusicArraySort(mode: .dateAscending)
+            }, label: {
+                Text("更新日昇順")
             })
-            Button(action: { mds.listMusicSort(method: .dateDescending) }, label: {
-                Text("追加日降順")
+            Button(action: {
+                albumDataStore.albumMusicArraySort(mode: .dateDescending)
+            }, label: {
+                Text("更新日降順")
             })
         } label: {
             Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
         }
     }
+    func randomPlay() {
+        guard let music = albumDataStore.albumMusicArray.randomElement() else { return }
+        playDataStore.musicChoosed(music: music)
+        playDataStore.setNextMusics(musicFilePaths: albumDataStore.albumMusicArray.map { $0.filePath })
+    }
+}
+
+#Preview {
+    AlbumMusicView()
 }

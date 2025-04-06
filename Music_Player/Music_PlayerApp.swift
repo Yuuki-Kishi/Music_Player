@@ -14,7 +14,7 @@ struct Music_PlayerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
         WindowGroup {
-            ContentView(mds: MusicDataStore.shared, pc: PlayController.shared)
+            ContentView()
         }
         .modelContainer(Persistance.sharedModelContainer)
     }
@@ -26,8 +26,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         do {
             try session.setCategory(.playback, mode: .default)
         }
-        catch let e {
-            print(e.localizedDescription)
+        catch let error {
+            print(error.localizedDescription)
         }
         return true
     }

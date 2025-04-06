@@ -1,20 +1,21 @@
 //
-//  FolderMusicView.swift
+//  FavoriteMusicView.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/03/06.
+//  Created by 岸　優樹 on 2024/03/16.
 //
 
 import SwiftUI
+import SwiftData
 
-struct FolderMusicView: View {
-    @StateObject var folderDataStore = FolderDataStore.shared
+struct FavoriteMusicView: View {
+    @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
     
     var body: some View {
         VStack {
-            if folderDataStore.folderMusicArray.isEmpty {
+            if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
                 Text("表示できる曲がありません")
             } else {
                 Button(action: {
@@ -23,18 +24,18 @@ struct FolderMusicView: View {
                     HStack {
                         Image(systemName: "play.circle")
                             .foregroundStyle(.accent)
-                        Text("すべて再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
+                        Text("すべて再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
                     }
                 })
-                List(folderDataStore.folderMusicArray) { music in
-                    FolderMusicViewCell(music: music)
+                List(favoriteMusicDataStore.favoriteMusicArray) { music in
+                    FavoriteMusicViewCell(music: music)
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
             }
             PlayWindowView()
         }
-        .navigationTitle(folderDataStore.selectedFolder?.folderName ?? "不明なアルバム")
+        .navigationTitle("お気に入り")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 toolBarMenu()
@@ -42,30 +43,35 @@ struct FolderMusicView: View {
         }
         .padding(.horizontal)
         .onAppear() {
+            if !FavoriteMusicRepository.isExistFavoriteMusicM3U8() {
+                if FavoriteMusicRepository.createFavoriteMusicM3U8() {
+                    print("createSucceeded")
+                }
+            }
             Task {
-                folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderName: folderDataStore.selectedFolder?.folderName ?? "不明なアルバム")
+                favoriteMusicDataStore.favoriteMusicArray = await FavoriteMusicRepository.getFavoriteMusics()
             }
         }
     }
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .nameAscending)
+                favoriteMusicDataStore.favoriteMusicArraySort(mode: .nameAscending)
             }, label: {
                 Text("曲名昇順")
             })
             Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .nameDescending)
+                favoriteMusicDataStore.favoriteMusicArraySort(mode: .nameDescending)
             }, label: {
                 Text("曲名降順")
             })
             Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .dateAscending)
+                favoriteMusicDataStore.favoriteMusicArraySort(mode: .dateAscending)
             }, label: {
                 Text("更新日昇順")
             })
             Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .dateDescending)
+                favoriteMusicDataStore.favoriteMusicArraySort(mode: .dateDescending)
             }, label: {
                 Text("更新日降順")
             })
@@ -74,12 +80,12 @@ struct FolderMusicView: View {
         }
     }
     func randomPlay() {
-        guard let music = folderDataStore.folderMusicArray.randomElement() else { return }
+        guard let music = favoriteMusicDataStore.favoriteMusicArray.randomElement() else { return }
         playDataStore.musicChoosed(music: music)
-        playDataStore.setNextMusics(musicFilePaths: folderDataStore.folderMusicArray.map { $0.filePath })
+        playDataStore.setNextMusics(musicFilePaths: favoriteMusicDataStore.favoriteMusicArray.map { $0.filePath })
     }
 }
 
 #Preview {
-    FolderMusicView()
+    FavoriteMusicView()
 }

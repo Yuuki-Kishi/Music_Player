@@ -9,64 +9,51 @@ import SwiftUI
 import SwiftData
 
 struct MusicView: View {
-    @ObservedObject var mds: MusicDataStore
-    @ObservedObject var pc: PlayController
-    @Binding private var musicArray: [Music]
-    @State private var isFirstAppear = false
-    @State private var isShowsProgressView = true
-    @State private var isShowAlert = false
-    @State private var deleteTarget: Music?
-    
-    init(mds: MusicDataStore, pc: PlayController, musicArray: Binding<[Music]>) {
-        self.mds = mds
-        self.pc = pc
-        self._musicArray = musicArray
-    }
+    @StateObject var musicDataStore = MusicDataStore.shared
+    @StateObject var playDataStore = PlayDataStore.shared
+    @StateObject var pathDataStore = PathDataStore.shared
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $pathDataStore.musicViewNavigationPath) {
             ZStack {
                 VStack {
-                    HStack {
+                    if musicDataStore.musicArray.isEmpty {
+                        Text("表示できる曲がありません")
+                    } else {
                         Button(action: {
-                            if !musicArray.isEmpty {
-                                pc.randomPlay(musics: musicArray)
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("すべて再生 (" + String(musicDataStore.musicArray.count) + "曲)")
                             }
-                        }){
-                            Image(systemName: "play.circle")
-                                .foregroundStyle(.purple)
-                            Text("すべて再生 " + String(musicArray.count) + "曲")
-                            Spacer()
+                        })
+                        List(musicDataStore.musicArray) { music in
+                            MusicCellView(music: music)
                         }
-                        .foregroundStyle(.primary)
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .padding(.horizontal)
-                    List($musicArray) { $music in
-                        MusicCellView(mds: mds, pc: pc, musics: musicArray, music: music, playingView: .music)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                    PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                    PlayWindowView()
                 }
-                if isShowsProgressView {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .scaleEffect(1.5)
-                        .tint(Color.purple)
-                }
+                .padding(.horizontal)
+                LoadingView()
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: PathDataStore.MusicViewPath.self) { path in
+                destination(path: path)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
                     toolBarMenu()
                 })
             }
             .onAppear() {
+                pathDataStore.musicViewNavigationPath.removeAll()
                 Task {
-                    if musicArray.isEmpty { await mds.getFile() }
-                    if !isFirstAppear { pc.setPlayingMusic(); isFirstAppear = true }
-                    isShowsProgressView = false
+                    musicDataStore.musicArray = await MusicRepository.getMusics()
                 }
             }
         }
@@ -74,35 +61,35 @@ struct MusicView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                Task {
-                    isShowsProgressView = true
-                    await mds.getFile()
-                    isShowsProgressView = false
-                }
-            }) {
-                Label("ファイルをスキャン", systemImage: "doc.viewfinder.fill")
-            }
-            NavigationLink(destination: FavoriteMusicView(mds: mds, pc: pc), label: {
-                Label("お気に入り", systemImage: "heart.fill")
+                
+            }, label: {
+                Label("設定", systemImage: "gearshape")
             })
-            NavigationLink(destination: DidPlayMusicView(mds: mds, pc: pc, didPlayMusicArray: $pc.didPlayMusics), label: {
-                Label("再生履歴", systemImage: "clock.arrow.circlepath")
-            })
-            NavigationLink(destination: SleepTimer(pc: pc), label: {
+            Button(action: {
+                pathDataStore.musicViewNavigationPath.append(.sleepTImer)
+            }, label: {
                 Label("スリープタイマー", systemImage: "timer")
             })
             Menu {
-                Button(action: { mds.musicSort(method: .nameAscending) }, label: {
+                Button(action: {
+                    musicDataStore.arraySort(mode: .nameAscending)
+                }, label: {
                     Text("曲名昇順")
                 })
-                Button(action: { mds.musicSort(method: .nameDescending) }, label: {
+                Button(action: {
+                    musicDataStore.arraySort(mode: .nameDescending)
+                }, label: {
                     Text("曲名降順")
                 })
-                Button(action: { mds.musicSort(method: .dateAscending) }, label: {
-                    Text("追加日昇順")
+                Button(action: {
+                    musicDataStore.arraySort(mode: .dateAscending)
+                }, label: {
+                    Text("更新日昇順")
                 })
-                Button(action: { mds.musicSort(method: .dateDescending) }, label: {
-                    Text("追加日降順")
+                Button(action: {
+                    musicDataStore.arraySort(mode: .dateDescending)
+                }, label: {
+                    Text("更新日降順")
                 })
             } label: {
                 Label("並び替え", systemImage: "arrow.up.arrow.down")
@@ -111,5 +98,31 @@ struct MusicView: View {
             Image(systemName: "ellipsis.circle")
         }
     }
+    @ViewBuilder
+    func destination(path: PathDataStore.MusicViewPath) -> some View {
+        switch path {
+        case .addPlaylist:
+            AddPlaylistView(music: musicDataStore.selectedMusic ?? Music(), pathArray: .music)
+        case .musicInfo:
+            MusicInfoView(music: musicDataStore.selectedMusic ?? Music())
+        case .favoriteMusic:
+            FavoriteMusicView()
+        case .selectFavoriteMusic:
+            FavoriteMusicSelectView()
+        case .setting:
+            EmptyView()
+        case .sleepTImer:
+            SleepTimer()
+        }
+    }
+    func randomPlay() {
+        guard let music = musicDataStore.musicArray.randomElement() else { return }
+        playDataStore.musicChoosed(music: music)
+        playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
+    }
+}
+
+#Preview {
+    MusicView()
 }
 

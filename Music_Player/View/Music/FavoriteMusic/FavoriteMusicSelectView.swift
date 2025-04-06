@@ -1,23 +1,22 @@
 //
-//  SelectMusicView.swift
+//  FavoriteMusicSelectionMusic.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2024/02/18.
+//  Created by 岸　優樹 on 2024/03/30.
 //
 
 import SwiftUI
-import SwiftData
 
-struct PlaylistSelectMusicView: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
+struct FavoriteMusicSelectView: View {
+    @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
     @State private var selectionValue: Set<Music> = []
     @State private var selectableMusicArray: [Music] = []
     
     var body: some View {
         List(selection: $selectionValue) {
-            ForEach(selectableMusicArray, id: \.filePath) { music in
-                PlaylistSelectMusicViewCell(music: music)
+            ForEach(selectableMusicArray, id: \.self) { music in
+                FavoriteMusicViewCell(music: music)
             }
         }
         .environment(\.editMode, .constant(.active))
@@ -27,6 +26,11 @@ struct PlaylistSelectMusicView: View {
             ToolbarItem(placement: .topBarTrailing, content: {
                 toolBarMenu()
             })
+        }
+        .onAppear() {
+            Task {
+                selectableMusicArray = await FavoriteMusicRepository.getSelectableMusics()
+            }
         }
     }
     func toolBarMenu() -> some View {
@@ -45,11 +49,8 @@ struct PlaylistSelectMusicView: View {
                 }
             })
             Button(action: {
-                Task {
-                    if await PlaylistRepository.addPlaylistMusics(playlist: playlistDataStore.selectedPlaylist ?? Playlist(), musicFilePaths: selectionValue.map { $0.filePath }) {
-                        print("success")
-                    }
-                    pathDataStore.playlistViewNavigationPath.removeLast()
+                if !FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) {
+                    print("addFailed")
                 }
             }, label: {
                 Text("完了")
@@ -59,5 +60,5 @@ struct PlaylistSelectMusicView: View {
 }
 
 #Preview {
-    PlaylistSelectMusicView()
+    FavoriteMusicView()
 }

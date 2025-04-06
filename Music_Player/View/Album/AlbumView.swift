@@ -8,79 +8,84 @@
 import SwiftUI
 
 struct AlbumView: View {
-    @ObservedObject var mds: MusicDataStore
-    @ObservedObject var pc: PlayController
-    @Binding private var albumArray: [Album]
-    
-    init(mds: MusicDataStore, pc: PlayController, albumArray: Binding<[Album]>) {
-        self.mds = mds
-        self.pc = pc
-        self._albumArray = albumArray
-    }
+    @StateObject var albumDataStore = AlbumDataStore.shared
+    @StateObject var pathDataStore = PathDataStore.shared
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
             VStack {
-                HStack {
-                    Text(String(albumArray.count) + "枚のアルバム")
+                if albumDataStore.albumArray.isEmpty {
+                    Text("表示できるアルバムがいません")
+                } else {
+                    Text(String(albumDataStore.albumArray.count) + "個のアルバム")
                         .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
-                    Spacer()
+                    List(albumDataStore.albumArray) { album in
+                        AlbumViewCell(album: album)
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .padding(.horizontal)
-                List($albumArray) { album in
-                    NavigationLink(value: album.albumName.wrappedValue, label: {
-                        HStack {
-                            Image(systemName: "music.note")
-                                .scaledToFit()
-                                .background(RoundedRectangle(cornerRadius: 10.0, style: .continuous).fill(Color(UIColor.systemGray6)).frame(width: 50, height: 50))
-                                .padding(.horizontal)
-                            Text(album.albumName.wrappedValue)
-                                .lineLimit(1)
-                                .padding()
-                            Spacer()
-                            Text(String(album.musicCount.wrappedValue) + "曲")
-                                .foregroundStyle(Color.gray)
-                        }
-                    })
-                }
-                .navigationDestination(for: String.self) { title in
-                    AlbumMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, navigationTitle: title)
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing, content: {
-                        toolBarMenu()
-                    })
-                }
-                PlayingMusicView(mds: mds, pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
+                PlayWindowView()
             }
             .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal)
+            .navigationDestination(for: PathDataStore.AlbumViewPath.self) { path in
+                destination(path: path)
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing, content: {
+                    toolBarMenu()
+                })
+            }
         }
         .onAppear() {
-            mds.albumSelection()
+            Task {
+                albumDataStore.albumArray = await AlbumRepository.getAlbums()
+            }
+        }
+    }
+    @ViewBuilder
+    func destination(path: PathDataStore.AlbumViewPath) -> some View {
+        switch path {
+        case .albumMusic:
+            AlbumMusicView()
+        case .addPlaylist:
+            AddPlaylistView(music: albumDataStore.selectedMusic ?? Music(), pathArray: .album)
+        case .musicInfo:
+            MusicInfoView(music: albumDataStore.selectedMusic ?? Music())
         }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: { mds.albumSort(method: .nameAscending) }, label: {
-                Text("アルバム名昇順")
+            Button(action: {
+                albumDataStore.albumArraySort(mode: .nameAscending)
+            }, label: {
+                Text("アーティスト名昇順")
             })
-            Button(action: { mds.albumSort(method: .nameDescending) }, label: {
-                Text("アルバム名降順")
+            Button(action: {
+                albumDataStore.albumArraySort(mode: .nameDescending)
+            }, label: {
+                Text("アーティスト名降順")
             })
-            Button(action: { mds.albumSort(method: .countAscending) }, label: {
+            Button(action: {
+                albumDataStore.albumArraySort(mode: .countAscending)
+            }, label: {
                 Text("曲数昇順")
             })
-            Button(action: { mds.albumSort(method: .countDescending) }, label: {
+            Button(action: {
+                albumDataStore.albumArraySort(mode: .countDescending)
+            }, label: {
                 Text("曲数降順")
             })
         } label: {
-            Image(systemName: "arrow.up.arrow.down.circle")
+            Image(systemName: "arrow.up.arrow.down")
         }
     }
 }
 
+#Preview {
+    AlbumView()
+}
