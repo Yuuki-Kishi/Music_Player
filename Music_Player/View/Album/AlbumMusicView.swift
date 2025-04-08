@@ -15,7 +15,9 @@ struct AlbumMusicView: View {
     var body: some View {
         VStack {
             if albumDataStore.albumMusicArray.isEmpty {
+                Spacer()
                 Text("表示できる曲がありません")
+                Spacer()
             } else {
                 Button(action: {
                     randomPlay()
@@ -24,11 +26,15 @@ struct AlbumMusicView: View {
                         Image(systemName: "play.circle")
                             .foregroundStyle(.accent)
                         Text("すべて再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.horizontal)
                 })
+                .foregroundStyle(.primary)
                 List(albumDataStore.albumMusicArray) { music in
                     AlbumMusicViewCell(music: music)
                 }
+                .frame(maxHeight: .infinity)
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
             }

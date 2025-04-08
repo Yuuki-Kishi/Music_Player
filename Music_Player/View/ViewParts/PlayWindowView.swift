@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct PlayWindowView: View {
+    @StateObject var musicDataStore = MusicDataStore.shared
     @StateObject var viewDataStore = ViewDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     
     var body: some View {
         VStack {
-            ProgressView(value: playDataStore.seekPosition, total: Double(playDataStore.playingMusic?.musicLength ?? 300))
+            ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
                 .progressViewStyle(LinearProgressViewStyle(tint: .accent))
             ZStack {
-//                HStack {
+                HStack {
                     VStack {
                         Text(playDataStore.playingMusic?.musicName ?? "再生停止中")
                             .lineLimit(1)
@@ -33,7 +34,8 @@ struct PlayWindowView: View {
                                 .frame(maxWidth: .infinity,alignment: .leading)
                         }
                     }
-                    .frame(width: UIScreen.main.bounds.width - 50, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer(minLength: 100)
 //                    Button(action: {}, label: {
 //                        Image(systemName: "play.fill")
 //                                .padding(14)
@@ -46,7 +48,7 @@ struct PlayWindowView: View {
 //                    })
 //                    .foregroundStyle(.clear)
 //                    .font(.system(size: 25.0))
-//                }
+                }
                 Button(action: {
                     viewDataStore.isShowPlayView = true
                 }, label: {
@@ -56,10 +58,14 @@ struct PlayWindowView: View {
                 })
                 HStack {
                     Button(action: {
-                        if playDataStore.playingMusic != nil {
-                            playDataStore.isPlaying.toggle()
+                        if playDataStore.playingMusic == nil {
+                            randomPlay()
                         } else {
-                            
+                            if playDataStore.isPlaying {
+                                playDataStore.pause()
+                            } else {
+                                playDataStore.play()
+                            }
                         }
                     }, label: {
                         if playDataStore.isPlaying {
@@ -84,7 +90,11 @@ struct PlayWindowView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
-        .padding(.horizontal)
+    }
+    func randomPlay() {
+        guard let music = musicDataStore.musicArray.randomElement() else { return }
+        playDataStore.musicChoosed(music: music)
+        playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
     }
 }
 

@@ -33,7 +33,7 @@ final class Playlist: Hashable, Identifiable, Equatable, Sendable {
         self.playlistName = playlistName
         self.musicCount = 0
         self.updateDate = Date()
-        self.filePath = "playlist/" + playlistName + ".m3u8"
+        self.filePath = "Playlist/" + "\(playlistName).m3u8"
     }
     
     init() {

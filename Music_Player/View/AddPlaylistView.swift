@@ -62,12 +62,12 @@ struct AddPlaylistView: View {
                 Text("キャンセル")
             })
             Button(action: {
-                makePlaylist()
+                createPlaylist()
             }, label: {
                 Text("作成")
             })
         }, message: {
-            Text("新しく作成するプレイリストの名前を入力してください。")
+            Text("新しく作成するプレイリストの名前を入力してください。自動で追加されます。")
         })
         .onAppear() {
             Task {
@@ -82,13 +82,13 @@ struct AddPlaylistView: View {
             }
         }
     }
-    func makePlaylist() {
+    func createPlaylist() {
         if text != "" {
             Task {
-                let playlist = await PlaylistRepository.createNewPlaylist(playlistName: text)
-                if await PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath]) {
-                    isShowAddAlert = true
-                }
+                guard await PlaylistRepository.createPlaylist(playlistName: text) else { return }
+                let playlist = Playlist(playlistName: text)
+                guard await PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath]) else { return }
+                isShowAddAlert = true
             }
         }
     }

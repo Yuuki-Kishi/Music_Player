@@ -19,7 +19,9 @@ struct PlaylistMusicView: View {
     var body: some View {
         VStack {
             if playlistDataStore.playlistMusicArray.isEmpty {
+                Spacer()
                 Text("表示できる曲がありません")
+                Spacer()
             } else {
                 Button(action: {
                     randomPlay()
@@ -28,8 +30,11 @@ struct PlaylistMusicView: View {
                         Image(systemName: "play.circle")
                             .foregroundStyle(.accent)
                         Text("すべて再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.horizontal)
                 })
+                .foregroundStyle(.primary)
                 List(playlistDataStore.playlistMusicArray) { music in
                     PlaylistMusicViewCell(music: music)
                 }
@@ -39,6 +44,7 @@ struct PlaylistMusicView: View {
             PlayWindowView()
         }
         .navigationTitle(playlistDataStore.selectedPlaylist?.playlistName ?? "不明なプレイリスト")
+        .padding(.horizontal)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 toolBarMenu()
@@ -50,7 +56,7 @@ struct PlaylistMusicView: View {
                 Text("キャンセル")
             })
             Button(action: {
-                
+                renamePlaylist()
             }, label: {
                 Text("変更")
             })
@@ -62,7 +68,7 @@ struct PlaylistMusicView: View {
                 Text("キャンセル")
             })
             Button(role: .destructive, action: {
-                
+                deletePlaylist()
             }, label: {
                 Text("削除")
             })
@@ -71,7 +77,8 @@ struct PlaylistMusicView: View {
         })
         .onAppear() {
             Task {
-                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistDataStore.selectedPlaylist?.filePath ?? "unknownFilePath")
+                guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
             }
         }
     }
@@ -128,15 +135,19 @@ struct PlaylistMusicView: View {
         playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
     }
     func renamePlaylist() {
-        if text == "" {
+        if text != "" {
             Task {
-                await PlaylistRepository.renamePlaylist(playlist: playlistDataStore.selectedPlaylist ?? Playlist(), newName: text)
+                guard let playlist = playlistDataStore.selectedPlaylist else { return }
+                guard await PlaylistRepository.renamePlaylist(playlist: playlist, newName: text) else { return }
+                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlist.filePath)
             }
         }
     }
     func deletePlaylist() {
         Task {
-            await PlaylistRepository.deletePlaylist(playlist: playlistDataStore.selectedPlaylist ?? Playlist())
+            guard let playlist = playlistDataStore.selectedPlaylist else { return }
+            guard await PlaylistRepository.deletePlaylist(playlist: playlist) else { return }
+            pathDataStore.playlistViewNavigationPath.removeLast()
         }
     }
 }

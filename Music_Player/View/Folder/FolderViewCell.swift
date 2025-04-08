@@ -19,6 +19,7 @@ struct FolderViewCell: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(String(folder.musicCount) + "曲")
         }
+        .contentShape(Rectangle())
         .onTapGesture {
             folderDataStore.selectedFolder = folder
             pathDataStore.folderViewNavigationPath.append(.folderMusic)

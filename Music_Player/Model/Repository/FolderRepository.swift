@@ -15,29 +15,26 @@ class FolderRepository {
     
     //get
     static func getFolders() async -> [Folder] {
-        let fileURLs = FileService.getFileURLs()
+        let folderPaths = FileService.getFolderPaths()
         var folders: [Folder] = []
-        for fileURL in fileURLs {
-            let folderName = FileService.getFolderName(fileURL: fileURL)
+        for folderPath in folderPaths {
+            guard let folderName = URL(string: folderPath)?.lastPathComponent else { return [] }
             if let index = folders.firstIndex(where: { $0.folderName == folderName }) {
                 folders[index].musicCount += 1
             } else {
-                folders.append(Folder(folderName: folderName, musicCount: 1, folderPath: fileURL.path()))
+                folders.append(Folder(folderName: folderName, musicCount: 1, folderPath: folderPath))
             }
         }
         FolderDataStore.shared.folderArraySort(mode: FolderDataStore.shared.folderSortMode)
         return folders
     }
     
-    static func getFolderMusic(folderName: String) async -> [Music] {
-        let fileURLs = FileService.getFileURLs()
+    static func getFolderMusic(folderPath: String) async -> [Music] {
+        let filePaths = FileService.getFilePaths(folderPath: folderPath)
         var musics: [Music] = []
-        for fileURL in fileURLs {
-            let folderNameOfFile = FileService.getFolderName(fileURL: fileURL)
-            if folderNameOfFile == folderName {
-                let music = await FileService.getFileMetadata(filePath: fileURL.path())
-                musics.append(music)
-            }
+        for filePath in filePaths {
+            let music = await FileService.getFileMetadata(filePath: filePath)
+            musics.append(music)
         }
         FolderDataStore.shared.folderArraySort(mode: FolderDataStore.shared.folderSortMode)
         return musics

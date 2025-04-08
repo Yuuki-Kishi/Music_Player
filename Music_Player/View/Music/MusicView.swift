@@ -18,7 +18,9 @@ struct MusicView: View {
             ZStack {
                 VStack {
                     if musicDataStore.musicArray.isEmpty {
+                        Spacer()
                         Text("表示できる曲がありません")
+                        Spacer()
                     } else {
                         Button(action: {
                             randomPlay()
@@ -27,8 +29,11 @@ struct MusicView: View {
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.accent)
                                 Text("すべて再生 (" + String(musicDataStore.musicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                            .padding(.horizontal)
                         })
+                        .foregroundStyle(.primary)
                         List(musicDataStore.musicArray) { music in
                             MusicCellView(music: music)
                         }
@@ -51,7 +56,6 @@ struct MusicView: View {
                 })
             }
             .onAppear() {
-                pathDataStore.musicViewNavigationPath.removeAll()
                 Task {
                     musicDataStore.musicArray = await MusicRepository.getMusics()
                 }

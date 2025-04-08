@@ -15,10 +15,10 @@ class AlbumRepository {
     
     //get
     static func getAlbums() async -> [Album] {
-        let fileURLs = FileService.getFileURLs()
+        let filePaths = FileService.getAllFilePaths()
         var albums: [Album] = []
-        for fileURL in fileURLs {
-            let music = await FileService.getFileMetadata(filePath: fileURL.path())
+        for filePath in filePaths {
+            let music = await FileService.getFileMetadata(filePath: filePath)
             if let index = albums.firstIndex(where: { $0.albumName == music.albumName }) {
                 albums[index].musicCount += 1
             } else {
@@ -30,10 +30,10 @@ class AlbumRepository {
     }
     
     static func getAlbumMusic(albumName: String) async -> [Music] {
-        let fileURLs = FileService.getFileURLs()
+        let filePaths = FileService.getAllFilePaths()
         var musics: [Music] = []
-        for fileURL in fileURLs {
-            let music = await FileService.getFileMetadata(filePath: fileURL.path())
+        for filePath in filePaths {
+            let music = await FileService.getFileMetadata(filePath: filePath)
             if music.albumName == albumName {
                 musics.append(music)
             }

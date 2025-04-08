@@ -19,14 +19,20 @@ struct PlaylistSelectMusicView: View {
             ForEach(selectableMusicArray, id: \.filePath) { music in
                 PlaylistSelectMusicViewCell(music: music)
             }
+            .environment(\.editMode, .constant(.active))
         }
-        .environment(\.editMode, .constant(.active))
+        .frame(maxHeight: .infinity)
         .listStyle(.plain)
         .navigationTitle("追加する曲を選択")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 toolBarMenu()
             })
+        }
+        .onAppear() {
+            Task {
+                selectableMusicArray = await MusicRepository.getMusics()
+            }
         }
     }
     func toolBarMenu() -> some View {

@@ -17,12 +17,13 @@ struct PlaylistView: View {
         NavigationStack(path: $pathDataStore.playlistViewNavigationPath) {
             VStack {
                 if playlistDataStore.playlistArray.isEmpty {
-                    Text("表示できるアルバムがいません")
+                    Spacer()
+                    Text("表示できるプレイリストがありません")
+                    Spacer()
                 } else {
-                    Text(String(playlistDataStore.playlistArray.count) + "個のアルバム")
-                        .lineLimit(1)
+                    Text(String(playlistDataStore.playlistArray.count) + "個のプレイリスト")
                         .font(.system(size: 15))
-                        .frame(height: 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     List(playlistDataStore.playlistArray) { playlist in
                         PlaylistViewCell(playlist: playlist)
                     }
@@ -52,7 +53,7 @@ struct PlaylistView: View {
                     Text("キャンセル")
                 })
                 Button(action: {
-                    
+                    createPlaylist()
                 }, label: {
                     Text("作成")
                 })
@@ -101,6 +102,14 @@ struct PlaylistView: View {
             })
         } label: {
             Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+    func createPlaylist() {
+        if text != "" {
+            Task {
+                guard await PlaylistRepository.createPlaylist(playlistName: text) else { return }
+                playlistDataStore.playlistArray = await PlaylistRepository.getPlaylists()
+            }
         }
     }
 }

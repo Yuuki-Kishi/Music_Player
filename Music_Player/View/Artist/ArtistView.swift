@@ -15,12 +15,13 @@ struct ArtistView: View {
         NavigationStack(path: $pathDataStore.artistViewNavigationPath) {
             VStack {
                 if artistDataStore.artistArray.isEmpty {
+                    Spacer()
                     Text("表示できるアーティストがいません")
+                    Spacer()
                 } else {
                     Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
-                        .lineLimit(1)
                         .font(.system(size: 15))
-                        .frame(height: 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     List(artistDataStore.artistArray) { artist in
                         ArtistViewCell(artist: artist)
                     }

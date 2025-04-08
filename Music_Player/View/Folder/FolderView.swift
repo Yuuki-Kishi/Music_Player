@@ -15,10 +15,11 @@ struct FolderView: View {
         NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
             VStack {
                 if folderDataStore.folderArray.isEmpty {
-                    Text("表示できるアルバムがいません")
+                    Spacer()
+                    Text("表示できるフォルダがありません")
+                    Spacer()
                 } else {
                     Text(String(folderDataStore.folderArray.count) + "個のアルバム")
-                        .lineLimit(1)
                         .font(.system(size: 15))
                         .frame(height: 20)
                     List(folderDataStore.folderArray) { folder in
@@ -29,7 +30,7 @@ struct FolderView: View {
                 }
                 PlayWindowView()
             }
-            .navigationTitle("アルバム")
+            .navigationTitle("フォルダ")
             .navigationBarTitleDisplayMode(.inline)
             .padding(.horizontal)
             .navigationDestination(for: PathDataStore.FolderViewPath.self) { path in

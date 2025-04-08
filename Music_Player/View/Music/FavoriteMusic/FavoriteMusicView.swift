@@ -16,7 +16,9 @@ struct FavoriteMusicView: View {
     var body: some View {
         VStack {
             if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
+                Spacer()
                 Text("表示できる曲がありません")
+                Spacer()
             } else {
                 Button(action: {
                     randomPlay()
@@ -25,8 +27,11 @@ struct FavoriteMusicView: View {
                         Image(systemName: "play.circle")
                             .foregroundStyle(.accent)
                         Text("すべて再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.horizontal)
                 })
+                .foregroundStyle(.primary)
                 List(favoriteMusicDataStore.favoriteMusicArray) { music in
                     FavoriteMusicViewCell(music: music)
                 }

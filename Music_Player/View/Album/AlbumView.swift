@@ -15,12 +15,13 @@ struct AlbumView: View {
         NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
             VStack {
                 if albumDataStore.albumArray.isEmpty {
-                    Text("表示できるアルバムがいません")
+                    Spacer()
+                    Text("表示できるアルバムがありません")
+                    Spacer()
                 } else {
                     Text(String(albumDataStore.albumArray.count) + "個のアルバム")
-                        .lineLimit(1)
                         .font(.system(size: 15))
-                        .frame(height: 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     List(albumDataStore.albumArray) { album in
                         AlbumViewCell(album: album)
                     }

@@ -54,17 +54,16 @@ struct ContentView: View {
             PlayView()
         })
         .onAppear() {
-            if !FileService.isExistDirectory(directoryPath: "Playlist") {
-                FileService.createDirectory(directoryName: "Playlist")
-            }
+            FileService.createDirectory(directoryPath: "Playlist")
+            FileService.createDirectory(directoryPath: "Playlist/System")
             if !WillPlayRepository.isExistWillPlayM3U8() {
                 if WillPlayRepository.createWillPlayM3U8() {
-                    print("createSucceeded")
+                    print("succeeded")
                 }
             }
             if !PlayedRepository.isExistPlayedM3U8() {
                 if PlayedRepository.createPlayedM3U8() {
-                    print("createSucceeded")
+                    print("succeeded")
                 }
             }
         }

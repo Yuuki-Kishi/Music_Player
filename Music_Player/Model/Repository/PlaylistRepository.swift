@@ -14,10 +14,17 @@ class PlaylistRepository {
     }()
     
     //create
-    static func createNewPlaylist(playlistName: String) async -> Playlist{
+    static func createPlaylist(playlistName: String) async -> Bool {
+        guard M3U8Service.createM3U8(folderPath: "Playlist", fileName: playlistName) else { return false }
         let playlist = Playlist(playlistName: playlistName)
         await actor.insert(playlist)
-        return playlist
+        return true
+    }
+    
+    //check
+    static func is(filePath: String) -> Bool {
+        let components = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }
+        return components.contains(filePath)
     }
     
     //get
@@ -30,51 +37,54 @@ class PlaylistRepository {
     }
     
     static func getPlaylistMusic(filePath: String) async -> [Music] {
-        let filePaths = M3U8Service.getM3U8Content(filePath: filePath)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("#") }
         var musics: [Music] = []
         for filePath in filePaths {
-            guard let fileURL = FileService.documentDirectory?.appendingPathComponent(filePath) else { return [] }
-            let music = await FileService.getFileMetadata(filePath: fileURL.path())
+            let music = await FileService.getFileMetadata(filePath: filePath)
             musics.append(music)
         }
         return musics
     }
     
     //update
-    static func renamePlaylist(playlist: Playlist, newName: String) async {
-        var newPlaylist = playlist
+    static func renamePlaylist(playlist: Playlist, newName: String) async -> Bool {
+        guard M3U8Service.renameM3U8(filePath: playlist.filePath, oldName: playlist.playlistName, newName: newName) else { return false }
+        let newPlaylist = playlist
         newPlaylist.playlistName = newName
         await actor.save()
+        return true
     }
     
     static func addPlaylistMusics(playlist: Playlist, musicFilePaths: [String]) async -> Bool {
         for musicFilePath in musicFilePaths {
-            if !M3U8Service.addMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) {
-                return false
-            }
+            guard M3U8Service.addMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) else { return false }
         }
-        var newPlaylist = playlist
+        let newPlaylist = playlist
         newPlaylist.musicCount += musicFilePaths.count
         await actor.save()
         return true
     }
     
     //delete
-    static func deletePlaylist(playlist: Playlist) async -> Bool {
-        if M3U8Service.deleteM3U8(filePath: playlist.filePath) {
-            await actor.delete(playlist)
-            return true
-        }
-        return false
+    static func deletePlaylistMusic(playlist: Playlist, musicFilePath: String) async -> Bool {
+        guard M3U8Service.removeMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) else { return false }
+        let newPlaylist = playlist
+        newPlaylist.musicCount -= 1
+        await actor.save()
+        return true
     }
     
-    static func deletePlaylistMusic(playlist: Playlist, musicFilePath: String) async -> Bool {
-        if M3U8Service.removeMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) {
-            var newPlaylist = playlist
-            newPlaylist.musicCount -= 1
-            await actor.save()
-            return true
-        }
-        return false
+    static func cleanUpPlaylist(playlist: Playlist) async -> Bool {
+        guard M3U8Service.cleanUpM3U8(filePath: playlist.filePath) else { return false }
+        let newPlaylist = playlist
+        newPlaylist.musicCount = 0
+        await actor.save()
+        return true
+    }
+    
+    static func deletePlaylist(playlist: Playlist) async -> Bool {
+        guard M3U8Service.deleteM3U8(filePath: playlist.filePath) else { return false }
+        await actor.delete(playlist)
+        return true
     }
 }

@@ -12,9 +12,8 @@ class WillPlayRepository {
     
     //create
     static func createWillPlayM3U8() -> Bool {
-        guard let fileURL = FileService.documentDirectory?.appendingPathComponent(filePath) else { return false }
-        let content = "#EXTM3U\n" + "#WillPlay\n"
-        return FileService.createFile(fileURL: fileURL, content: content)
+        let content = "#EXTM3U\n" + "#WillPlay"
+        return FileService.createFile(filePath: filePath, content: content)
     }
     
     //check
@@ -25,43 +24,38 @@ class WillPlayRepository {
     //get
     static func getWillPlay() async -> [Music] {
         var musics: [Music] = []
-        let filePaths = M3U8Service.getM3U8Content(filePath: filePath)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath)
         for filePath in filePaths {
-            if FileService.isExistFile(filePath: filePath) {
-                let music = await FileService.getFileMetadata(filePath: filePath)
-                musics.append(music)
-            } else {
-                if deleteWillPlay(filePath: filePath) {
-                    print("DeleteSucceed")
-                }
+            if !FileService.isExistFile(filePath: filePath) {
+                guard deleteWillPlay(filePath: filePath) else { return [] }
+                print("DeleteSucceed")
+                continue
             }
+            let music = await FileService.getFileMetadata(filePath: filePath)
+            musics.append(music)
         }
         return musics
     }
     
     static func nextMusic() async -> Music? {
-        var music: Music? = nil
-        let filePaths = M3U8Service.getM3U8Content(filePath: filePath)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath)
         if let nextFilePath = filePaths.first {
-            if FileService.isExistFile(filePath: filePath) {
-                music = await FileService.getFileMetadata(filePath: filePath)
-            }
+            guard FileService.isExistFile(filePath: nextFilePath) else { return nil }
+            return await FileService.getFileMetadata(filePath: nextFilePath)
         }
-        return music
+        return nil
     }
     
     //update
     static func addWillPlay(newMusicFilePaths: [String]) -> Bool {
         for newMusicFilePath in newMusicFilePaths {
-            if !M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) {
-                return false
-            }
+            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { return false }
         }
         return true
     }
     
     static func insertWillPlay(newMusicFilePaths: [String], at index: Int) -> Bool {
-        var filePaths = M3U8Service.getM3U8Content(filePath: filePath)
+        var filePaths = M3U8Service.getM3U8Components(filePath: filePath)
         var riversedFilePaths: [String] = []
         riversedFilePaths = newMusicFilePaths.reversed()
         for newMusicFilePath in riversedFilePaths {
@@ -71,29 +65,10 @@ class WillPlayRepository {
     }
     
     static func moveWillPlay(from: IndexSet, to: Int) -> Bool {
-        var filePaths = M3U8Service.getM3U8Content(filePath: filePath)
+        var filePaths = M3U8Service.getM3U8Components(filePath: filePath)
         filePaths.move(fromOffsets: from, toOffset: to)
-        let description = "#EXTM3U\n" + "#WillPlay\n" + filePaths.description
-        guard let data = description.data(using: .utf8) else { return false }
-        guard let fileURL = FileService.documentDirectory?.appendingPathComponent(filePath) else { return false }
-        do {
-            try data.write(to: fileURL)
-            return true
-        } catch {
-            print(error)
-        }
-        return false
-    }
-    
-    @MainActor
-    static func selectWillPlay(music: Music) -> Bool {
-        PlayDataStore.shared.musicChoosed(music: music)
-        guard let index = WillPlayDataStore.shared.willPlayMusicArray.firstIndex(of: music) else { return false }
-        for i in 0 ... index {
-            if deleteWillPlay(filePath: music.filePath) {
-                WillPlayDataStore.shared.willPlayMusicArray.removeFirst()
-            }
-        }
+        let content = "#EXTM3U\n" + "#WillPlay\n" + filePaths.joined(separator: "\n")
+        guard FileService.updateFile(filePath: filePath, content: content) else { return false }
         return true
     }
     

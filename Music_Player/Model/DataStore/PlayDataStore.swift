@@ -13,7 +13,7 @@ class PlayDataStore: ObservableObject {
     static let shared = PlayDataStore()
     @Published var playingMusic: Music? = nil
     @Published var seekPosition: Double = 0.0
-    @Published var seekPositionUpdateTimer: Timer? = nil
+    private var seekPositionUpdateTimer: Timer?
     @Published var cashedSeekBarSeconds: Double = 0.0
     @Published var isPlaying: Bool = false
     @Published var playMode: PlayMode = .shuffle
@@ -58,7 +58,8 @@ class PlayDataStore: ObservableObject {
     }
     
     func setTimer() {
-        seekPositionUpdateTimer = Timer(timeInterval: 0.1, target: self, selector: #selector(updateSeekPosition), userInfo: nil, repeats: true)
+        seekPositionUpdateTimer?.invalidate()
+        seekPositionUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateSeekPosition), userInfo: nil, repeats: true)
     }
     
     @objc func updateSeekPosition() {
@@ -152,6 +153,7 @@ class PlayDataStore: ObservableObject {
             try audioEngine.start()
             playerNode.play()
             NotificationRepository.setNowPlayingInfo()
+            isPlaying = true
 //            UserDefaults.standard.setValue(music?.musicName ?? "不明な曲", forKey: "plaingMusicName")
         }
         catch let error {

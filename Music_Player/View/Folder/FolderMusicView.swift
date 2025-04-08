@@ -15,7 +15,9 @@ struct FolderMusicView: View {
     var body: some View {
         VStack {
             if folderDataStore.folderMusicArray.isEmpty {
+                Spacer()
                 Text("表示できる曲がありません")
+                Spacer()
             } else {
                 Button(action: {
                     randomPlay()
@@ -24,8 +26,11 @@ struct FolderMusicView: View {
                         Image(systemName: "play.circle")
                             .foregroundStyle(.accent)
                         Text("すべて再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.horizontal)
                 })
+                .foregroundStyle(.primary)
                 List(folderDataStore.folderMusicArray) { music in
                     FolderMusicViewCell(music: music)
                 }
@@ -43,7 +48,7 @@ struct FolderMusicView: View {
         .padding(.horizontal)
         .onAppear() {
             Task {
-                folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderName: folderDataStore.selectedFolder?.folderName ?? "不明なアルバム")
+                folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderDataStore.selectedFolder?.folderPath ?? "")
             }
         }
     }

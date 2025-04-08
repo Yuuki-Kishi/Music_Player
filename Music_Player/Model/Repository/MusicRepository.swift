@@ -15,10 +15,10 @@ class MusicRepository {
     
     //get
     static func getMusics() async -> [Music] {
-        let fileURLs = FileService.getFileURLs()
+        let filePaths = FileService.getAllFilePaths()
         var musics: [Music] = []
-        for fileURL in fileURLs {
-            let music = await FileService.getFileMetadata(filePath: fileURL.path())
+        for filePath in filePaths {
+            let music = await FileService.getFileMetadata(filePath: filePath)
             musics.append(music)
         }
         MusicDataStore.shared.arraySort(mode: MusicDataStore.shared.musicsSortMode)

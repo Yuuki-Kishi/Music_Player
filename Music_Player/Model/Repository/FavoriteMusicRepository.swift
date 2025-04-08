@@ -12,9 +12,8 @@ class FavoriteMusicRepository {
     
     //create
     static func createFavoriteMusicM3U8() -> Bool {
-        guard let fileURL = FileService.documentDirectory?.appendingPathComponent(filePath) else { return false }
-        let content = "#EXTM3U\n" + "#Favorite\n"
-        return FileService.createFile(fileURL: fileURL, content: content)
+        let content = "#EXTM3U\n" + "#Favorite"
+        return FileService.createFile(filePath: filePath, content: content)
     }
     
     //check
@@ -23,32 +22,31 @@ class FavoriteMusicRepository {
     }
     
     static func isFavoriteMusic(filePath: String) -> Bool {
-        let filePaths = M3U8Service.getM3U8Content(filePath: filePath)
-        return filePaths.contains(filePath)
+        let components = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }
+        return components.contains(filePath)
     }
     
     //get
     static func getFavoriteMusics() async -> [Music] {
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }
         var musics: [Music] = []
-        let filePaths = M3U8Service.getM3U8Content(filePath: filePath)
         for filePath in filePaths {
-            if FileService.isExistFile(filePath: filePath) {
-                let music = await FileService.getFileMetadata(filePath: filePath)
-                musics.append(music)
-            } else {
-                if deleteFavoriteMusic(filePath: filePath) {
-                    print("DeleteSucceed")
-                }
+            if !FileService.isExistFile(filePath: filePath) {
+                guard deleteFavoriteMusic(filePath: filePath) else { return [] }
+                print("DeleteSucceed")
+                continue
             }
+            let music = await FileService.getFileMetadata(filePath: filePath)
+            musics.append(music)
         }
         return musics
     }
     
     static func getSelectableMusics() async -> [Music] {
-        let fileURLs = FileService.getFileURLs()
+        let filePaths = FileService.getAllFilePaths()
         var musics: [Music] = []
-        for fileURL in fileURLs {
-            let music = await FileService.getFileMetadata(filePath: fileURL.path())
+        for filePath in filePaths {
+            let music = await FileService.getFileMetadata(filePath: filePath)
             musics.append(music)
         }
         return musics
@@ -57,9 +55,7 @@ class FavoriteMusicRepository {
     //update
     static func addFavoriteMusics(newMusicFilePaths: [String]) -> Bool {
         for newMusicFilePath in newMusicFilePaths {
-            if !M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) {
-                return false
-            }
+            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { return false }
         }
         return true
     }
@@ -74,10 +70,10 @@ class FavoriteMusicRepository {
     
     //delete
     static func deleteFavoriteMusic(filePath: String) -> Bool {
-        M3U8Service.removeMusic(M3U8FilePath: filePath, musicFilePath: filePath)
+        M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath)
     }
     
-    static func deleteAllFavoriteMusicData() -> Bool {
-        createFavoriteMusicM3U8()
+    static func cleanUpFavorite() -> Bool {
+        M3U8Service.cleanUpM3U8(filePath: filePath)
     }
 }

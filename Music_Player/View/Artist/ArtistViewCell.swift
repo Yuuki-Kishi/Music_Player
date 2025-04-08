@@ -14,11 +14,24 @@ struct ArtistViewCell: View {
     
     var body: some View {
         HStack {
-            Image(systemName: "person.crop.circle")
+            Image(systemName: "person.fill")
+                .background(
+                    Circle()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(Color(UIColor.systemGray5))
+                )
+                .font(.system(size: 20.0))
+                .foregroundStyle(.primary)
             Text(artist.artistName)
+                .lineLimit(1)
+                .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading)
             Text(String(artist.musicCount) + "曲")
+                .font(.system(size: 15.0))
+                .foregroundStyle(.gray)
         }
+        .contentShape(Rectangle())
         .onTapGesture {
             artistDataStore.selectedArtist = artist
             pathDataStore.artistViewNavigationPath.append(.artistMusic)

@@ -12,9 +12,9 @@ class PlayedRepository {
     
     //create
     static func createPlayedM3U8() -> Bool {
-        guard let fileURL = FileService.documentDirectory?.appendingPathComponent(filePath) else { return false }
-        let content = "#EXTM3U\n" + "#WillPlay\n"
-        return FileService.createFile(fileURL: fileURL, content: content)
+        let filePath = "Playlist/System/Played.m3u8"
+        let content = "#EXTM3U\n" + "#WillPlay"
+        return FileService.createFile(filePath: filePath, content: content)
     }
     
     //check
