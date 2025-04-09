@@ -11,8 +11,9 @@ import SwiftData
 struct AddPlaylistView: View {
     @StateObject var pathDataStore = PathDataStore.shared
     @State private var playlistArray: [Playlist] = []
-    @State private var isShowAddAlert = false
-    @State private var isShowCreatePlaylist = false
+    @State private var isLoading: Bool = true
+    @State private var isShowCleateAlert: Bool = false
+    @State private var isShowAddedAlert: Bool = false
     @State private var text = ""
     @State var music: Music
     @State var pathArray: PathArray
@@ -22,41 +23,36 @@ struct AddPlaylistView: View {
     }
     
     var body: some View {
-        List(playlistArray) { playlist in
-            HStack {
-                Text(playlist.playlistName)
+        ZStack {
+            if isLoading {
                 Spacer()
-                Text(String(playlist.musicCount) + "曲")
-                    .foregroundStyle(Color.gray)
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                tapped(playlist: playlist)
+                Text("読み込み中...")
+                Spacer()
+            } else {
+                if playlistArray.isEmpty {
+                    Spacer()
+                    Text("表示できるプレイリストがありません")
+                    Spacer()
+                } else {
+                    List(playlistArray) { playlist in
+                        AddPlaylistViewCell(playlist: playlist, music: music, pathArray: pathArray)
+                    }
+                    .listStyle(.plain)
+                }
             }
         }
-        .listStyle(.plain)
         .navigationTitle("プレイリストに追加")
-        .alert("追加完了", isPresented: $isShowAddAlert, actions: {
-            Button(action: {
-                added()
-            }, label: {
-                Text("OK")
-            })
-        }, message: {
-            Text("プレイリストに追加しました。")
-        })
-        .navigationTitle("プレイリスト")
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 Button(action: {
-                    isShowCreatePlaylist = true
+                    isShowCleateAlert = true
                 }, label: {
                     Image(systemName: "plus")
                 })
             })
         }
-        .alert("プレイリストを追加", isPresented: $isShowCreatePlaylist, actions: {
+        .alert("プレイリストを追加", isPresented: $isShowCleateAlert, actions: {
             TextField("プレイリスト名", text: $text)
             Button(role: .cancel, action: {}, label: {
                 Text("キャンセル")
@@ -69,20 +65,25 @@ struct AddPlaylistView: View {
         }, message: {
             Text("新しく作成するプレイリストの名前を入力してください。自動で追加されます。")
         })
+        .alert("追加完了", isPresented: $isShowAddedAlert, actions: {
+            Button(action: {
+                added()
+            }, label: {
+                Text("OK")
+            })
+        }, message: {
+            Text("プレイリストに追加しました。")
+        })
         .onAppear() {
             playlistArray = PlaylistRepository.getPlaylists()
+            isLoading = false
         }
-    }
-    func tapped(playlist: Playlist) {
-        let playlist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath])
-        isShowAddAlert = true
     }
     func createPlaylist() {
         if text != "" {
             guard PlaylistRepository.createPlaylist(playlistName: text) else { return }
-            let playlist = Playlist(playlistName: text)
-            let newPlaylist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath])
-            isShowAddAlert = true
+            guard PlaylistRepository.addPlaylistMusic(playlistFilePath: "Playlist/\(text).m3u8", musicFilePath: music.filePath) else { return }
+            isShowAddedAlert = true
         }
     }
     func added() {

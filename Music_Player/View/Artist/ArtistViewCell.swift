@@ -15,12 +15,13 @@ struct ArtistViewCell: View {
     var body: some View {
         HStack {
             Image(systemName: "person.fill")
+                .font(.system(size: 30.0))
                 .background(
                     Circle()
-                        .frame(width: 30, height: 30)
+                        .frame(width: 50, height: 50)
                         .foregroundStyle(Color(UIColor.systemGray5))
                 )
-                .font(.system(size: 20.0))
+                .frame(width: 40, height: 40)
                 .foregroundStyle(.primary)
             Text(artist.artistName)
                 .lineLimit(1)

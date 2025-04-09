@@ -28,12 +28,12 @@ class FavoriteMusicRepository {
     
     //get
     static func getFavoriteMusics() async -> [Music] {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }.droppedFisrt(2)
         var musics: [Music] = []
         for filePath in filePaths {
             if !FileService.isExistFile(filePath: filePath) {
-                guard deleteFavoriteMusic(filePath: filePath) else { return [] }
-                print("DeleteSucceed")
+                guard removeFavoriteMusic(filePath: filePath) else { return [] }
+                print("removeSucceeded")
                 continue
             }
             let music = await FileService.getFileMetadata(filePath: filePath)
@@ -53,23 +53,24 @@ class FavoriteMusicRepository {
     }
     
     //update
-    static func addFavoriteMusics(newMusicFilePaths: [String]) -> Bool {
-        for newMusicFilePath in newMusicFilePaths {
-            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { continue }
-        }
-        return true
+    static func addFavoriteMusic(newMusicFilePath: String) -> Bool {
+        M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath)
+    }
+    
+    static func updateFavoriteMusics(newMusicFilePaths: [String]) -> Bool {
+        M3U8Service.updateM3U8(filePath: filePath, contents: newMusicFilePaths)
     }
     
     static func toggleFavoriteMusic(filePath: String) -> Bool {
         if isFavoriteMusic(filePath: filePath) {
-            return deleteFavoriteMusic(filePath: filePath)
+            return removeFavoriteMusic(filePath: filePath)
         } else {
-            return addFavoriteMusics(newMusicFilePaths: [filePath])
+            return addFavoriteMusic(newMusicFilePath: filePath)
         }
     }
     
     //delete
-    static func deleteFavoriteMusic(filePath: String) -> Bool {
+    static func removeFavoriteMusic(filePath: String) -> Bool {
         M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath)
     }
     

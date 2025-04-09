@@ -12,15 +12,24 @@ struct FavoriteMusicSelectView: View {
     @StateObject var pathDataStore = PathDataStore.shared
     @State private var selectionValue: Set<Music> = []
     @State private var selectableMusicArray: [Music] = []
+    @State private var isLoading: Bool = true
     
     var body: some View {
-        List(selection: $selectionValue) {
-            ForEach(selectableMusicArray, id: \.self) { music in
-                FavoriteMusicViewCell(music: music)
+        ZStack {
+            if isLoading {
+                Spacer()
+                Text("読み込み中...")
+                Spacer()
+            } else {
+                List(selection: $selectionValue) {
+                    ForEach(selectableMusicArray, id: \.self) { music in
+                        FavoriteMusicSelectViewCell(music: music)
+                    }
+                }
+                .environment(\.editMode, .constant(.active))
+                .listStyle(.plain)
             }
         }
-        .environment(\.editMode, .constant(.active))
-        .listStyle(.plain)
         .navigationTitle("追加する曲を選択")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
@@ -47,8 +56,7 @@ struct FavoriteMusicSelectView: View {
                 }
             })
             Button(action: {
-                guard FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) else { return }
-                print("addSucceeded")
+                addMusic()
             }, label: {
                 Text("完了")
             })
@@ -57,11 +65,17 @@ struct FavoriteMusicSelectView: View {
     func getSelectableMusics() {
         Task {
             selectableMusicArray = await FavoriteMusicRepository.getSelectableMusics()
+            selectionValue = Set(selectableMusicArray.filter { isFavorite(filePath: $0.filePath) })
+            isLoading = false
         }
     }
+    func isFavorite(filePath: String) -> Bool {
+        FavoriteMusicRepository.isFavoriteMusic(filePath: filePath)
+    }
     func addMusic() {
-        guard FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) else { return }
-        pathDataStore.playlistViewNavigationPath.removeLast()
+        let musicFilePaths = selectionValue.map { $0.filePath }
+        guard FavoriteMusicRepository.updateFavoriteMusics(newMusicFilePaths: musicFilePaths) else { return }
+        pathDataStore.musicViewNavigationPath.removeLast()
     }
 }
 

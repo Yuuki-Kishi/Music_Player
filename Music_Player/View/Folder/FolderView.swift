@@ -10,29 +10,41 @@ import SwiftUI
 struct FolderView: View {
     @StateObject var folderDataStore = FolderDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
         NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
-            VStack {
-                if folderDataStore.folderArray.isEmpty {
-                    Spacer()
-                    Text("表示できるフォルダがありません")
-                    Spacer()
-                } else {
-                    Text(String(folderDataStore.folderArray.count) + "個のアルバム")
-                        .font(.system(size: 15))
-                        .frame(height: 20)
-                    List(folderDataStore.folderArray) { folder in
-                        FolderViewCell(folder: folder)
+            ZStack {
+                VStack {
+                    if isLoading {
+                        Spacer()
+                        Text("読み込み中...")
+                        Spacer()
+                    } else {
+                        if folderDataStore.folderArray.isEmpty {
+                            Spacer()
+                            Text("表示できるフォルダがありません")
+                            Spacer()
+                        } else {
+                            Text(String(folderDataStore.folderArray.count) + "個のフォルダ")
+                                .font(.system(size: 15))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            List(folderDataStore.folderArray) { folder in
+                                FolderViewCell(folder: folder)
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                        }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
-                PlayWindowView()
+                VStack {
+                    Spacer()
+                    PlayWindowView()
+                }
             }
             .navigationTitle("フォルダ")
             .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal)
             .navigationDestination(for: PathDataStore.FolderViewPath.self) { path in
                 destination(path: path)
             }
@@ -41,9 +53,12 @@ struct FolderView: View {
                     toolBarMenu()
                 })
             }
-        }
-        .onAppear() {
-            getFolders()
+            .onAppear() {
+                getFolders()
+            }
+            .onDisappear() {
+                isLoading = true
+            }
         }
     }
     @ViewBuilder
@@ -86,6 +101,7 @@ struct FolderView: View {
     func getFolders() {
         Task {
             folderDataStore.folderArray = await FolderRepository.getFolders()
+            isLoading = false
         }
     }
 }

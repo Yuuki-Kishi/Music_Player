@@ -26,13 +26,8 @@ class M3U8Service {
         return content.components(separatedBy: "\n")
     }
     
-    static func getM3U8s(folderPath: String) -> [String] {
-        let filePaths = FileService.getPlaylistFilePaths()
-        var playlistNames: [String] = []
-        for filePath in filePaths {
-            playlistNames.append(getM3U8Name(filePath: filePath))
-        }
-        return playlistNames
+    static func getM3U8FilePaths(folderPath: String) -> [String] {
+        FileService.getPlaylistFilePaths()
     }
     
     static func getM3U8Name(filePath: String) -> String {
@@ -48,6 +43,13 @@ class M3U8Service {
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }
     
+    static func addMusics(M3U8FilePath: String, musicFilePaths: [String]) -> Bool {
+        var components = getM3U8Components(filePath: M3U8FilePath)
+        components.append(contentsOf: musicFilePaths)
+        let newContent = components.joined(separator: "\n")
+        return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
+    }
+    
     static func insertMusic(M3U8FilePath: String, musicFilePath: String, index: Int) -> Bool {
         var components = getM3U8Components(filePath: M3U8FilePath)
         components.insert(musicFilePath, at: index)
@@ -55,13 +57,20 @@ class M3U8Service {
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }
     
+    static func insertMusics(M3U8FilePath: String, musicFilePaths: [String], index: Int) -> Bool {
+        var components = getM3U8Components(filePath: M3U8FilePath)
+        components.insert(contentsOf: musicFilePaths, at: index)
+        let newContent = components.joined(separator: "\n")
+        return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
+    }
+    
     static func updateM3U8(filePath: String, contents: [String]) -> Bool {
         let fileName = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
-        var content: String = "#EXTM3U\n" + "#\(fileName)"
+        var newContent: String = "#EXTM3U\n" + "#\(fileName)"
         if !contents.isEmpty {
-            content = "#EXTM3U\n" + "#\(fileName)\n" + contents.joined(separator: "\n")
+            newContent = "#EXTM3U\n" + "#\(fileName)\n" + contents.joined(separator: "\n")
         }
-        return FileService.updateFile(filePath: filePath, content: content)
+        return FileService.updateFile(filePath: filePath, content: newContent)
     }
     
     static func renameM3U8(filePath: String, newName: String) -> Bool {

@@ -110,6 +110,7 @@ class FileService {
     static func getFileContent(filePath: String) -> String? {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return nil }
         do {
+            let content = try String(contentsOf: fileURL, encoding: .utf8)
             return try String(contentsOf: fileURL, encoding: .utf8)
         } catch {
             print(error)

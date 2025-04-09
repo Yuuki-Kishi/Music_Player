@@ -10,29 +10,41 @@ import SwiftUI
 struct ArtistView: View {
     @StateObject var artistDataStore = ArtistDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
         NavigationStack(path: $pathDataStore.artistViewNavigationPath) {
-            VStack {
-                if artistDataStore.artistArray.isEmpty {
-                    Spacer()
-                    Text("表示できるアーティストがいません")
-                    Spacer()
-                } else {
-                    Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    List(artistDataStore.artistArray) { artist in
-                        ArtistViewCell(artist: artist)
+            ZStack {
+                VStack {
+                    if isLoading {
+                        Spacer()
+                        Text("読み込み中...")
+                        Spacer()
+                    } else {
+                        if artistDataStore.artistArray.isEmpty {
+                            Spacer()
+                            Text("表示できるアーティストがいません")
+                            Spacer()
+                        } else {
+                            Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
+                                .font(.system(size: 15))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            List(artistDataStore.artistArray) { artist in
+                                ArtistViewCell(artist: artist)
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                        }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
-                PlayWindowView()
+                VStack {
+                    Spacer()
+                    PlayWindowView()
+                }
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal)
             .navigationDestination(for: PathDataStore.ArtistViewPath.self) { path in
                 destination(path: path)
             }
@@ -41,9 +53,12 @@ struct ArtistView: View {
                     toolBarMenu()
                 })
             }
-        }
-        .onAppear() {
-            getArtists()
+            .onAppear() {
+                getArtists()
+            }
+            .onDisappear() {
+                isLoading = true
+            }
         }
     }
     @ViewBuilder
@@ -86,6 +101,7 @@ struct ArtistView: View {
     func getArtists() {
         Task {
             artistDataStore.artistArray = await ArtistRepository.getArtists()
+            isLoading = false
         }
     }
 }

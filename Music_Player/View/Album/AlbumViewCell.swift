@@ -14,12 +14,12 @@ struct AlbumViewCell: View {
     
     var body: some View {
         HStack {
-            Image(systemName: "music.note")
-                .font(.system(size: 20.0))
+            Image(systemName: "square.stack.fill")
+                .font(.system(size: 30.0))
                 .background(
                     RoundedRectangle(cornerRadius: 5.0)
                         .foregroundStyle(Color(UIColor.systemGray5))
-                        .frame(width: 30, height: 30)
+                        .frame(width: 50, height: 50)
                 )
             Text(album.albumName)
                 .font(.system(size: 20.0))

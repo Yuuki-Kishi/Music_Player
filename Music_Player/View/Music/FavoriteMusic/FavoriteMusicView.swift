@@ -12,34 +12,46 @@ struct FavoriteMusicView: View {
     @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     @State private var isShowAlert: Bool = false
     
     var body: some View {
-        VStack {
-            if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
-                Spacer()
-                Text("表示できる曲がありません")
-                Spacer()
-            } else {
-                Button(action: {
-                    randomPlay()
-                }, label: {
-                    HStack {
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.accent)
-                        Text("すべて再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
+                        Spacer()
+                        Text("表示できる曲がありません")
+                        Spacer()
+                    } else {
+                        Button(action: {
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("すべて再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.horizontal)
+                        })
+                        .foregroundStyle(.primary)
+                        List(favoriteMusicDataStore.favoriteMusicArray) { music in
+                            FavoriteMusicViewCell(music: music)
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .padding(.horizontal)
-                })
-                .foregroundStyle(.primary)
-                List(favoriteMusicDataStore.favoriteMusicArray) { music in
-                    FavoriteMusicViewCell(music: music)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
-            PlayWindowView()
+            VStack {
+                Spacer()
+                PlayWindowView()
+            }
         }
         .navigationTitle("お気に入り")
         .toolbar {
@@ -47,7 +59,6 @@ struct FavoriteMusicView: View {
                 toolBarMenu()
             })
         }
-        .padding(.horizontal)
         .alert("本当に空にしますか？", isPresented: $isShowAlert, actions: {
             Button(role: .cancel, action: {}, label: {
                 Text("キャンセル")
@@ -67,9 +78,17 @@ struct FavoriteMusicView: View {
             }
             getFavoriteMusics()
         }
+        .onDisappear() {
+            isLoading = true
+        }
     }
     func toolBarMenu() -> some View {
         Menu {
+            Button(action: {
+                pathDataStore.musicViewNavigationPath.append(.selectFavoriteMusic)
+            }, label: {
+                Label("曲を追加", systemImage: "plus")
+            })
             Menu {
                 Button(action: {
                     favoriteMusicDataStore.favoriteMusicArraySort(mode: .nameAscending)
@@ -107,6 +126,7 @@ struct FavoriteMusicView: View {
     func getFavoriteMusics() {
         Task {
             favoriteMusicDataStore.favoriteMusicArray = await FavoriteMusicRepository.getFavoriteMusics()
+            isLoading = false
         }
     }
     func randomPlay() {

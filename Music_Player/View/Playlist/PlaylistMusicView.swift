@@ -12,39 +12,50 @@ struct PlaylistMusicView: View {
     @StateObject var playlistDataStore = PlaylistDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     @State private var isShowRenameAlert: Bool = false
     @State private var isShowDeleteAlert: Bool = false
     @State private var text: String = ""
     
     var body: some View {
-        VStack {
-            if playlistDataStore.playlistMusicArray.isEmpty {
-                Spacer()
-                Text("表示できる曲がありません")
-                Spacer()
-            } else {
-                Button(action: {
-                    randomPlay()
-                }, label: {
-                    HStack {
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.accent)
-                        Text("すべて再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if playlistDataStore.playlistMusicArray.isEmpty {
+                        Spacer()
+                        Text("表示できる曲がありません")
+                        Spacer()
+                    } else {
+                        Button(action: {
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("すべて再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.horizontal)
+                        })
+                        .foregroundStyle(.primary)
+                        List(playlistDataStore.playlistMusicArray) { music in
+                            PlaylistMusicViewCell(music: music)
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .padding(.horizontal)
-                })
-                .foregroundStyle(.primary)
-                List(playlistDataStore.playlistMusicArray) { music in
-                    PlaylistMusicViewCell(music: music)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
-            PlayWindowView()
+            VStack {
+                Spacer()
+                PlayWindowView()
+            }
         }
         .navigationTitle(playlistDataStore.selectedPlaylist?.playlistName ?? "不明なプレイリスト")
-        .padding(.horizontal)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 toolBarMenu()
@@ -77,6 +88,9 @@ struct PlaylistMusicView: View {
         })
         .onAppear() {
             getPlaylistMusics()
+        }
+        .onDisappear() {
+            isLoading = true
         }
     }
     func toolBarMenu() -> some View{
@@ -130,6 +144,7 @@ struct PlaylistMusicView: View {
         Task {
             guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
             playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
+            isLoading = false
         }
     }
     func randomPlay() {
@@ -139,14 +154,14 @@ struct PlaylistMusicView: View {
     }
     func renamePlaylist() {
         if text != "" {
-            guard let playlist = playlistDataStore.selectedPlaylist else { return }
-            guard PlaylistRepository.renamePlaylist(playlist: playlist, newName: text) else { return }
+            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+            guard PlaylistRepository.renamePlaylist(playlistFilePath: filePath, newName: text) else { return }
             getPlaylistMusics()
         }
     }
     func deletePlaylist() {
-        guard let playlist = playlistDataStore.selectedPlaylist else { return }
-        guard PlaylistRepository.deletePlaylist(playlist: playlist) else { return }
+        guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+        guard PlaylistRepository.deletePlaylist(playlistFilePath: filePath) else { return }
         pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }

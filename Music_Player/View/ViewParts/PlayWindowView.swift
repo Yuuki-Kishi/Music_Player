@@ -16,6 +16,7 @@ struct PlayWindowView: View {
         VStack {
             ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
                 .progressViewStyle(LinearProgressViewStyle(tint: .accent))
+                .padding(.horizontal)
             ZStack {
                 HStack {
                     VStack {
@@ -36,45 +37,20 @@ struct PlayWindowView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     Spacer(minLength: 100)
-//                    Button(action: {}, label: {
-//                        Image(systemName: "play.fill")
-//                                .padding(14)
-//                    })
-//                    .font(.system(size: 25.0))
-//                    .foregroundStyle(.clear)
-//                    Button(action: {}, label: {
-//                        Image(systemName: "forward.fill")
-//                            .padding(.vertical, 14)
-//                    })
-//                    .foregroundStyle(.clear)
-//                    .font(.system(size: 25.0))
                 }
-                Button(action: {
-                    viewDataStore.isShowPlayView = true
-                }, label: {
-                    Rectangle()
-                        .foregroundStyle(.clear)
-                        .frame(maxWidth: .infinity, maxHeight: 20)
-                })
+                .frame(height: 20)
                 HStack {
                     Button(action: {
-                        if playDataStore.playingMusic == nil {
-                            randomPlay()
-                        } else {
-                            if playDataStore.isPlaying {
-                                playDataStore.pause()
-                            } else {
-                                playDataStore.play()
-                            }
-                        }
+                        viewDataStore.isShowPlayView = true
                     }, label: {
-                        if playDataStore.isPlaying {
-                            Image(systemName: "pause.fill")
-                                .padding(14)
-                        } else {
-                            Image(systemName: "play.fill")
-                                .padding(14)
-                        }
+                        Rectangle()
+                            .foregroundStyle(.clear)
+                            .frame(maxWidth: .infinity, maxHeight: 20)
+                    })
+                    Button(action: {
+                        playButtonAction()
+                    }, label: {
+                        playButtonIcon()
                     })
                     .font(.system(size: 25.0))
                     .foregroundStyle(.primary)
@@ -82,20 +58,40 @@ struct PlayWindowView: View {
                         playDataStore.moveNextMusic()
                     }, label: {
                         Image(systemName: "forward.fill")
-                            .padding(.vertical, 14)
+                            .font(.system(size: 25.0))
                     })
                     .foregroundStyle(.primary)
-                    .font(.system(size: 25.0))
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
+        .background(Color(UIColor.systemGray5))
     }
     func randomPlay() {
         guard let music = musicDataStore.musicArray.randomElement() else { return }
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
+    }
+    func playButtonAction() {
+        if playDataStore.playingMusic == nil {
+            randomPlay()
+        } else {
+            if playDataStore.isPlaying {
+                playDataStore.pause()
+            } else {
+                playDataStore.play()
+            }
+        }
+    }
+    func playButtonIcon() -> some View {
+        if playDataStore.isPlaying {
+            Image(systemName: "pause.fill")
+                .padding(14)
+        } else {
+            Image(systemName: "play.fill")
+                .padding(14)
+        }
     }
 }
 

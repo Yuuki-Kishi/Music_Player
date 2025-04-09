@@ -13,16 +13,24 @@ struct PlaylistSelectMusicView: View {
     @StateObject var pathDataStore = PathDataStore.shared
     @State private var selectionValue: Set<Music> = []
     @State private var selectableMusicArray: [Music] = []
+    @State private var isLoading: Bool = true
     
     var body: some View {
-        List(selection: $selectionValue) {
-            ForEach(selectableMusicArray, id: \.filePath) { music in
-                PlaylistSelectMusicViewCell(music: music)
+        ZStack {
+            if isLoading {
+                Spacer()
+                Text("読み込み中...")
+                Spacer()
+            } else {
+                List(selection: $selectionValue) {
+                    ForEach(selectableMusicArray, id: \.filePath) { music in
+                        PlaylistSelectMusicViewCell(music: music)
+                    }
+                }
+                .environment(\.editMode, .constant(.active))
+                .listStyle(.plain)
             }
-            .environment(\.editMode, .constant(.active))
         }
-        .frame(maxHeight: .infinity)
-        .listStyle(.plain)
         .navigationTitle("追加する曲を選択")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
@@ -58,12 +66,18 @@ struct PlaylistSelectMusicView: View {
     func getSelectableMusicArray() {
         Task {
             selectableMusicArray = await MusicRepository.getMusics()
+            selectionValue = Set(selectableMusicArray.filter { isInclude(musicFilePath: $0.filePath) })
+            isLoading = false
         }
     }
+    func isInclude(musicFilePath: String) -> Bool {
+        guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return false }
+        return PlaylistRepository.isIncludeMusic(playlistFilePath: playlistFilePath, musicFilePath: musicFilePath)
+    }
     func addMusic() {
-        guard let playlist = playlistDataStore.selectedPlaylist else { return }
-        let newPlaylist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: selectionValue.map { $0.filePath })
-        playlistDataStore.selectedPlaylist = newPlaylist
+        guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+        let musicFilePaths = selectionValue.map { $0.filePath }
+        guard PlaylistRepository.updatePlaylistMusics(playlistFilePath: filePath, musicFilePaths: musicFilePaths) else { return }
         pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }

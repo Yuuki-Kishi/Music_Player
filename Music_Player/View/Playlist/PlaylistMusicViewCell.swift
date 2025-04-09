@@ -43,7 +43,7 @@ struct PlaylistMusicViewCell: View {
         .onTapGesture {
             tapped()
         }
-        .alert("プレイリストから削除しますか？", isPresented: $isShowExcludeAlert, actions: {
+        .alert("プレイリストから除外しますか？", isPresented: $isShowExcludeAlert, actions: {
             Button(role: .cancel, action: {}, label: {
                 Text("キャンセル")
             })
@@ -107,7 +107,7 @@ struct PlaylistMusicViewCell: View {
             Button(role: .destructive, action: {
                 isShowExcludeAlert = true
             }, label: {
-                Label("プレイリストから削除", systemImage: "minus.circle")
+                Label("プレイリストから除外", systemImage: "minus.circle")
             })
             Button(role: .destructive, action: {
                 isShowDeleteAlert = true
@@ -121,11 +121,10 @@ struct PlaylistMusicViewCell: View {
         }
     }
     func excludeMusic() {
-        guard let playlist = playlistDataStore.selectedPlaylist else { return }
-        let newPlaylist = PlaylistRepository.removePlaylistMusic(playlist: playlist, musicFilePaths: [music.filePath])
-        playlistDataStore.selectedPlaylist = newPlaylist
+        guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+        guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
         Task {
-            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: newPlaylist.filePath)
+            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistFilePath)
         }
     }
     func deleteMusicFile() {

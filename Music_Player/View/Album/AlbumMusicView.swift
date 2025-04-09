@@ -11,34 +11,46 @@ struct AlbumMusicView: View {
     @StateObject var albumDataStore = AlbumDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
-        VStack {
-            if albumDataStore.albumMusicArray.isEmpty {
-                Spacer()
-                Text("表示できる曲がありません")
-                Spacer()
-            } else {
-                Button(action: {
-                    randomPlay()
-                }, label: {
-                    HStack {
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.accent)
-                        Text("すべて再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if albumDataStore.albumMusicArray.isEmpty {
+                        Spacer()
+                        Text("表示できる曲がありません")
+                        Spacer()
+                    } else {
+                        Button(action: {
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("すべて再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.horizontal)
+                        })
+                        .foregroundStyle(.primary)
+                        List(albumDataStore.albumMusicArray) { music in
+                            AlbumMusicViewCell(music: music)
+                        }
+                        .frame(maxHeight: .infinity)
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .padding(.horizontal)
-                })
-                .foregroundStyle(.primary)
-                List(albumDataStore.albumMusicArray) { music in
-                    AlbumMusicViewCell(music: music)
                 }
-                .frame(maxHeight: .infinity)
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
-            PlayWindowView()
+            VStack {
+                Spacer()
+                PlayWindowView()
+            }
         }
         .navigationTitle(albumDataStore.selectedAlbum?.albumName ?? "不明なアルバム")
         .toolbar {
@@ -46,9 +58,11 @@ struct AlbumMusicView: View {
                 toolBarMenu()
             })
         }
-        .padding(.horizontal)
         .onAppear() {
             getAlbumMusics()
+        }
+        .onDisappear() {
+            isLoading = true
         }
     }
     func toolBarMenu() -> some View {
@@ -81,6 +95,7 @@ struct AlbumMusicView: View {
         guard let albumName = albumDataStore.selectedAlbum?.albumName else { return }
         Task {
             albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumName)
+            isLoading = false
         }
     }
     func randomPlay() {

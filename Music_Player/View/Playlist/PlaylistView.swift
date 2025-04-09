@@ -10,31 +10,43 @@ import SwiftUI
 struct PlaylistView: View {
     @StateObject var playlistDataStore = PlaylistDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     @State private var isShowAlert = false
     @State private var text = ""
     
     var body: some View {
         NavigationStack(path: $pathDataStore.playlistViewNavigationPath) {
-            VStack {
-                if playlistDataStore.playlistArray.isEmpty {
+            ZStack {
+                if isLoading {
                     Spacer()
-                    Text("表示できるプレイリストがありません")
+                    Text("読み込み中...")
                     Spacer()
                 } else {
-                    Text(String(playlistDataStore.playlistArray.count) + "個のプレイリスト")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    List(playlistDataStore.playlistArray) { playlist in
-                        PlaylistViewCell(playlist: playlist)
+                    VStack {
+                        if playlistDataStore.playlistArray.isEmpty {
+                            Spacer()
+                            Text("表示できるプレイリストがありません")
+                            Spacer()
+                        } else {
+                            Text(String(playlistDataStore.playlistArray.count) + "個のプレイリスト")
+                                .font(.system(size: 15))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            List(playlistDataStore.playlistArray) { playlist in
+                                PlaylistViewCell(playlist: playlist)
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                        }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
-                PlayWindowView()
+                VStack {
+                    Spacer()
+                    PlayWindowView()
+                }
             }
             .navigationTitle("プレイリスト")
             .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal)
             .navigationDestination(for: PathDataStore.PlaylistViewPath.self) { path in
                 destination(path: path)
             }
@@ -60,9 +72,12 @@ struct PlaylistView: View {
             }, message: {
                 Text("作成するプレイリストの名前を入力してください。")
             })
-        }
-        .onAppear() {
-            getPlaylists()
+            .onAppear() {
+                getPlaylists()
+            }
+            .onDisappear() {
+                isLoading = true
+            }
         }
     }
     @ViewBuilder
@@ -104,6 +119,7 @@ struct PlaylistView: View {
     }
     func getPlaylists() {
         playlistDataStore.playlistArray = PlaylistRepository.getPlaylists()
+        isLoading = false
     }
     func createPlaylist() {
         if text != "" {

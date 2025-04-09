@@ -15,12 +15,13 @@ struct PlaylistViewCell: View {
     var body: some View {
         HStack {
             Image(systemName: "music.note.list")
-                .font(.system(size: 20.0))
+                .font(.system(size: 30.0))
                 .background(
                     RoundedRectangle(cornerRadius: 5.0)
                         .foregroundStyle(Color(UIColor.systemGray5))
-                        .frame(width: 30, height: 30)
+                        .frame(width: 50, height: 50)
                 )
+                .frame(width: 40, height: 40)
             Text(playlist.playlistName)
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)

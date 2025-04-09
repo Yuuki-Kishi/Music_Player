@@ -12,34 +12,44 @@ struct MusicView: View {
     @StateObject var musicDataStore = MusicDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
         NavigationStack(path: $pathDataStore.musicViewNavigationPath) {
             ZStack {
                 VStack {
-                    if musicDataStore.musicArray.isEmpty {
+                    if isLoading {
                         Spacer()
-                        Text("表示できる曲がありません")
+                        Text("読み込み中...")
                         Spacer()
                     } else {
-                        Button(action: {
-                            randomPlay()
-                        }, label: {
-                            HStack {
-                                Image(systemName: "play.circle")
-                                    .foregroundStyle(.accent)
-                                Text("すべて再生 (" + String(musicDataStore.musicArray.count) + "曲)")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                        if musicDataStore.musicArray.isEmpty {
+                            Spacer()
+                            Text("表示できる曲がありません")
+                            Spacer()
+                        } else {
+                            Button(action: {
+                                randomPlay()
+                            }, label: {
+                                HStack {
+                                    Image(systemName: "play.circle")
+                                        .foregroundStyle(.accent)
+                                    Text("すべて再生 (" + String(musicDataStore.musicArray.count) + "曲)")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .padding(.horizontal)
+                            })
+                            .foregroundStyle(.primary)
+                            List(musicDataStore.musicArray) { music in
+                                MusicCellView(music: music)
                             }
-                            .padding(.horizontal)
-                        })
-                        .foregroundStyle(.primary)
-                        List(musicDataStore.musicArray) { music in
-                            MusicCellView(music: music)
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
                     }
+                }
+                VStack {
+                    Spacer()
                     PlayWindowView()
                 }
                 LoadingView()
@@ -57,14 +67,23 @@ struct MusicView: View {
             .onAppear() {
                 getMusics()
             }
+            .onDisappear() {
+                isLoading = true
+            }
         }
     }
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                
+                isLoading = true
+                getMusics()
             }, label: {
-                Label("設定", systemImage: "gearshape")
+                Label("ファイルをスキャン", systemImage: "document.viewfinder.fill")
+            })
+            Button(action: {
+                pathDataStore.musicViewNavigationPath.append(.favoriteMusic)
+            }, label: {
+                Label("お気に入り", systemImage: "heart.fill")
             })
             Button(action: {
                 pathDataStore.musicViewNavigationPath.append(.sleepTImer)
@@ -119,6 +138,7 @@ struct MusicView: View {
     func getMusics() {
         Task {
             musicDataStore.musicArray = await MusicRepository.getMusics()
+            isLoading = false
         }
     }
     func randomPlay() {

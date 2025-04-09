@@ -11,33 +11,45 @@ struct FolderMusicView: View {
     @StateObject var folderDataStore = FolderDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
-        VStack {
-            if folderDataStore.folderMusicArray.isEmpty {
-                Spacer()
-                Text("表示できる曲がありません")
-                Spacer()
-            } else {
-                Button(action: {
-                    randomPlay()
-                }, label: {
-                    HStack {
-                        Image(systemName: "play.circle")
-                            .foregroundStyle(.accent)
-                        Text("すべて再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if folderDataStore.folderMusicArray.isEmpty {
+                        Spacer()
+                        Text("表示できる曲がありません")
+                        Spacer()
+                    } else {
+                        Button(action: {
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("すべて再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.horizontal)
+                        })
+                        .foregroundStyle(.primary)
+                        List(folderDataStore.folderMusicArray) { music in
+                            FolderMusicViewCell(music: music)
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
-                    .padding(.horizontal)
-                })
-                .foregroundStyle(.primary)
-                List(folderDataStore.folderMusicArray) { music in
-                    FolderMusicViewCell(music: music)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
-            PlayWindowView()
+            VStack {
+                Spacer()
+                PlayWindowView()
+            }
         }
         .navigationTitle(folderDataStore.selectedFolder?.folderName ?? "不明なアルバム")
         .toolbar {
@@ -45,9 +57,11 @@ struct FolderMusicView: View {
                 toolBarMenu()
             })
         }
-        .padding(.horizontal)
         .onAppear() {
             getFolderMusics()
+        }
+        .onDisappear() {
+            isLoading = true
         }
     }
     func toolBarMenu() -> some View {
@@ -80,6 +94,7 @@ struct FolderMusicView: View {
         guard let folderPath = folderDataStore.selectedFolder?.folderPath else { return }
         Task {
             folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderPath)
+            isLoading = false
         }
     }
     func randomPlay() {

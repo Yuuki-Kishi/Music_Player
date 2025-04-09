@@ -8,7 +8,7 @@
 import Foundation
 
 class PlaylistRepository {
-    static let folderPath: String = "Playlist"
+    static let folderPath: String = "Playlist/"
     
     //create
     static func createPlaylist(playlistName: String) -> Bool {
@@ -20,14 +20,19 @@ class PlaylistRepository {
         FileService.isExistFile(filePath: filePath)
     }
     
+    static func isIncludeMusic(playlistFilePath: String, musicFilePath: String) -> Bool {
+        let playlistMusics = M3U8Service.getM3U8Components(filePath: playlistFilePath)
+        return playlistMusics.contains(musicFilePath)
+    }
+    
     //get
     static func getPlaylists() -> [Playlist] {
-        let filePaths = M3U8Service.getM3U8s(folderPath: folderPath)
+        let filePaths = M3U8Service.getM3U8FilePaths(folderPath: folderPath)
         var playlists: [Playlist] = []
         for filePath in filePaths {
-            let playlistName = M3U8Service.getM3U8Name(filePath: filePath)
-            let musicCount = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(2).count
-            let playlist = Playlist(playlistName: playlistName, musicCount: musicCount, filePath: filePath)
+            let playlistName = M3U8Service.getM3U8Name(filePath: folderPath + filePath)
+            let musicCount = M3U8Service.getM3U8Components(filePath: folderPath + filePath).droppedFisrt(2).count
+            let playlist = Playlist(playlistName: playlistName, musicCount: musicCount, filePath: folderPath + filePath)
             playlists.append(playlist)
         }
         return playlists
@@ -44,30 +49,24 @@ class PlaylistRepository {
     }
     
     //update
-    static func renamePlaylist(playlist: Playlist, newName: String) -> Bool {
-        M3U8Service.renameM3U8(filePath: playlist.filePath, newName: newName)
+    static func renamePlaylist(playlistFilePath: String, newName: String) -> Bool {
+        M3U8Service.renameM3U8(filePath: playlistFilePath, newName: newName)
     }
     
-    static func addPlaylistMusics(playlist: Playlist, musicFilePaths: [String]) -> Playlist {
-        var newPlaylist = playlist
-        for musicFilePath in musicFilePaths {
-            guard M3U8Service.addMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) else { continue }
-            newPlaylist.musicCount += 1
-        }
-        return newPlaylist
+    static func addPlaylistMusic(playlistFilePath: String, musicFilePath: String) -> Bool {
+        M3U8Service.addMusic(M3U8FilePath: playlistFilePath, musicFilePath: musicFilePath)
+    }
+    
+    static func updatePlaylistMusics(playlistFilePath: String, musicFilePaths: [String]) -> Bool {
+        M3U8Service.updateM3U8(filePath: playlistFilePath, contents: musicFilePaths)
     }
     
     //delete
-    static func removePlaylistMusic(playlist: Playlist, musicFilePaths: [String]) -> Playlist {
-        var newPlaylist = playlist
-        for musicFilePath in musicFilePaths {
-            guard M3U8Service.removeMusic(M3U8FilePath: playlist.filePath, musicFilePath: musicFilePath) else { continue }
-            newPlaylist.musicCount -= 1
-        }
-        return newPlaylist
+    static func removePlaylistMusic(playlistFilePath: String, musicFilePath: String) -> Bool {
+        M3U8Service.removeMusic(M3U8FilePath: playlistFilePath, musicFilePath: musicFilePath)
     }
     
-    static func deletePlaylist(playlist: Playlist) -> Bool {
-        M3U8Service.deleteM3U8(filePath: playlist.filePath)
+    static func deletePlaylist(playlistFilePath: String) -> Bool {
+        M3U8Service.deleteM3U8(filePath: folderPath + playlistFilePath)
     }
 }

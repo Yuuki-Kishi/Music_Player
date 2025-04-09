@@ -10,29 +10,41 @@ import SwiftUI
 struct AlbumView: View {
     @StateObject var albumDataStore = AlbumDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
         NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
-            VStack {
-                if albumDataStore.albumArray.isEmpty {
-                    Spacer()
-                    Text("表示できるアルバムがありません")
-                    Spacer()
-                } else {
-                    Text(String(albumDataStore.albumArray.count) + "個のアルバム")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    List(albumDataStore.albumArray) { album in
-                        AlbumViewCell(album: album)
+            ZStack {
+                VStack {
+                    if isLoading {
+                        Spacer()
+                        Text("読み込み中...")
+                        Spacer()
+                    } else {
+                        if albumDataStore.albumArray.isEmpty {
+                            Spacer()
+                            Text("表示できるアルバムがありません")
+                            Spacer()
+                        } else {
+                            Text(String(albumDataStore.albumArray.count) + "個のアルバム")
+                                .font(.system(size: 15))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            List(albumDataStore.albumArray) { album in
+                                AlbumViewCell(album: album)
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                        }
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
-                PlayWindowView()
+                VStack {
+                    Spacer()
+                    PlayWindowView()
+                }
             }
             .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)
-            .padding(.horizontal)
             .navigationDestination(for: PathDataStore.AlbumViewPath.self) { path in
                 destination(path: path)
             }
@@ -41,9 +53,12 @@ struct AlbumView: View {
                     toolBarMenu()
                 })
             }
-        }
-        .onAppear() {
-            getAlbums()
+            .onAppear() {
+                getAlbums()
+            }
+            .onDisappear() {
+                isLoading = true
+            }
         }
     }
     @ViewBuilder
@@ -86,6 +101,7 @@ struct AlbumView: View {
     func getAlbums() {
         Task {
             albumDataStore.albumArray = await AlbumRepository.getAlbums()
+            isLoading = false
         }
     }
 }

@@ -22,6 +22,7 @@ struct MusicInfoView: View {
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
             }
+            .padding(.horizontal)
             HStack {
                 Text("アーティスト名")
                 Spacer()
@@ -30,6 +31,7 @@ struct MusicInfoView: View {
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
             }
+            .padding(.horizontal)
             HStack {
                 Text("アルバム名")
                 Spacer()
@@ -38,6 +40,7 @@ struct MusicInfoView: View {
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
             }
+            .padding(.horizontal)
             HStack {
                 Text("曲の長さ")
                 Spacer()
@@ -46,6 +49,7 @@ struct MusicInfoView: View {
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
             }
+            .padding(.horizontal)
             HStack {
                 Text("ファイルサイズ")
                 Spacer()
@@ -54,27 +58,29 @@ struct MusicInfoView: View {
                     .truncationMode(.tail)
                     .foregroundStyle(Color.gray)
             }
+            .padding(.horizontal)
             HStack {
                 Text("ファイルパス")
                 Spacer()
-                let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
-                let fullFilePath = directoryPath + "/" + music.filePath
-                Text(fullFilePath)
+                Text(music.filePath)
                     .lineLimit(1)
                     .truncationMode(.head)
                     .foregroundStyle(Color.gray)
             }
+            .contentShape(Rectangle())
+            .padding(.horizontal)
             .onTapGesture {
                 UIPasteboard.general.string = music.filePath
                 isShowAlert = true
             }
-            .alert("ファイルパスをコピーしました", isPresented: $isShowAlert, actions: {
-                Button(action: {}, label: {
-                    Text("OK")
-                })
-            })
         }
+        .listStyle(.plain)
         .navigationTitle("曲の情報")
+        .alert("ファイルパスをコピーしました", isPresented: $isShowAlert, actions: {
+            Button(action: {}, label: {
+                Text("OK")
+            })
+        })
     }
     func secToMin(second: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()
