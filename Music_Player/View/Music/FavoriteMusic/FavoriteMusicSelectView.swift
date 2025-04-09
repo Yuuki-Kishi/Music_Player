@@ -28,9 +28,7 @@ struct FavoriteMusicSelectView: View {
             })
         }
         .onAppear() {
-            Task {
-                selectableMusicArray = await FavoriteMusicRepository.getSelectableMusics()
-            }
+            getSelectableMusics()
         }
     }
     func toolBarMenu() -> some View {
@@ -49,13 +47,21 @@ struct FavoriteMusicSelectView: View {
                 }
             })
             Button(action: {
-                if !FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) {
-                    print("addFailed")
-                }
+                guard FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) else { return }
+                print("addSucceeded")
             }, label: {
                 Text("完了")
             })
         }
+    }
+    func getSelectableMusics() {
+        Task {
+            selectableMusicArray = await FavoriteMusicRepository.getSelectableMusics()
+        }
+    }
+    func addMusic() {
+        guard FavoriteMusicRepository.addFavoriteMusics(newMusicFilePaths: selectionValue.map { $0.filePath }) else { return }
+        pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }
 

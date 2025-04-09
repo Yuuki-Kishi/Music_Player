@@ -48,9 +48,7 @@ struct AlbumMusicView: View {
         }
         .padding(.horizontal)
         .onAppear() {
-            Task {
-                albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumDataStore.selectedAlbum?.albumName ?? "不明なアルバム")
-            }
+            getAlbumMusics()
         }
     }
     func toolBarMenu() -> some View {
@@ -77,6 +75,12 @@ struct AlbumMusicView: View {
             })
         } label: {
             Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+        }
+    }
+    func getAlbumMusics() {
+        guard let albumName = albumDataStore.selectedAlbum?.albumName else { return }
+        Task {
+            albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumName)
         }
     }
     func randomPlay() {

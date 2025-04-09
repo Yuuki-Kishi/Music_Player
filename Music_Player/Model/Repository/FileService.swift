@@ -19,7 +19,7 @@ class FileService {
     static func createFile(filePath: String, content: String) -> Bool {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
         guard let data = content.data(using: .utf8) else { return false }
-        return fileManager.createFile(atPath: fileURL.path(), contents: data)
+        return fileManager.createFile(atPath: fileURL.planePath, contents: data)
     }
     
     static func createDirectory(folderPath: String) {
@@ -34,12 +34,12 @@ class FileService {
     //check
     static func isExistFile(filePath: String) -> Bool {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
-        return fileManager.fileExists(atPath: fileURL.path())
+        return fileManager.fileExists(atPath: fileURL.planePath)
     }
     
     static func isExistDirectory(folderPath: String) -> Bool {
         guard let folderURL = documentDirectory?.appendingPathComponent(folderPath) else { return false }
-        return fileManager.fileExists(atPath: folderURL.path())
+        return fileManager.fileExists(atPath: folderURL.planePath)
     }
     
     //get
@@ -49,10 +49,27 @@ class FileService {
         do {
             let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
             for fileURL in fileURLs {
-                if fileURL.path().contains("/.Trash/") || fileURL.path().contains("/Playlist/") { continue }
-                let path = fileURL.path().replacingOccurrences(of: folderURL.path(), with: "")
+                if fileURL.planePath.contains("/.Trash/") || fileURL.planePath.contains("/Playlist/") { continue }
+                let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
                 let filePath = path.replacingOccurrences(of: "/private", with: "")
-                filePaths.append(filePath.removingPercentEncoding ?? filePath)
+                filePaths.append(filePath)
+            }
+        } catch {
+            print(error)
+        }
+        return filePaths
+    }
+    
+    static func getPlaylistFilePaths() -> [String] {
+        guard let folderURL = documentDirectory?.appendingPathComponent("Playlist") else { return [] }
+        var filePaths: [String] = []
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil).filter { $0.planePath.contains(".m3u8") }
+            for fileURL in fileURLs {
+                if fileURL.planePath.contains("/.Trash/") { continue }
+                let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
+                let filePath = path.replacingOccurrences(of: "/private", with: "")
+                filePaths.append(filePath)
             }
         } catch {
             print(error)
@@ -65,10 +82,12 @@ class FileService {
         let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
         var filePaths: [String] = []
         while let fileURL = fileURLs?.nextObject() as? URL {
-            if fileURL.path().contains("/.Trash/") || fileURL.path().contains("/Playlist/") { continue }
-            let path = fileURL.path().replacingOccurrences(of: directoryURL.path(), with: "")
+            if fileURL.planePath.contains("/.Trash") || fileURL.planePath.contains("/Playlist") { continue }
+            let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
+            if resourceValues?.isDirectory == true { continue }
+            let path = fileURL.planePath.replacingOccurrences(of: directoryURL.planePath, with: "")
             let filePath = path.replacingOccurrences(of: "/private", with: "")
-            filePaths.append(filePath.removingPercentEncoding ?? filePath)
+            filePaths.append(filePath)
         }
         return filePaths
     }
@@ -78,10 +97,12 @@ class FileService {
         let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
         var folderPaths: [String] = []
         while let fileURL = fileURLs?.nextObject() as? URL {
-            if fileURL.path().contains("/.Trash/") || fileURL.path().contains("/Playlist/") { continue }
-            let folderURL = fileURL.deletingLastPathComponent()
-            let folderPath = folderURL.path().replacingOccurrences(of: directoryURL.path(), with: "")
-            folderPaths.append(folderPath.removingPercentEncoding ?? folderPath)
+            if fileURL.planePath.contains("/.Trash") || fileURL.planePath.contains("/Playlist") { continue }
+            let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
+            if resourceValues?.isDirectory == true { continue }
+            let path = fileURL.deletingLastPathComponent().planePath.replacingOccurrences(of: "/private", with: "")
+            let folderPath = path.replacingOccurrences(of: directoryURL.planePath, with: "")
+            folderPaths.append(folderPath)
         }
         return folderPaths
     }
@@ -108,7 +129,7 @@ class FileService {
             let bcf = ByteCountFormatter()
             bcf.allowedUnits = [.useAll]
             bcf.countStyle = .file
-            let attributes: [FileAttributeKey: Any] = try fileManager.attributesOfItem(atPath: fileURL.path().removingPercentEncoding ?? fileURL.path())
+            let attributes: [FileAttributeKey: Any] = try fileManager.attributesOfItem(atPath: fileURL.planePath)
             guard let editedDate = attributes[FileAttributeKey.modificationDate] as? Date else { return Music() }
             guard let bytes = attributes[.size] as? Int64 else { return Music() }
             let fileSize = bcf.string(fromByteCount: bytes)
@@ -132,10 +153,7 @@ class FileService {
         return false
     }
     
-    static func renameFile(filePath: String, newName: String) -> Bool {
-        var fileComponents = filePath.components(separatedBy: "\n")
-        fileComponents[fileComponents.count - 1] = newName
-        let newFilePath = fileComponents.joined(separator: "\n")
+    static func renameFile(filePath: String, newFilePath: String) -> Bool {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
         guard let newFileURL = documentDirectory?.appendingPathComponent(newFilePath) else { return false }
         do {
@@ -149,7 +167,7 @@ class FileService {
     
     //delete
     static func fileDelete(filePath: String) -> Bool {
-        if !isExistFile(filePath: filePath) { return false }
+        guard isExistFile(filePath: filePath) else { return false }
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
         do {
             try fileManager.trashItem(at: fileURL, resultingItemURL: nil)

@@ -79,7 +79,7 @@ struct PlayWindowView: View {
                     .font(.system(size: 25.0))
                     .foregroundStyle(.primary)
                     Button(action: {
-                        
+                        playDataStore.moveNextMusic()
                     }, label: {
                         Image(systemName: "forward.fill")
                             .padding(.vertical, 14)
@@ -90,6 +90,7 @@ struct PlayWindowView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
+        .padding(.horizontal)
     }
     func randomPlay() {
         guard let music = musicDataStore.musicArray.randomElement() else { return }

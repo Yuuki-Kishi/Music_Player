@@ -19,6 +19,7 @@
 		DE6A177A2BA5B48F004BC71D /* AddPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6A17792BA5B48F004BC71D /* AddPlaylistView.swift */; };
 		DE6A177C2BA5D8EF004BC71D /* PlayedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6A177B2BA5D8EF004BC71D /* PlayedView.swift */; };
 		DE7BA5F22B3DA95100FB78DD /* ListMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE7BA5F12B3DA95100FB78DD /* ListMusicView.swift */; };
+		DE86A8E72DA58F51003DABCC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE86A8E62DA58F51003DABCC /* Extensions.swift */; };
 		DE9DB2B42B8A32F1007CE8FB /* ArtistMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9DB2B32B8A32F1007CE8FB /* ArtistMusicView.swift */; };
 		DE9DB2B62B8A3622007CE8FB /* AlbumMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9DB2B52B8A3622007CE8FB /* AlbumMusicView.swift */; };
 		DE9EE1BD2D97BD2500C215D1 /* MusicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1BC2D97BD2500C215D1 /* MusicRepository.swift */; };
@@ -56,7 +57,6 @@
 		DEC4CFFB2B98A40A009F5296 /* FolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC4CFFA2B98A40A009F5296 /* FolderView.swift */; };
 		DEC4CFFD2B98A785009F5296 /* FolderMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC4CFFC2B98A785009F5296 /* FolderMusicView.swift */; };
 		DEC8CCC42BAA838600FA9D98 /* WillPlayRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC32BAA838600FA9D98 /* WillPlayRepository.swift */; };
-		DEC8CCC82BAD4CBB00FA9D98 /* Persistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC72BAD4CBB00FA9D98 /* Persistance.swift */; };
 		DEC8CCCA2BADC04800FA9D98 /* FavoriteMusicRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCC92BADC04800FA9D98 /* FavoriteMusicRepository.swift */; };
 		DEC8CCCC2BADCC4A00FA9D98 /* PlaylistRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCCB2BADCC4A00FA9D98 /* PlaylistRepository.swift */; };
 		DEC8CCCE2BB6AC4E00FA9D98 /* PlaylistMusicViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC8CCCD2BB6AC4E00FA9D98 /* PlaylistMusicViewCell.swift */; };
@@ -93,6 +93,7 @@
 		DE6A17792BA5B48F004BC71D /* AddPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlaylistView.swift; sourceTree = "<group>"; };
 		DE6A177B2BA5D8EF004BC71D /* PlayedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedView.swift; sourceTree = "<group>"; };
 		DE7BA5F12B3DA95100FB78DD /* ListMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListMusicView.swift; sourceTree = "<group>"; };
+		DE86A8E62DA58F51003DABCC /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		DE9DB2B32B8A32F1007CE8FB /* ArtistMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistMusicView.swift; sourceTree = "<group>"; };
 		DE9DB2B52B8A3622007CE8FB /* AlbumMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumMusicView.swift; sourceTree = "<group>"; };
 		DE9EE1BC2D97BD2500C215D1 /* MusicRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicRepository.swift; sourceTree = "<group>"; };
@@ -131,7 +132,6 @@
 		DEC4CFFA2B98A40A009F5296 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		DEC4CFFC2B98A785009F5296 /* FolderMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderMusicView.swift; sourceTree = "<group>"; };
 		DEC8CCC32BAA838600FA9D98 /* WillPlayRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WillPlayRepository.swift; sourceTree = "<group>"; };
-		DEC8CCC72BAD4CBB00FA9D98 /* Persistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistance.swift; sourceTree = "<group>"; };
 		DEC8CCC92BADC04800FA9D98 /* FavoriteMusicRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteMusicRepository.swift; sourceTree = "<group>"; };
 		DEC8CCCB2BADCC4A00FA9D98 /* PlaylistRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistRepository.swift; sourceTree = "<group>"; };
 		DEC8CCCD2BB6AC4E00FA9D98 /* PlaylistMusicViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMusicViewCell.swift; sourceTree = "<group>"; };
@@ -243,6 +243,7 @@
 				DE6A176B2BA47B7A004BC71D /* Album.swift */,
 				DE6A176D2BA47B93004BC71D /* Playlist.swift */,
 				DE6A176F2BA47BA7004BC71D /* Folder.swift */,
+				DE86A8E62DA58F51003DABCC /* Extensions.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -377,21 +378,12 @@
 		DED9FD662B74D49D0008B127 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				DED9FD672B7730700008B127 /* SwiftData */,
 				DE9EE1B72D97ADDE00C215D1 /* DataStore */,
 				DE9EE1B82D97ADE700C215D1 /* Entity */,
 				DE9EE1B92D97ADF900C215D1 /* Repository */,
 				DE9EE1B62D97ADD600C215D1 /* Old */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		DED9FD672B7730700008B127 /* SwiftData */ = {
-			isa = PBXGroup;
-			children = (
-				DEC8CCC72BAD4CBB00FA9D98 /* Persistance.swift */,
-			);
-			path = SwiftData;
 			sourceTree = "<group>";
 		};
 		DEDAB6DE2DA25E7B00899C6A /* WillPlay */ = {
@@ -505,6 +497,7 @@
 				DEE5AC4F2AE8A1280082069C /* MusicView.swift in Sources */,
 				DE9EE1EA2DA17C4B00C215D1 /* FavoriteMusicDataStore.swift in Sources */,
 				DE9EE1D12D9BB1FC00C215D1 /* ArtistViewCell.swift in Sources */,
+				DE86A8E72DA58F51003DABCC /* Extensions.swift in Sources */,
 				DEC4CFFD2B98A785009F5296 /* FolderMusicView.swift in Sources */,
 				DEDAB6E62DA2C1A400899C6A /* PlayedRepository.swift in Sources */,
 				DE9EE1D52D9BD97000C215D1 /* AlbumViewCell.swift in Sources */,
@@ -534,7 +527,6 @@
 				DE9EE1DF2D9C42D600C215D1 /* FolderMusicViewCell.swift in Sources */,
 				DE9EE1CA2D984B4500C215D1 /* ViewDataStore.swift in Sources */,
 				DE9EE1C82D98465A00C215D1 /* PathDataStore.swift in Sources */,
-				DEC8CCC82BAD4CBB00FA9D98 /* Persistance.swift in Sources */,
 				DE9EE1C12D97CF3B00C215D1 /* AlbumDataStore.swift in Sources */,
 				DED9FD812B82360B0008B127 /* PlaylistSelectMusicView.swift in Sources */,
 				DEDAB6E22DA2C04A00899C6A /* PlayedDataStore.swift in Sources */,

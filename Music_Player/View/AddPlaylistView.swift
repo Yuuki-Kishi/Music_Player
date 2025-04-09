@@ -70,26 +70,19 @@ struct AddPlaylistView: View {
             Text("新しく作成するプレイリストの名前を入力してください。自動で追加されます。")
         })
         .onAppear() {
-            Task {
-                playlistArray = await PlaylistRepository.getPlaylists()
-            }
+            playlistArray = PlaylistRepository.getPlaylists()
         }
     }
     func tapped(playlist: Playlist) {
-        Task {
-            if await PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath]) {
-                isShowAddAlert = true
-            }
-        }
+        let playlist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath])
+        isShowAddAlert = true
     }
     func createPlaylist() {
         if text != "" {
-            Task {
-                guard await PlaylistRepository.createPlaylist(playlistName: text) else { return }
-                let playlist = Playlist(playlistName: text)
-                guard await PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath]) else { return }
-                isShowAddAlert = true
-            }
+            guard PlaylistRepository.createPlaylist(playlistName: text) else { return }
+            let playlist = Playlist(playlistName: text)
+            let newPlaylist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: [music.filePath])
+            isShowAddAlert = true
         }
     }
     func added() {

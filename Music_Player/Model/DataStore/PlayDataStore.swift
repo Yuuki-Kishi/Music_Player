@@ -92,12 +92,13 @@ class PlayDataStore: ObservableObject {
         switch playMode {
         case .shuffle:
             Task {
+                guard let playingMusic = self.playingMusic else { return }
+                if PlayedRepository.addPlayed(newMusicFilePaths: [playingMusic.filePath]) {
+                    print("addSucceeded")
+                }
                 if let nextMusic = await WillPlayRepository.nextMusic() {
-                    if WillPlayRepository.deleteWillPlay(filePath: nextMusic.filePath) {
-                        print("deleteSucceeded")
-                    }
-                    if PlayedRepository.addPlayed(newMusicFilePaths: [self.playingMusic?.filePath ?? ""]) {
-                        print("addSucceeded")
+                    if WillPlayRepository.removeWillPlay(filePaths: [nextMusic.filePath]) {
+                        print("removeSucceeded")
                     }
                     musicChoosed(music: nextMusic)
                 } else {
@@ -106,14 +107,57 @@ class PlayDataStore: ObservableObject {
             }
         case .order:
             Task {
+                guard let playingMusic = self.playingMusic else { return }
+                if PlayedRepository.addPlayed(newMusicFilePaths: [playingMusic.filePath]) {
+                    print("addSucceeded")
+                }
                 if let nextMusic = await WillPlayRepository.nextMusic() {
-                    if WillPlayRepository.deleteWillPlay(filePath: nextMusic.filePath) {
-                        print("deleteSucceeded")
-                    }
-                    if PlayedRepository.addPlayed(newMusicFilePaths: [self.playingMusic?.filePath ?? ""]) {
-                        print("addSucceeded")
+                    if WillPlayRepository.removeWillPlay(filePaths: [nextMusic.filePath]) {
+                        print("removeSucceeded")
                     }
                     musicChoosed(music: nextMusic)
+                } else {
+                    self.playingMusic = nil
+                }
+            }
+        case .sameRepeat:
+            if let music = self.playingMusic {
+                musicChoosed(music: music)
+            }
+        }
+    }
+    
+    func movePreviousMusic() {
+        stop()
+        seekPosition = 0.0
+        cashedSeekBarSeconds = 0.0
+        switch playMode {
+        case .shuffle:
+            Task {
+                guard let playingMusic = self.playingMusic else { return }
+                if WillPlayRepository.insertWillPlay(newMusicFilePaths: [playingMusic.filePath], at: 0) {
+                    print("addSucceeded")
+                }
+                if let previousMusic = await PlayedRepository.previousMusic() {
+                    if PlayedRepository.removePlayed(filePaths: [previousMusic.filePath]) {
+                        print("removeSucceeded")
+                    }
+                    musicChoosed(music: previousMusic)
+                } else {
+                    self.playingMusic = nil
+                }
+            }
+        case .order:
+            Task {
+                guard let playingMusic = self.playingMusic else { return }
+                if WillPlayRepository.insertWillPlay(newMusicFilePaths: [playingMusic.filePath], at: 0) {
+                    print("addSucceeded")
+                }
+                if let previousMusic = await PlayedRepository.previousMusic() {
+                    if PlayedRepository.removePlayed(filePaths: [previousMusic.filePath]) {
+                        print("removeSucceeded")
+                    }
+                    musicChoosed(music: previousMusic)
                 } else {
                     self.playingMusic = nil
                 }
@@ -186,18 +230,24 @@ class PlayDataStore: ObservableObject {
     
     func setNextMusics(musicFilePaths: [String]) {
         var filePaths = musicFilePaths
-        guard let index = filePaths.firstIndex(of: playingMusic?.filePath ?? "") else { return }
+        guard let filePath = playingMusic?.filePath else { return }
+        guard let index = filePaths.firstIndex(of: filePath) else { return }
         filePaths.remove(at: index)
+        guard PlayedRepository.cleanUpPlayed() else { return }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
+        print("setSucceeded")
+    }
+    
+    func changePlayMode() {
         switch playMode {
         case .shuffle:
-            filePaths.shuffle()
+            playMode = .order
         case .order:
-            filePaths.sort { $0 < $1 }
+            playMode = .sameRepeat
         case .sameRepeat:
-            filePaths = []
+            playMode = .shuffle
         }
-        if WillPlayRepository.addWillPlay(newMusicFilePaths: filePaths) {
-            print("succeeded")
-        }
+//        guard WillPlayRepository.sortWillPlay(sortMode: playMode) else { return }
+        print("sortSucceeded")
     }
 }

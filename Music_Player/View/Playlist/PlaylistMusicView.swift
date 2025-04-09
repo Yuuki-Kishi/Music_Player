@@ -76,10 +76,7 @@ struct PlaylistMusicView: View {
             Text("作成するプレイリストの名前を入力してください。")
         })
         .onAppear() {
-            Task {
-                guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
-            }
+            getPlaylistMusics()
         }
     }
     func toolBarMenu() -> some View{
@@ -129,6 +126,12 @@ struct PlaylistMusicView: View {
             Image(systemName: "ellipsis.circle")
         }
     }
+    func getPlaylistMusics() {
+        Task {
+            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
+        }
+    }
     func randomPlay() {
         guard let music = playlistDataStore.playlistMusicArray.randomElement() else { return }
         playDataStore.musicChoosed(music: music)
@@ -136,19 +139,15 @@ struct PlaylistMusicView: View {
     }
     func renamePlaylist() {
         if text != "" {
-            Task {
-                guard let playlist = playlistDataStore.selectedPlaylist else { return }
-                guard await PlaylistRepository.renamePlaylist(playlist: playlist, newName: text) else { return }
-                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlist.filePath)
-            }
+            guard let playlist = playlistDataStore.selectedPlaylist else { return }
+            guard PlaylistRepository.renamePlaylist(playlist: playlist, newName: text) else { return }
+            getPlaylistMusics()
         }
     }
     func deletePlaylist() {
-        Task {
-            guard let playlist = playlistDataStore.selectedPlaylist else { return }
-            guard await PlaylistRepository.deletePlaylist(playlist: playlist) else { return }
-            pathDataStore.playlistViewNavigationPath.removeLast()
-        }
+        guard let playlist = playlistDataStore.selectedPlaylist else { return }
+        guard PlaylistRepository.deletePlaylist(playlist: playlist) else { return }
+        pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }
 

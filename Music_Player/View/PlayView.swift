@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct PlayView: View {
+    @StateObject var musicDataStore = MusicDataStore.shared
     @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
     @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var pathDataStore = PathDataStore.shared
@@ -23,11 +24,11 @@ struct PlayView: View {
                 Image(systemName: "music.note")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.width * 0.3, height: UIScreen.main.bounds.width * 0.3)
+                    .frame(width: UIScreen.main.bounds.width * 0.2, height: UIScreen.main.bounds.width * 0.2)
                     .padding(100)
                     .foregroundStyle(Color(UIColor.systemGray))
                     .background(Color(UIColor.systemGray3))
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 50, style: .continuous))
                 Spacer()
                 HStack {
                     VStack {
@@ -39,6 +40,7 @@ struct PlayView: View {
                         Text(playDataStore.playingMusic?.artistName ?? "")
                             .lineLimit(1)
                             .font(.system(size: 20))
+                            .foregroundStyle(.gray)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
                     }
@@ -53,7 +55,7 @@ struct PlayView: View {
                 Slider(value: $displaySeekPosition, in: 0 ... (playDataStore.playingMusic?.musicLength ?? 300), onEditingChanged: { isEditing in
                     isEditingSeekPosition = isEditing
                     if !isEditing {
-                        
+                        playDataStore.setSeek()
                     }
                 })
                 .onChange(of: playDataStore.seekPosition) {
@@ -61,7 +63,6 @@ struct PlayView: View {
                         self.displaySeekPosition = playDataStore.seekPosition
                     }
                 }
-                .tint(.purple)
                 .padding(.horizontal)
                 HStack {
                     Text(secToMin(sec: displaySeekPosition))
@@ -77,11 +78,10 @@ struct PlayView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        
+                        playDataStore.changePlayMode()
                     }, label: {
                         Image(systemName: playModeImage())
                     })
-                    .foregroundStyle(.purple)
                     Spacer()
                     Spacer()
                     Button(action: {
@@ -89,62 +89,57 @@ struct PlayView: View {
                     }, label: {
                         Image(systemName: favoriteButtonImage())
                     })
-                    .foregroundStyle(.purple)
                     Spacer()
                     Spacer()
                     Button(action: {
-                        
+                        pathDataStore.playViewNavigationPath.append(.willPlay)
                     }, label: {
                         Image(systemName: "list.bullet")
                     })
-//                    NavigationLink(destination: WillPlayMusicView(mds: mds, pc: pc), label: {
-//                        Image(systemName: "list.bullet")
-//                    })
                     Spacer()
                 }
                 Spacer()
                 HStack {
                     Spacer()
                     Button(action: {
-                        
+                        playDataStore.movePreviousMusic()
                     }, label: {
                         Image(systemName: "backward.fill")
+                            .font(.system(size: 25.0))
+                            .foregroundStyle(.primary)
                     })
-                    .font(.system(size: 25.0))
-                    .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        if playDataStore.isPlaying {
-                            
+                        if playDataStore.playingMusic == nil {
+                            randomPlay()
                         } else {
-                            
+                            if playDataStore.isPlaying {
+                                playDataStore.pause()
+                            } else {
+                                playDataStore.play()
+                            }
                         }
                     }, label: {
                         Image(systemName: playButtonImage())
+                            .font(.system(size: 40.0))
+                            .foregroundStyle(.primary)
                     })
-                    .font(.system(size: 40.0))
-                    .foregroundStyle(.primary)
                     Spacer()
                     Button(action: {
-                        
+                        playDataStore.moveNextMusic()
                     }, label: {
                         Image(systemName: "forward.fill")
+                            .font(.system(size: 25.0))
+                            .foregroundStyle(.primary)
                     })
-                    .font(.system(size: 25.0))
-                    .foregroundStyle(.primary)
                     Spacer()
                 }
                 Spacer(minLength: 50)
             }
-        }
-        .navigationTitle("再生中の曲")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: PathDataStore.PlayViewPath.self) { path in
-            switch path {
-            case .addPlaylist:
-                AddPlaylistView(music: playDataStore.playingMusic ?? Music(), pathArray: .play)
-            case .musicInfo:
-                MusicInfoView(music: playDataStore.playingMusic ?? Music())
+            .navigationTitle("再生中の曲")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: PathDataStore.PlayViewPath.self) { path in
+                destination(path: path)
             }
         }
         .padding()
@@ -177,7 +172,6 @@ struct PlayView: View {
             })
         } label: {
             Image(systemName: "ellipsis")
-                .foregroundStyle(Color.purple)
                 .frame(width: 40, height: 40)
         }
         .menuOrder(.fixed)
@@ -211,7 +205,8 @@ struct PlayView: View {
         }
     }
     func isFavorite() -> Bool {
-        FavoriteMusicRepository.isFavoriteMusic(filePath: playDataStore.playingMusic?.filePath ?? "")
+        guard let filePath = playDataStore.playingMusic?.filePath else { return false }
+        return FavoriteMusicRepository.isFavoriteMusic(filePath: filePath)
     }
     func toggleFavorite() {
         if isFavorite() {
@@ -238,6 +233,22 @@ struct PlayView: View {
         } else {
             return "play.fill"
         }
+    }
+    @ViewBuilder
+    func destination(path: PathDataStore.PlayViewPath) -> some View {
+        switch path {
+        case .addPlaylist:
+            AddPlaylistView(music: playDataStore.playingMusic ?? Music(), pathArray: .play)
+        case .musicInfo:
+            MusicInfoView(music: playDataStore.playingMusic ?? Music())
+        case .willPlay:
+            WillPlayView()
+        }
+    }
+    func randomPlay() {
+        guard let music = musicDataStore.musicArray.randomElement() else { return }
+        playDataStore.musicChoosed(music: music)
+        playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
     }
 }
 

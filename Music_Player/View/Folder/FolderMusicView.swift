@@ -47,9 +47,7 @@ struct FolderMusicView: View {
         }
         .padding(.horizontal)
         .onAppear() {
-            Task {
-                folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderDataStore.selectedFolder?.folderPath ?? "")
-            }
+            getFolderMusics()
         }
     }
     func toolBarMenu() -> some View {
@@ -76,6 +74,12 @@ struct FolderMusicView: View {
             })
         } label: {
             Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+        }
+    }
+    func getFolderMusics() {
+        guard let folderPath = folderDataStore.selectedFolder?.folderPath else { return }
+        Task {
+            folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderPath)
         }
     }
     func randomPlay() {

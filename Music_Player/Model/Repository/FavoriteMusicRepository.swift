@@ -22,7 +22,7 @@ class FavoriteMusicRepository {
     }
     
     static func isFavoriteMusic(filePath: String) -> Bool {
-        let components = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }
+        let components = M3U8Service.getM3U8Components(filePath: self.filePath).filter { !$0.contains("\n") }
         return components.contains(filePath)
     }
     
@@ -55,7 +55,7 @@ class FavoriteMusicRepository {
     //update
     static func addFavoriteMusics(newMusicFilePaths: [String]) -> Bool {
         for newMusicFilePath in newMusicFilePaths {
-            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { return false }
+            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { continue }
         }
         return true
     }

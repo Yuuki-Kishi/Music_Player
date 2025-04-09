@@ -47,9 +47,7 @@ struct ArtistMusicView: View {
         }
         .padding(.horizontal)
         .onAppear() {
-            Task {
-                artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistDataStore.selectedArtist?.artistName ?? "不明なアーティスト")
-            }
+            getArtistMusics()
         }
     }
     func toolBarMenu() -> some View {
@@ -76,6 +74,12 @@ struct ArtistMusicView: View {
             })
         } label: {
             Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+        }
+    }
+    func getArtistMusics() {
+        guard let artistName = artistDataStore.selectedArtist?.artistName else { return }
+        Task {
+            artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistName)
         }
     }
     func randomPlay() {

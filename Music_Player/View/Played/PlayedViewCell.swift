@@ -36,11 +36,7 @@ struct PlayedViewCell: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            if PlayedRepository.selectPlayed(music: music) {
-                Task {
-                    playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
-                }
-            }
+            tapped()
         }
     }
     func secToMin(second: TimeInterval) -> String {
@@ -50,6 +46,15 @@ struct PlayedViewCell: View {
         else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
         dateFormatter.zeroFormattingBehavior = .pad
         return dateFormatter.string(from: second)!
+    }
+    func tapped() {
+        guard let index = playedDataStore.playedMusicArray.firstIndex(of: music) else { return }
+        let skipMusicFilePaths = playedDataStore.playedMusicArray.prefix(index - 1).map { $0.filePath }
+        guard PlayedRepository.removePlayed(filePaths: skipMusicFilePaths) else { return }
+        guard WillPlayRepository.insertWillPlay(newMusicFilePaths: skipMusicFilePaths, at: 0) else { return }
+        Task {
+            playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
+        }
     }
 }
 

@@ -43,9 +43,7 @@ struct ArtistView: View {
             }
         }
         .onAppear() {
-            Task {
-                artistDataStore.artistArray = await ArtistRepository.getArtists()
-            }
+            getArtists()
         }
     }
     @ViewBuilder
@@ -83,6 +81,11 @@ struct ArtistView: View {
             })
         } label: {
             Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+    func getArtists() {
+        Task {
+            artistDataStore.artistArray = await ArtistRepository.getArtists()
         }
     }
 }

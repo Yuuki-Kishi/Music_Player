@@ -33,7 +33,7 @@ class FolderRepository {
         let filePaths = FileService.getFilePaths(folderPath: folderPath)
         var musics: [Music] = []
         for filePath in filePaths {
-            let music = await FileService.getFileMetadata(filePath: filePath)
+            let music = await FileService.getFileMetadata(filePath: folderPath + filePath)
             musics.append(music)
         }
         FolderDataStore.shared.folderArraySort(mode: FolderDataStore.shared.folderSortMode)

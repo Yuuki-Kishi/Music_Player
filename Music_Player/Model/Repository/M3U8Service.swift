@@ -26,6 +26,20 @@ class M3U8Service {
         return content.components(separatedBy: "\n")
     }
     
+    static func getM3U8s(folderPath: String) -> [String] {
+        let filePaths = FileService.getPlaylistFilePaths()
+        var playlistNames: [String] = []
+        for filePath in filePaths {
+            playlistNames.append(getM3U8Name(filePath: filePath))
+        }
+        return playlistNames
+    }
+    
+    static func getM3U8Name(filePath: String) -> String {
+        let components = getM3U8Components(filePath: filePath)
+        return String(components[1].dropFirst())
+    }
+    
     //update
     static func addMusic(M3U8FilePath: String, musicFilePath: String) -> Bool {
         var components = getM3U8Components(filePath: M3U8FilePath)
@@ -34,13 +48,31 @@ class M3U8Service {
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }
     
-    static func renameM3U8(filePath: String, oldName: String, newName: String) -> Bool {
+    static func insertMusic(M3U8FilePath: String, musicFilePath: String, index: Int) -> Bool {
+        var components = getM3U8Components(filePath: M3U8FilePath)
+        components.insert(musicFilePath, at: index)
+        let newContent = components.joined(separator: "\n")
+        return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
+    }
+    
+    static func updateM3U8(filePath: String, contents: [String]) -> Bool {
+        let fileName = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
+        var content: String = "#EXTM3U\n" + "#\(fileName)"
+        if !contents.isEmpty {
+            content = "#EXTM3U\n" + "#\(fileName)\n" + contents.joined(separator: "\n")
+        }
+        return FileService.updateFile(filePath: filePath, content: content)
+    }
+    
+    static func renameM3U8(filePath: String, newName: String) -> Bool {
         var contents = getM3U8Components(filePath: filePath)
-        guard let index = contents.firstIndex(of: "#" + oldName) else { return false }
-        contents[index] = "#" + newName
+        contents[1] = "#" + newName
         let newContent = contents.joined(separator: "\n")
+        var filePathComponents = filePath.components(separatedBy: "\n")
+        filePathComponents[filePathComponents.count - 1] = "\(newName).m3u8"
+        let newFilePath = filePathComponents.joined(separator: "\n")
         guard FileService.updateFile(filePath: filePath, content: newContent) else { return false }
-        return FileService.renameFile(filePath: filePath, newName: newName)
+        return FileService.renameFile(filePath: filePath, newFilePath: newFilePath)
     }
     
     //delete
@@ -53,7 +85,7 @@ class M3U8Service {
     }
     
     static func cleanUpM3U8(filePath: String) -> Bool {
-        guard let fileName = filePath.components(separatedBy: "\n").last else { return false }
+        let fileName = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
         let content = "#EXTM3U\n" + "#\(fileName)"
         return FileService.updateFile(filePath: filePath, content: content)
     }

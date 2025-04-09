@@ -121,14 +121,16 @@ struct PlaylistMusicViewCell: View {
         }
     }
     func excludeMusic() {
+        guard let playlist = playlistDataStore.selectedPlaylist else { return }
+        let newPlaylist = PlaylistRepository.removePlaylistMusic(playlist: playlist, musicFilePaths: [music.filePath])
+        playlistDataStore.selectedPlaylist = newPlaylist
         Task {
-            await PlaylistRepository.deletePlaylistMusic(playlist: playlistDataStore.selectedPlaylist ?? Playlist(), musicFilePath: music.filePath)
+            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: newPlaylist.filePath)
         }
     }
     func deleteMusicFile() {
-        if FileService.fileDelete(filePath: music.filePath) {
-            print("DeleteSucceeded")
-        }
+        guard FileService.fileDelete(filePath: music.filePath) else { return }
+        print("DeleteSucceeded")
     }
 }
 

@@ -26,9 +26,14 @@ struct PlayedView: View {
             PlayWindowView()
         }
         .onAppear() {
-            
+            getPlayed()
         }
         .navigationTitle("再生履歴")
+    }
+    func getPlayed() {
+        Task {
+            playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
+        }
     }
 }
 

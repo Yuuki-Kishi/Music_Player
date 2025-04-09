@@ -43,9 +43,7 @@ struct FolderView: View {
             }
         }
         .onAppear() {
-            Task {
-                folderDataStore.folderArray = await FolderRepository.getFolders()
-            }
+            getFolders()
         }
     }
     @ViewBuilder
@@ -83,6 +81,11 @@ struct FolderView: View {
             })
         } label: {
             Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+    func getFolders() {
+        Task {
+            folderDataStore.folderArray = await FolderRepository.getFolders()
         }
     }
 }

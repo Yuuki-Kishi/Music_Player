@@ -33,6 +33,6 @@ class PathDataStore: ObservableObject {
         case folderMusic, addPlaylist, musicInfo
     }
     enum PlayViewPath {
-        case addPlaylist, musicInfo
+        case addPlaylist, musicInfo, willPlay
     }
 }

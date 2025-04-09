@@ -51,11 +51,3 @@ struct Music: Hashable, Identifiable, Equatable {
         self.filePath = "unknownFilePath"
     }
 }
-
-extension Array where Element == Music {
-    mutating func remove(item: Element) {
-        if let index = firstIndex(where: { $0.filePath == item.filePath }) {
-            self.remove(at: index)
-        }
-    }
-}

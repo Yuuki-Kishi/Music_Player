@@ -43,9 +43,7 @@ struct AlbumView: View {
             }
         }
         .onAppear() {
-            Task {
-                albumDataStore.albumArray = await AlbumRepository.getAlbums()
-            }
+            getAlbums()
         }
     }
     @ViewBuilder
@@ -83,6 +81,11 @@ struct AlbumView: View {
             })
         } label: {
             Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+    func getAlbums() {
+        Task {
+            albumDataStore.albumArray = await AlbumRepository.getAlbums()
         }
     }
 }

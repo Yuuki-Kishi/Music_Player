@@ -24,13 +24,15 @@ struct WillPlayView: View {
             }
             .listStyle(.plain)
             .navigationTitle("再生予定曲")
-            PlayWindowView()
+        }
+        .onAppear() {
+            getWillPlay()
         }
     }
     func delete(at offsets: IndexSet) {
         for offset in offsets {
             let filePath = willPlayDataSotre.willPlayMusicArray[offset].filePath
-            if WillPlayRepository.deleteWillPlay(filePath: filePath) {
+            if WillPlayRepository.removeWillPlay(filePaths: [filePath]) {
                 willPlayDataSotre.willPlayMusicArray.remove(at: offset)
             }
         }
@@ -38,6 +40,11 @@ struct WillPlayView: View {
     func move(from source: IndexSet, to destination: Int) {
         if WillPlayRepository.moveWillPlay(from: source, to: destination) {
             willPlayDataSotre.willPlayMusicArray.move(fromOffsets: source, toOffset: destination)
+        }
+    }
+    func getWillPlay() {
+        Task {
+            willPlayDataSotre.willPlayMusicArray = await WillPlayRepository.getWillPlay()
         }
     }
 }

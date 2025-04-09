@@ -42,7 +42,6 @@ struct MusicView: View {
                     }
                     PlayWindowView()
                 }
-                .padding(.horizontal)
                 LoadingView()
             }
             .navigationTitle("ミュージック")
@@ -56,9 +55,7 @@ struct MusicView: View {
                 })
             }
             .onAppear() {
-                Task {
-                    musicDataStore.musicArray = await MusicRepository.getMusics()
-                }
+                getMusics()
             }
         }
     }
@@ -117,6 +114,11 @@ struct MusicView: View {
             EmptyView()
         case .sleepTImer:
             SleepTimer()
+        }
+    }
+    func getMusics() {
+        Task {
+            musicDataStore.musicArray = await MusicRepository.getMusics()
         }
     }
     func randomPlay() {

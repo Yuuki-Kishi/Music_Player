@@ -62,9 +62,7 @@ struct PlaylistView: View {
             })
         }
         .onAppear() {
-            Task {
-                playlistDataStore.playlistArray = await PlaylistRepository.getPlaylists()
-            }
+            getPlaylists()
         }
     }
     @ViewBuilder
@@ -104,12 +102,13 @@ struct PlaylistView: View {
             Image(systemName: "arrow.up.arrow.down")
         }
     }
+    func getPlaylists() {
+        playlistDataStore.playlistArray = PlaylistRepository.getPlaylists()
+    }
     func createPlaylist() {
         if text != "" {
-            Task {
-                guard await PlaylistRepository.createPlaylist(playlistName: text) else { return }
-                playlistDataStore.playlistArray = await PlaylistRepository.getPlaylists()
-            }
+            guard PlaylistRepository.createPlaylist(playlistName: text) else { return }
+            getPlaylists()
         }
     }
 }

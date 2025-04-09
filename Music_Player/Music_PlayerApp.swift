@@ -16,7 +16,6 @@ struct Music_PlayerApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(Persistance.sharedModelContainer)
     }
 }
 

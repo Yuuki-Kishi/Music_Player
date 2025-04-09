@@ -30,9 +30,7 @@ struct PlaylistSelectMusicView: View {
             })
         }
         .onAppear() {
-            Task {
-                selectableMusicArray = await MusicRepository.getMusics()
-            }
+            getSelectableMusicArray()
         }
     }
     func toolBarMenu() -> some View {
@@ -51,16 +49,22 @@ struct PlaylistSelectMusicView: View {
                 }
             })
             Button(action: {
-                Task {
-                    if await PlaylistRepository.addPlaylistMusics(playlist: playlistDataStore.selectedPlaylist ?? Playlist(), musicFilePaths: selectionValue.map { $0.filePath }) {
-                        print("success")
-                    }
-                    pathDataStore.playlistViewNavigationPath.removeLast()
-                }
+                addMusic()
             }, label: {
                 Text("完了")
             })
         }
+    }
+    func getSelectableMusicArray() {
+        Task {
+            selectableMusicArray = await MusicRepository.getMusics()
+        }
+    }
+    func addMusic() {
+        guard let playlist = playlistDataStore.selectedPlaylist else { return }
+        let newPlaylist = PlaylistRepository.addPlaylistMusics(playlist: playlist, musicFilePaths: selectionValue.map { $0.filePath })
+        playlistDataStore.selectedPlaylist = newPlaylist
+        pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }
 
