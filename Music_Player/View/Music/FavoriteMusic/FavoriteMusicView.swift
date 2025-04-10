@@ -34,7 +34,7 @@ struct FavoriteMusicView: View {
                             HStack {
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.accent)
-                                Text("すべて再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
+                                Text("シャッフル再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal)
@@ -87,26 +87,30 @@ struct FavoriteMusicView: View {
             Button(action: {
                 pathDataStore.musicViewNavigationPath.append(.selectFavoriteMusic)
             }, label: {
-                Label("曲を追加", systemImage: "plus")
+                Label("登録曲を編集", systemImage: "pencil.and.list.clipboard")
             })
             Menu {
                 Button(action: {
-                    favoriteMusicDataStore.favoriteMusicArraySort(mode: .nameAscending)
+                    favoriteMusicDataStore.arraySort(mode: .nameAscending)
+                    favoriteMusicDataStore.saveMusicSortMode()
                 }, label: {
                     Text("曲名昇順")
                 })
                 Button(action: {
-                    favoriteMusicDataStore.favoriteMusicArraySort(mode: .nameDescending)
+                    favoriteMusicDataStore.arraySort(mode: .nameDescending)
+                    favoriteMusicDataStore.saveMusicSortMode()
                 }, label: {
                     Text("曲名降順")
                 })
                 Button(action: {
-                    favoriteMusicDataStore.favoriteMusicArraySort(mode: .dateAscending)
+                    favoriteMusicDataStore.arraySort(mode: .dateAscending)
+                    favoriteMusicDataStore.saveMusicSortMode()
                 }, label: {
                     Text("更新日昇順")
                 })
                 Button(action: {
-                    favoriteMusicDataStore.favoriteMusicArraySort(mode: .dateDescending)
+                    favoriteMusicDataStore.arraySort(mode: .dateDescending)
+                    favoriteMusicDataStore.saveMusicSortMode()
                 }, label: {
                     Text("更新日降順")
                 })
@@ -126,17 +130,20 @@ struct FavoriteMusicView: View {
     func getFavoriteMusics() {
         Task {
             favoriteMusicDataStore.favoriteMusicArray = await FavoriteMusicRepository.getFavoriteMusics()
+            favoriteMusicDataStore.loadMusicSort()
             isLoading = false
         }
     }
     func randomPlay() {
         guard let music = favoriteMusicDataStore.favoriteMusicArray.randomElement() else { return }
+        playDataStore.setPlayMode(playMode: .shuffle)
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: favoriteMusicDataStore.favoriteMusicArray.map { $0.filePath })
     }
     func cleanUpFavoriteMusics() {
         guard FavoriteMusicRepository.cleanUpFavorite() else { return }
         favoriteMusicDataStore.favoriteMusicArray.removeAll()
+        pathDataStore.musicViewNavigationPath.removeLast()
     }
 }
 

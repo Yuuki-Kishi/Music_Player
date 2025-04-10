@@ -36,7 +36,7 @@ struct PlaylistMusicView: View {
                             HStack {
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.accent)
-                                Text("すべて再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
+                                Text("シャッフル再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal)
@@ -98,7 +98,7 @@ struct PlaylistMusicView: View {
             Button(action: {
                 pathDataStore.playlistViewNavigationPath.append(.selectMusic)
             }, label: {
-                Label("曲を追加", systemImage: "plus")
+                Label("登録曲を編集", systemImage: "pencil.and.list.clipboard")
             })
             Button(action: {
                 text = playlistDataStore.selectedPlaylist?.playlistName ?? ""
@@ -109,21 +109,25 @@ struct PlaylistMusicView: View {
             Menu {
                 Button(action: {
                     playlistDataStore.playlistMusicArraySort(mode: .nameAscending)
+                    playlistDataStore.saveMusicSortMode()
                 }, label: {
                     Text("曲名昇順")
                 })
                 Button(action: {
                     playlistDataStore.playlistMusicArraySort(mode: .nameDescending)
+                    playlistDataStore.saveMusicSortMode()
                 }, label: {
                     Text("曲名降順")
                 })
                 Button(action: {
                     playlistDataStore.playlistMusicArraySort(mode: .dateAscending)
+                    playlistDataStore.saveMusicSortMode()
                 }, label: {
                     Text("更新日昇順")
                 })
                 Button(action: {
                     playlistDataStore.playlistMusicArraySort(mode: .dateDescending)
+                    playlistDataStore.saveMusicSortMode()
                 }, label: {
                     Text("更新日降順")
                 })
@@ -144,18 +148,21 @@ struct PlaylistMusicView: View {
         Task {
             guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
             playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
+            playlistDataStore.loadMusicSort()
             isLoading = false
         }
     }
     func randomPlay() {
         guard let music = playlistDataStore.playlistMusicArray.randomElement() else { return }
+        playDataStore.setPlayMode(playMode: .shuffle)
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
     }
     func renamePlaylist() {
         if text != "" {
-            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-            guard PlaylistRepository.renamePlaylist(playlistFilePath: filePath, newName: text) else { return }
+            guard let playlist = playlistDataStore.selectedPlaylist else { return }
+            let newPlaylist = PlaylistRepository.renamePlaylist(playlist: playlist, newName: text)
+            playlistDataStore.selectedPlaylist = newPlaylist
             getPlaylistMusics()
         }
     }

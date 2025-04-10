@@ -21,7 +21,7 @@ class PlayDataStore: ObservableObject {
     private let audioEngine: AVAudioEngine = .init()
     private let playerNode: AVAudioPlayerNode = .init()
     
-    enum PlayMode {
+    enum PlayMode: String {
         case shuffle, order, sameRepeat
     }
     
@@ -238,6 +238,14 @@ class PlayDataStore: ObservableObject {
         print("setSucceeded")
     }
     
+    func setPlayMode(playMode: PlayMode) {
+        self.playMode = playMode
+        let filePaths = WillPlayDataStore.shared.willPlayMusicArray.map { $0.filePath }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
+        print("sortSucceeded")
+        UserDefaultsRepository.savePlayMode(playMode: playMode)
+    }
+    
     func changePlayMode() {
         switch playMode {
         case .shuffle:
@@ -247,7 +255,9 @@ class PlayDataStore: ObservableObject {
         case .sameRepeat:
             playMode = .shuffle
         }
-//        guard WillPlayRepository.sortWillPlay(sortMode: playMode) else { return }
+        let filePaths = WillPlayDataStore.shared.willPlayMusicArray.map { $0.filePath }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
         print("sortSucceeded")
+        UserDefaultsRepository.savePlayMode(playMode: playMode)
     }
 }

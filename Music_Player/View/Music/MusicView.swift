@@ -34,7 +34,7 @@ struct MusicView: View {
                                 HStack {
                                     Image(systemName: "play.circle")
                                         .foregroundStyle(.accent)
-                                    Text("すべて再生 (" + String(musicDataStore.musicArray.count) + "曲)")
+                                    Text("シャッフル再生 (" + String(musicDataStore.musicArray.count) + "曲)")
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                                 .padding(.horizontal)
@@ -93,21 +93,25 @@ struct MusicView: View {
             Menu {
                 Button(action: {
                     musicDataStore.arraySort(mode: .nameAscending)
+                    musicDataStore.saveSortMode()
                 }, label: {
                     Text("曲名昇順")
                 })
                 Button(action: {
                     musicDataStore.arraySort(mode: .nameDescending)
+                    musicDataStore.saveSortMode()
                 }, label: {
                     Text("曲名降順")
                 })
                 Button(action: {
                     musicDataStore.arraySort(mode: .dateAscending)
+                    musicDataStore.saveSortMode()
                 }, label: {
                     Text("更新日昇順")
                 })
                 Button(action: {
                     musicDataStore.arraySort(mode: .dateDescending)
+                    musicDataStore.saveSortMode()
                 }, label: {
                     Text("更新日降順")
                 })
@@ -138,11 +142,13 @@ struct MusicView: View {
     func getMusics() {
         Task {
             musicDataStore.musicArray = await MusicRepository.getMusics()
+            musicDataStore.loadSort()
             isLoading = false
         }
     }
     func randomPlay() {
         guard let music = musicDataStore.musicArray.randomElement() else { return }
+        playDataStore.setPlayMode(playMode: .shuffle)
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
     }

@@ -43,7 +43,7 @@ struct PlaylistMusicViewCell: View {
         .onTapGesture {
             tapped()
         }
-        .alert("プレイリストから除外しますか？", isPresented: $isShowExcludeAlert, actions: {
+        .alert("本当に除外しますか？", isPresented: $isShowExcludeAlert, actions: {
             Button(role: .cancel, action: {}, label: {
                 Text("キャンセル")
             })

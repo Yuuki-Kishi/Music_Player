@@ -82,7 +82,7 @@ class FileService {
         let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
         var filePaths: [String] = []
         while let fileURL = fileURLs?.nextObject() as? URL {
-            if fileURL.planePath.contains("/.Trash") || fileURL.planePath.contains("/Playlist") { continue }
+            if !fileURL.isMusicFile { continue }
             let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
             if resourceValues?.isDirectory == true { continue }
             let path = fileURL.planePath.replacingOccurrences(of: directoryURL.planePath, with: "")
@@ -97,7 +97,7 @@ class FileService {
         let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
         var folderPaths: [String] = []
         while let fileURL = fileURLs?.nextObject() as? URL {
-            if fileURL.planePath.contains("/.Trash") || fileURL.planePath.contains("/Playlist") { continue }
+            if !fileURL.isMusicFile { continue }
             let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
             if resourceValues?.isDirectory == true { continue }
             let path = fileURL.deletingLastPathComponent().planePath.replacingOccurrences(of: "/private", with: "")
@@ -110,7 +110,6 @@ class FileService {
     static func getFileContent(filePath: String) -> String? {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return nil }
         do {
-            let content = try String(contentsOf: fileURL, encoding: .utf8)
             return try String(contentsOf: fileURL, encoding: .utf8)
         } catch {
             print(error)

@@ -16,6 +16,7 @@ struct AlbumViewCell: View {
         HStack {
             Image(systemName: "square.stack.fill")
                 .font(.system(size: 30.0))
+                .foregroundStyle(.accent)
                 .background(
                     RoundedRectangle(cornerRadius: 5.0)
                         .foregroundStyle(Color(UIColor.systemGray5))

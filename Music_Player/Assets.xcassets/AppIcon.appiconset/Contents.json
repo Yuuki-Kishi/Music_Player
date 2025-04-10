@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "File Musicianアイコン.png",
+      "filename" : "File Musicianアイコン2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "File MusicianアイコンDark.png",
+      "filename" : "File Musicianアイコン2Dark.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

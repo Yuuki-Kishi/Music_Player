@@ -73,13 +73,11 @@ class M3U8Service {
         return FileService.updateFile(filePath: filePath, content: newContent)
     }
     
-    static func renameM3U8(filePath: String, newName: String) -> Bool {
+    static func renameM3U8(filePath: String, newFilePath: String) -> Bool {
+        let fileName = URL(fileURLWithPath: newFilePath).deletingPathExtension().lastPathComponent
         var contents = getM3U8Components(filePath: filePath)
-        contents[1] = "#" + newName
+        contents[1] = "#" + fileName
         let newContent = contents.joined(separator: "\n")
-        var filePathComponents = filePath.components(separatedBy: "\n")
-        filePathComponents[filePathComponents.count - 1] = "\(newName).m3u8"
-        let newFilePath = filePathComponents.joined(separator: "\n")
         guard FileService.updateFile(filePath: filePath, content: newContent) else { return false }
         return FileService.renameFile(filePath: filePath, newFilePath: newFilePath)
     }

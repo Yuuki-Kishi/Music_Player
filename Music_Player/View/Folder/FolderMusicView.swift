@@ -32,7 +32,7 @@ struct FolderMusicView: View {
                             HStack {
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.accent)
-                                Text("すべて再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
+                                Text("シャッフル再生 (" + String(folderDataStore.folderMusicArray.count) + "曲)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal)
@@ -68,37 +68,43 @@ struct FolderMusicView: View {
         Menu {
             Button(action: {
                 folderDataStore.folderMusicArraySort(mode: .nameAscending)
+                folderDataStore.saveMusicSortMode()
             }, label: {
                 Text("曲名昇順")
             })
             Button(action: {
                 folderDataStore.folderMusicArraySort(mode: .nameDescending)
+                folderDataStore.saveMusicSortMode()
             }, label: {
                 Text("曲名降順")
             })
             Button(action: {
                 folderDataStore.folderMusicArraySort(mode: .dateAscending)
+                folderDataStore.saveMusicSortMode()
             }, label: {
                 Text("更新日昇順")
             })
             Button(action: {
                 folderDataStore.folderMusicArraySort(mode: .dateDescending)
+                folderDataStore.saveMusicSortMode()
             }, label: {
                 Text("更新日降順")
             })
         } label: {
-            Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+            Label("並び替え", systemImage: "arrow.up.arrow.down")
         }
     }
     func getFolderMusics() {
         guard let folderPath = folderDataStore.selectedFolder?.folderPath else { return }
         Task {
             folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderPath)
+            folderDataStore.loadMusicSort()
             isLoading = false
         }
     }
     func randomPlay() {
         guard let music = folderDataStore.folderMusicArray.randomElement() else { return }
+        playDataStore.setPlayMode(playMode: .shuffle)
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: folderDataStore.folderMusicArray.map { $0.filePath })
     }

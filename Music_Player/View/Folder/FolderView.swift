@@ -76,21 +76,25 @@ struct FolderView: View {
         Menu {
             Button(action: {
                 folderDataStore.folderArraySort(mode: .nameAscending)
+                folderDataStore.saveSortMode()
             }, label: {
-                Text("アーティスト名昇順")
+                Text("フォルダ名昇順")
             })
             Button(action: {
                 folderDataStore.folderArraySort(mode: .nameDescending)
+                folderDataStore.saveSortMode()
             }, label: {
-                Text("アーティスト名降順")
+                Text("フォルダ名降順")
             })
             Button(action: {
                 folderDataStore.folderArraySort(mode: .countAscending)
+                folderDataStore.saveSortMode()
             }, label: {
                 Text("曲数昇順")
             })
             Button(action: {
                 folderDataStore.folderArraySort(mode: .countDescending)
+                folderDataStore.saveSortMode()
             }, label: {
                 Text("曲数降順")
             })
@@ -101,6 +105,7 @@ struct FolderView: View {
     func getFolders() {
         Task {
             folderDataStore.folderArray = await FolderRepository.getFolders()
+            folderDataStore.loadSort()
             isLoading = false
         }
     }

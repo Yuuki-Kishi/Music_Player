@@ -33,4 +33,12 @@ extension URL {
     var planePath: String {
         self.path(percentEncoded: false)
     }
+    var isMusicFile: Bool {
+        let isTrashed = self.planePath.contains("/.Trash")
+        let isPlaylist = self.planePath.contains("/playlist")
+        let isSystem = self.planePath.contains("/System")
+        let isM3U8 = self.planePath.contains(".m3u8")
+        let isDSStore = self.planePath.contains(".DS_Store")
+        return !isTrashed && !isPlaylist && !isSystem && !isM3U8 && !isDSStore
+    }
 }

@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var viewDataStore = ViewDataStore.shared
+    @StateObject var pathDataStore = PathDataStore.shared
     
     var body: some View {
         TabView() {
@@ -50,24 +52,30 @@ struct ContentView: View {
                 }
         }
         .accentColor(.accent)
-        .sheet(isPresented: $viewDataStore.isShowPlayView, content: {
+        .sheet(isPresented: $viewDataStore.isShowPlayView, onDismiss: {
+            pathDataStore.playViewNavigationPath.removeAll()
+        }, content: {
             PlayView()
         })
         .onAppear() {
-            FileService.createDirectory(folderPath: "Playlist")
-            FileService.createDirectory(folderPath: "Playlist/System")
-            if !WillPlayRepository.isExistWillPlayM3U8() {
-                guard WillPlayRepository.createWillPlayM3U8() else { return }
-                print("succeeded")
-            }
-            if !PlayedRepository.isExistPlayedM3U8() {
-                guard PlayedRepository.createPlayedM3U8() else { return }
-                print("succeeded")
-            }
-            if !FavoriteMusicRepository.isExistFavoriteMusicM3U8() {
-                guard FavoriteMusicRepository.createFavoriteMusicM3U8() else { return }
-                print("succeeded")
-            }
+            onAppear()
         }
+    }
+    func onAppear() {
+        FileService.createDirectory(folderPath: "Playlist")
+        FileService.createDirectory(folderPath: "Playlist/System")
+        if !WillPlayRepository.isExistWillPlayM3U8() {
+            guard WillPlayRepository.createWillPlayM3U8() else { return }
+            print("succeeded")
+        }
+        if !PlayedRepository.isExistPlayedM3U8() {
+            guard PlayedRepository.createPlayedM3U8() else { return }
+            print("succeeded")
+        }
+        if !FavoriteMusicRepository.isExistFavoriteMusicM3U8() {
+            guard FavoriteMusicRepository.createFavoriteMusicM3U8() else { return }
+            print("succeeded")
+        }
+        playDataStore.playMode = UserDefaultsRepository.loadPlayMode()
     }
 }

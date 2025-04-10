@@ -32,7 +32,7 @@ struct AlbumMusicView: View {
                             HStack {
                                 Image(systemName: "play.circle")
                                     .foregroundStyle(.accent)
-                                Text("すべて再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
+                                Text("シャッフル再生 (" + String(albumDataStore.albumMusicArray.count) + "曲)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal)
@@ -69,37 +69,43 @@ struct AlbumMusicView: View {
         Menu {
             Button(action: {
                 albumDataStore.albumMusicArraySort(mode: .nameAscending)
+                albumDataStore.saveMusicSortMode()
             }, label: {
                 Text("曲名昇順")
             })
             Button(action: {
                 albumDataStore.albumMusicArraySort(mode: .nameDescending)
+                albumDataStore.saveMusicSortMode()
             }, label: {
                 Text("曲名降順")
             })
             Button(action: {
                 albumDataStore.albumMusicArraySort(mode: .dateAscending)
+                albumDataStore.saveMusicSortMode()
             }, label: {
                 Text("更新日昇順")
             })
             Button(action: {
                 albumDataStore.albumMusicArraySort(mode: .dateDescending)
+                albumDataStore.saveMusicSortMode()
             }, label: {
                 Text("更新日降順")
             })
         } label: {
-            Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
+            Label("並び替え", systemImage: "arrow.up.arrow.down")
         }
     }
     func getAlbumMusics() {
         guard let albumName = albumDataStore.selectedAlbum?.albumName else { return }
         Task {
             albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumName)
+            albumDataStore.loadMusicSort()
             isLoading = false
         }
     }
     func randomPlay() {
         guard let music = albumDataStore.albumMusicArray.randomElement() else { return }
+        playDataStore.setPlayMode(playMode: .shuffle)
         playDataStore.musicChoosed(music: music)
         playDataStore.setNextMusics(musicFilePaths: albumDataStore.albumMusicArray.map { $0.filePath })
     }

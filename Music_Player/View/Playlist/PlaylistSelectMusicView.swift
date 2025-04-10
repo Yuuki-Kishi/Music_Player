@@ -23,7 +23,7 @@ struct PlaylistSelectMusicView: View {
                 Spacer()
             } else {
                 List(selection: $selectionValue) {
-                    ForEach(selectableMusicArray, id: \.filePath) { music in
+                    ForEach(selectableMusicArray, id: \.self) { music in
                         PlaylistSelectMusicViewCell(music: music)
                     }
                 }
@@ -66,8 +66,21 @@ struct PlaylistSelectMusicView: View {
     func getSelectableMusicArray() {
         Task {
             selectableMusicArray = await MusicRepository.getMusics()
+            sortSelectableMusicArray()
             selectionValue = Set(selectableMusicArray.filter { isInclude(musicFilePath: $0.filePath) })
             isLoading = false
+        }
+    }
+    func sortSelectableMusicArray() {
+        switch playlistDataStore.playlistMusicSortMode {
+        case .nameAscending:
+            selectableMusicArray.sort { $0.musicName < $1.musicName }
+        case .nameDescending:
+            selectableMusicArray.sort { $0.musicName > $1.musicName }
+        case .dateAscending:
+            selectableMusicArray.sort { $0.editedDate < $1.editedDate }
+        case .dateDescending:
+            selectableMusicArray.sort { $0.editedDate > $1.editedDate }
         }
     }
     func isInclude(musicFilePath: String) -> Bool {

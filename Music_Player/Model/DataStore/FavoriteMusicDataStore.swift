@@ -14,11 +14,11 @@ class FavoriteMusicDataStore: ObservableObject {
     @Published var selectedMusic: Music? = nil
     @Published var favoriteMusicSortMode: FavoriteMusicSortMode = .nameAscending
     
-    enum FavoriteMusicSortMode {
+    enum FavoriteMusicSortMode: String {
         case nameAscending, nameDescending, dateAscending, dateDescending
     }
     
-    func favoriteMusicArraySort(mode: FavoriteMusicSortMode) {
+    func arraySort(mode: FavoriteMusicSortMode) {
         switch mode {
         case .nameAscending:
             favoriteMusicArray.sort { $0.musicName < $1.musicName }
@@ -30,5 +30,15 @@ class FavoriteMusicDataStore: ObservableObject {
             favoriteMusicArray.sort { $0.editedDate > $1.editedDate }
         }
         favoriteMusicSortMode = mode
+    }
+    
+    func saveMusicSortMode() {
+        UserDefaultsRepository.saveSortMode(sortMode: favoriteMusicSortMode.rawValue, key: "FavoriteMusicSortMode")
+    }
+    
+    func loadMusicSort() {
+        let sortModeString = UserDefaultsRepository.loadSortMode(key: "FavoriteMusicSortMode") ?? "nameAscending"
+        guard let sortMode = FavoriteMusicSortMode(rawValue: sortModeString) else { return }
+        arraySort(mode: sortMode)
     }
 }

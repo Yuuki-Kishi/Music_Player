@@ -17,11 +17,11 @@ class FolderDataStore: ObservableObject {
     @Published var folderSortMode: FolderSortMode = .nameAscending
     @Published var folderMusicSortMode: FolderMusicSortMode = .nameAscending
     
-    enum FolderSortMode {
+    enum FolderSortMode: String {
         case nameAscending, nameDescending, countAscending, countDescending
     }
     
-    enum FolderMusicSortMode {
+    enum FolderMusicSortMode: String {
         case nameAscending, nameDescending, dateAscending, dateDescending
     }
     
@@ -39,6 +39,16 @@ class FolderDataStore: ObservableObject {
         folderSortMode = mode
     }
     
+    func saveSortMode() {
+        UserDefaultsRepository.saveSortMode(sortMode: folderSortMode.rawValue, key: "FolderSortMode")
+    }
+    
+    func loadSort() {
+        let sortModeString = UserDefaultsRepository.loadSortMode(key: "FolderSortMode") ?? "nameAscending"
+        guard let sortMode = FolderSortMode(rawValue: sortModeString) else { return }
+        folderArraySort(mode: sortMode)
+    }
+    
     func folderMusicArraySort(mode: FolderMusicSortMode) {
         switch mode {
         case .nameAscending:
@@ -51,5 +61,15 @@ class FolderDataStore: ObservableObject {
             folderMusicArray.sort { $0.editedDate > $1.editedDate }
         }
         folderMusicSortMode = mode
+    }
+    
+    func saveMusicSortMode() {
+        UserDefaultsRepository.saveSortMode(sortMode: folderMusicSortMode.rawValue, key: "FolderMusicSortMode")
+    }
+    
+    func loadMusicSort() {
+        let sortModeString = UserDefaultsRepository.loadSortMode(key: "FolderMusicSortMode") ?? "nameAscending"
+        guard let sortMode = FolderMusicSortMode(rawValue: sortModeString) else { return }
+        folderMusicArraySort(mode: sortMode)
     }
 }

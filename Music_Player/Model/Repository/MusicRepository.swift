@@ -21,7 +21,7 @@ class MusicRepository {
             let music = await FileService.getFileMetadata(filePath: filePath)
             musics.append(music)
         }
-        MusicDataStore.shared.arraySort(mode: MusicDataStore.shared.musicsSortMode)
+        MusicDataStore.shared.arraySort(mode: MusicDataStore.shared.musicArraySortMode)
         return musics
     }
     

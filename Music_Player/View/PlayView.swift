@@ -31,18 +31,28 @@ struct PlayView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 50, style: .continuous))
                 Spacer()
                 HStack {
-                    VStack {
-                        Text(playDataStore.playingMusic?.musicName ?? "再生停止中")
-                            .lineLimit(1)
-                            .font(.system(size: 25).bold())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
-                        Text(playDataStore.playingMusic?.artistName ?? "")
-                            .lineLimit(1)
-                            .font(.system(size: 20))
-                            .foregroundStyle(.gray)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
+                    if playDataStore.playingMusic == nil {
+                        VStack {
+                            Spacer()
+                            Text("再生停止中")
+                                .font(.system(size: 25).bold())
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                        }
+                        .frame(height: 50)
+                    } else {
+                        VStack {
+                            Text(playDataStore.playingMusic?.musicName ?? "不明な曲")
+                                .lineLimit(1)
+                                .font(.system(size: 25).bold())
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(playDataStore.playingMusic?.artistName ?? "不明なアーティスト")
+                                .lineLimit(1)
+                                .font(.system(size: 20))
+                                .foregroundStyle(.gray)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .frame(height: 50)
                     }
                     musicMenu()
                     .font(.system(size: 20, weight: .semibold))

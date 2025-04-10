@@ -76,21 +76,25 @@ struct AlbumView: View {
         Menu {
             Button(action: {
                 albumDataStore.albumArraySort(mode: .nameAscending)
+                albumDataStore.saveSortMode()
             }, label: {
-                Text("アーティスト名昇順")
+                Text("アルバム名昇順")
             })
             Button(action: {
                 albumDataStore.albumArraySort(mode: .nameDescending)
+                albumDataStore.saveSortMode()
             }, label: {
-                Text("アーティスト名降順")
+                Text("アルバム名降順")
             })
             Button(action: {
                 albumDataStore.albumArraySort(mode: .countAscending)
+                albumDataStore.saveSortMode()
             }, label: {
                 Text("曲数昇順")
             })
             Button(action: {
                 albumDataStore.albumArraySort(mode: .countDescending)
+                albumDataStore.saveSortMode()
             }, label: {
                 Text("曲数降順")
             })
@@ -101,6 +105,7 @@ struct AlbumView: View {
     func getAlbums() {
         Task {
             albumDataStore.albumArray = await AlbumRepository.getAlbums()
+            albumDataStore.loadSort()
             isLoading = false
         }
     }

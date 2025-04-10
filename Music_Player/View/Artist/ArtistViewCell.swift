@@ -16,13 +16,13 @@ struct ArtistViewCell: View {
         HStack {
             Image(systemName: "person.fill")
                 .font(.system(size: 30.0))
+                .foregroundStyle(.accent)
                 .background(
                     Circle()
                         .frame(width: 50, height: 50)
                         .foregroundStyle(Color(UIColor.systemGray5))
                 )
                 .frame(width: 40, height: 40)
-                .foregroundStyle(.primary)
             Text(artist.artistName)
                 .lineLimit(1)
                 .font(.system(size: 20.0))

@@ -16,6 +16,7 @@ struct PlaylistViewCell: View {
         HStack {
             Image(systemName: "music.note.list")
                 .font(.system(size: 30.0))
+                .foregroundStyle(.accent)
                 .background(
                     RoundedRectangle(cornerRadius: 5.0)
                         .foregroundStyle(Color(UIColor.systemGray5))

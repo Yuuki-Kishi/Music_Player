@@ -13,60 +13,69 @@ struct PlayWindowView: View {
     @StateObject var playDataStore = PlayDataStore.shared
     
     var body: some View {
-        VStack {
-            ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
-                .progressViewStyle(LinearProgressViewStyle(tint: .accent))
-                .padding(.horizontal)
-            ZStack {
-                HStack {
+        ZStack {
+            Rectangle()
+                .foregroundStyle(Color(UIColor.systemGray6))
+                .frame(height: 60)
+            VStack {
+                ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
+                    .progressViewStyle(LinearProgressViewStyle(tint: .accent))
+                Spacer()
+            }
+            .padding(.horizontal)
+            HStack {
+                if playDataStore.playingMusic == nil {
+                    Text("再生停止中")
+                        .font(.system(size: 20.0))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
                     VStack {
-                        Text(playDataStore.playingMusic?.musicName ?? "再生停止中")
+                        Text(playDataStore.playingMusic?.musicName ?? "不明な曲")
                             .lineLimit(1)
                             .font(.system(size: 20.0))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         HStack {
-                            Text(playDataStore.playingMusic?.artistName ?? "")
+                            Text(playDataStore.playingMusic?.artistName ?? "不明なアーティスト")
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(playDataStore.playingMusic?.albumName ?? "")
+                            Text(playDataStore.playingMusic?.albumName ?? "不明なアルバム")
                                 .lineLimit(1)
                                 .font(.system(size: 12.5))
                                 .frame(maxWidth: .infinity,alignment: .leading)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    Spacer(minLength: 100)
                 }
-                .frame(height: 20)
-                HStack {
-                    Button(action: {
-                        viewDataStore.isShowPlayView = true
-                    }, label: {
-                        Rectangle()
-                            .foregroundStyle(.clear)
-                            .frame(maxWidth: .infinity, maxHeight: 20)
-                    })
-                    Button(action: {
-                        playButtonAction()
-                    }, label: {
-                        playButtonIcon()
-                    })
-                    .font(.system(size: 25.0))
-                    .foregroundStyle(.primary)
-                    Button(action: {
-                        playDataStore.moveNextMusic()
-                    }, label: {
-                        Image(systemName: "forward.fill")
-                            .font(.system(size: 25.0))
-                    })
-                    .foregroundStyle(.primary)
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+                Spacer(minLength: 100)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            HStack {
+                Button(action: {
+                    viewDataStore.isShowPlayView = true
+                }, label: {
+                    Rectangle()
+                        .foregroundStyle(.clear)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                })
+                Button(action: {
+                    playButtonAction()
+                }, label: {
+                    playButtonIcon()
+                })
+                .font(.system(size: 25.0))
+                Button(action: {
+                    playDataStore.moveNextMusic()
+                }, label: {
+                    Image(systemName: "forward.fill")
+                        .font(.system(size: 25.0))
+                        .padding(.vertical, 10)
+                })
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.horizontal)
         }
-        .background(Color(UIColor.systemGray5))
+        .frame(maxWidth: .infinity, maxHeight: 60)
     }
     func randomPlay() {
         guard let music = musicDataStore.musicArray.randomElement() else { return }
@@ -87,10 +96,10 @@ struct PlayWindowView: View {
     func playButtonIcon() -> some View {
         if playDataStore.isPlaying {
             Image(systemName: "pause.fill")
-                .padding(14)
+                .padding(10)
         } else {
             Image(systemName: "play.fill")
-                .padding(14)
+                .padding(10)
         }
     }
 }

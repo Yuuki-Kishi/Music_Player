@@ -49,8 +49,15 @@ class PlaylistRepository {
     }
     
     //update
-    static func renamePlaylist(playlistFilePath: String, newName: String) -> Bool {
-        M3U8Service.renameM3U8(filePath: playlistFilePath, newName: newName)
+    static func renamePlaylist(playlist: Playlist, newName: String) -> Playlist {
+        let filePath = playlist.filePath
+        let newFilePath = folderPath + newName + ".m3u8"
+        var newPlaylist = playlist
+        newPlaylist.playlistName = newName
+        newPlaylist.filePath = newFilePath
+        guard M3U8Service.renameM3U8(filePath: filePath, newFilePath: newFilePath) else { return Playlist() }
+        return newPlaylist
+
     }
     
     static func addPlaylistMusic(playlistFilePath: String, musicFilePath: String) -> Bool {
@@ -67,6 +74,6 @@ class PlaylistRepository {
     }
     
     static func deletePlaylist(playlistFilePath: String) -> Bool {
-        M3U8Service.deleteM3U8(filePath: folderPath + playlistFilePath)
+        M3U8Service.deleteM3U8(filePath: playlistFilePath)
     }
 }

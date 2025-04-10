@@ -17,11 +17,11 @@ class AlbumDataStore: ObservableObject {
     @Published var albumSortMode: AlbumSortMode = .nameAscending
     @Published var albumMusicSortMode: AlbumMusicSortMode = .nameAscending
     
-    enum AlbumSortMode {
+    enum AlbumSortMode: String {
         case nameAscending, nameDescending, countAscending, countDescending
     }
     
-    enum AlbumMusicSortMode {
+    enum AlbumMusicSortMode: String {
         case nameAscending, nameDescending, dateAscending, dateDescending
     }
     
@@ -39,6 +39,16 @@ class AlbumDataStore: ObservableObject {
         albumSortMode = mode
     }
     
+    func saveSortMode() {
+        UserDefaultsRepository.saveSortMode(sortMode: albumSortMode.rawValue, key: "AlbumSortMode")
+    }
+    
+    func loadSort() {
+        let sortModeString = UserDefaultsRepository.loadSortMode(key: "AlbumSortMode") ?? "nameAscending"
+        guard let sortMode = AlbumSortMode(rawValue: sortModeString) else { return }
+        albumArraySort(mode: sortMode)
+    }
+    
     func albumMusicArraySort(mode: AlbumMusicSortMode) {
         switch mode {
         case .nameAscending:
@@ -51,5 +61,15 @@ class AlbumDataStore: ObservableObject {
             albumMusicArray.sort { $0.editedDate > $1.editedDate }
         }
         albumMusicSortMode = mode
+    }
+    
+    func saveMusicSortMode() {
+        UserDefaultsRepository.saveSortMode(sortMode: albumMusicSortMode.rawValue, key: "AlbumMusicSortMode")
+    }
+    
+    func loadMusicSort() {
+        let sortModeString = UserDefaultsRepository.loadSortMode(key: "AlbumMusicSortMode") ?? "nameAscending"
+        guard let sortMode = AlbumMusicSortMode(rawValue: sortModeString) else { return }
+        albumMusicArraySort(mode: sortMode)
     }
 }

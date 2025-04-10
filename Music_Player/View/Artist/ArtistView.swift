@@ -76,21 +76,25 @@ struct ArtistView: View {
         Menu {
             Button(action: {
                 artistDataStore.artistArraySort(mode: .nameAscending)
+                artistDataStore.saveSortMode()
             }, label: {
                 Text("アーティスト名昇順")
             })
             Button(action: {
                 artistDataStore.artistArraySort(mode: .nameDescending)
+                artistDataStore.saveSortMode()
             }, label: {
                 Text("アーティスト名降順")
             })
             Button(action: {
                 artistDataStore.artistArraySort(mode: .countAscending)
+                artistDataStore.saveSortMode()
             }, label: {
                 Text("曲数昇順")
             })
             Button(action: {
                 artistDataStore.artistArraySort(mode: .countDescending)
+                artistDataStore.saveSortMode()
             }, label: {
                 Text("曲数降順")
             })
@@ -101,6 +105,7 @@ struct ArtistView: View {
     func getArtists() {
         Task {
             artistDataStore.artistArray = await ArtistRepository.getArtists()
+            artistDataStore.loadSort()
             isLoading = false
         }
     }

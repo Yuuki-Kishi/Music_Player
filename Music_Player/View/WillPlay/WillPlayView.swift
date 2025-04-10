@@ -9,22 +9,35 @@ import SwiftUI
 
 struct WillPlayView: View {
     @StateObject var willPlayDataSotre = WillPlayDataStore.shared
+    @State private var isLoading: Bool = true
     
     var body: some View {
         VStack {
-            List {
-                ForEach(willPlayDataSotre.willPlayMusicArray, id: \.filePath) { music in
-                    WillPlayViewCell(music: music)
+            if isLoading {
+                Spacer()
+                Text("読み込み中...")
+                Spacer()
+            } else {
+                if willPlayDataSotre.willPlayMusicArray.isEmpty {
+                    Spacer()
+                    Text("表示できる曲がありません")
+                    Spacer()
+                } else {
+                    List {
+                        ForEach(willPlayDataSotre.willPlayMusicArray, id: \.filePath) { music in
+                            WillPlayViewCell(music: music)
+                        }
+                        .onDelete(perform: delete)
+                        .onMove(perform: move)
+                    }
+                    .listStyle(.plain)
                 }
-                .onDelete(perform: delete)
-                .onMove(perform: move)
             }
-            .toolbar {
-                MyEditButton()
-            }
-            .listStyle(.plain)
-            .navigationTitle("再生予定曲")
         }
+        .toolbar {
+            MyEditButton()
+        }
+        .navigationTitle("再生予定曲")
         .onAppear() {
             getWillPlay()
         }
@@ -45,6 +58,7 @@ struct WillPlayView: View {
     func getWillPlay() {
         Task {
             willPlayDataSotre.willPlayMusicArray = await WillPlayRepository.getWillPlay()
+            isLoading = false
         }
     }
 }
