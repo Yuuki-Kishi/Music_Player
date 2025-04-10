@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct WillPlayView: View {
+    @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var willPlayDataSotre = WillPlayDataStore.shared
     @State private var isLoading: Bool = true
     
@@ -18,7 +19,11 @@ struct WillPlayView: View {
                 Text("読み込み中...")
                 Spacer()
             } else {
-                if willPlayDataSotre.willPlayMusicArray.isEmpty {
+                if playDataStore.playMode == .sameRepeat {
+                    Spacer()
+                    Text("再生中の曲をリピートします")
+                    Spacer()
+                } else if willPlayDataSotre.willPlayMusicArray.isEmpty {
                     Spacer()
                     Text("表示できる曲がありません")
                     Spacer()

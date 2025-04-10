@@ -28,7 +28,7 @@ class FavoriteMusicRepository {
     
     //get
     static func getFavoriteMusics() async -> [Music] {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }.droppedFisrt(2)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).filter { !$0.contains("\n") }.droppedFisrt(index: 2)
         var musics: [Music] = []
         for filePath in filePaths {
             if !FileService.isExistFile(filePath: filePath) {

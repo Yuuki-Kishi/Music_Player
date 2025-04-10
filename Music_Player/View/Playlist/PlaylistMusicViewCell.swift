@@ -84,7 +84,7 @@ struct PlaylistMusicViewCell: View {
         return dateFormatter.string(from: second)!
     }
     func tapped() {
-        playDataStore.musicChoosed(music: music)
+        playDataStore.musicChoosed(music: music, playGroup: .playlist)
         playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
     }
     func menuButton() -> some View {

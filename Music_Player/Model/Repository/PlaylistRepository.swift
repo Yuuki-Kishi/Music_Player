@@ -31,7 +31,7 @@ class PlaylistRepository {
         var playlists: [Playlist] = []
         for filePath in filePaths {
             let playlistName = M3U8Service.getM3U8Name(filePath: folderPath + filePath)
-            let musicCount = M3U8Service.getM3U8Components(filePath: folderPath + filePath).droppedFisrt(2).count
+            let musicCount = M3U8Service.getM3U8Components(filePath: folderPath + filePath).droppedFisrt(index: 2).count
             let playlist = Playlist(playlistName: playlistName, musicCount: musicCount, filePath: folderPath + filePath)
             playlists.append(playlist)
         }
@@ -39,7 +39,7 @@ class PlaylistRepository {
     }
     
     static func getPlaylistMusic(filePath: String) async -> [Music] {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(2)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         var musics: [Music] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: filePath)

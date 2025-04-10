@@ -64,7 +64,7 @@ struct MusicCellView: View {
         }
     }
     func tapped() {
-        playDataStore.musicChoosed(music: music)
+        playDataStore.musicChoosed(music: music, playGroup: .music)
         playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
     }
     func secToMin(second: TimeInterval) -> String {

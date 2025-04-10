@@ -106,7 +106,7 @@ struct ArtistMusicView: View {
     func randomPlay() {
         guard let music = artistDataStore.artistMusicArray.randomElement() else { return }
         playDataStore.setPlayMode(playMode: .shuffle)
-        playDataStore.musicChoosed(music: music)
+        playDataStore.musicChoosed(music: music, playGroup: .artist)
         playDataStore.setNextMusics(musicFilePaths: artistDataStore.artistMusicArray.map { $0.filePath })
     }
 }

@@ -24,8 +24,14 @@ extension Array where Element == String {
         }
     }
     
-    func droppedFisrt(_: Int) -> [String] {
-        return Array(self.dropFirst(2))
+    func droppedFisrt(index: Int) -> [Element] {
+        return Array(self.dropFirst(index))
+    }
+}
+
+extension Array where Element == Music {
+    func droppedFisrt(index: Int) -> [Element] {
+        return Array(self.dropFirst(index))
     }
 }
 

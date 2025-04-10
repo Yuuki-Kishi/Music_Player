@@ -137,7 +137,7 @@ struct FavoriteMusicView: View {
     func randomPlay() {
         guard let music = favoriteMusicDataStore.favoriteMusicArray.randomElement() else { return }
         playDataStore.setPlayMode(playMode: .shuffle)
-        playDataStore.musicChoosed(music: music)
+        playDataStore.musicChoosed(music: music, playGroup: .favorite)
         playDataStore.setNextMusics(musicFilePaths: favoriteMusicDataStore.favoriteMusicArray.map { $0.filePath })
     }
     func cleanUpFavoriteMusics() {

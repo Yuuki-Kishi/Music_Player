@@ -17,12 +17,16 @@ class PlayDataStore: ObservableObject {
     @Published var cashedSeekBarSeconds: Double = 0.0
     @Published var isPlaying: Bool = false
     @Published var playMode: PlayMode = .shuffle
-    
+    @Published var playGroup: PlayGroup = .music
     private let audioEngine: AVAudioEngine = .init()
     private let playerNode: AVAudioPlayerNode = .init()
     
     enum PlayMode: String {
         case shuffle, order, sameRepeat
+    }
+    
+    enum PlayGroup: String {
+        case music, artist, album, playlist, folder, favorite
     }
     
     init() {
@@ -100,7 +104,7 @@ class PlayDataStore: ObservableObject {
                     if WillPlayRepository.removeWillPlay(filePaths: [nextMusic.filePath]) {
                         print("removeSucceeded")
                     }
-                    musicChoosed(music: nextMusic)
+                    musicChoosed(music: nextMusic, playGroup: playGroup)
                 } else {
                     self.playingMusic = nil
                 }
@@ -115,14 +119,14 @@ class PlayDataStore: ObservableObject {
                     if WillPlayRepository.removeWillPlay(filePaths: [nextMusic.filePath]) {
                         print("removeSucceeded")
                     }
-                    musicChoosed(music: nextMusic)
+                    musicChoosed(music: nextMusic, playGroup: playGroup)
                 } else {
                     self.playingMusic = nil
                 }
             }
         case .sameRepeat:
             if let music = self.playingMusic {
-                musicChoosed(music: music)
+                musicChoosed(music: music, playGroup: playGroup)
             }
         }
     }
@@ -142,7 +146,7 @@ class PlayDataStore: ObservableObject {
                     if PlayedRepository.removePlayed(filePaths: [previousMusic.filePath]) {
                         print("removeSucceeded")
                     }
-                    musicChoosed(music: previousMusic)
+                    musicChoosed(music: previousMusic, playGroup: playGroup)
                 } else {
                     self.playingMusic = nil
                 }
@@ -157,14 +161,14 @@ class PlayDataStore: ObservableObject {
                     if PlayedRepository.removePlayed(filePaths: [previousMusic.filePath]) {
                         print("removeSucceeded")
                     }
-                    musicChoosed(music: previousMusic)
+                    musicChoosed(music: previousMusic, playGroup: playGroup)
                 } else {
                     self.playingMusic = nil
                 }
             }
         case .sameRepeat:
             if let music = self.playingMusic {
-                musicChoosed(music: music)
+                musicChoosed(music: music, playGroup: playGroup)
             }
         }
     }
@@ -218,7 +222,8 @@ class PlayDataStore: ObservableObject {
         playerNode.stop()
     }
     
-    func musicChoosed(music: Music) {
+    func musicChoosed(music: Music, playGroup: PlayGroup) {
+        self.playGroup = playGroup
         setMusic(music: music)
         setScheduleFile()
         seekPosition = 0.0
@@ -234,14 +239,13 @@ class PlayDataStore: ObservableObject {
         guard let index = filePaths.firstIndex(of: filePath) else { return }
         filePaths.remove(at: index)
         guard PlayedRepository.cleanUpPlayed() else { return }
-        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, playGroup: playGroup) else { return }
         print("setSucceeded")
     }
     
     func setPlayMode(playMode: PlayMode) {
         self.playMode = playMode
-        let filePaths = WillPlayDataStore.shared.willPlayMusicArray.map { $0.filePath }
-        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, playGroup: playGroup) else { return }
         print("sortSucceeded")
         UserDefaultsRepository.savePlayMode(playMode: playMode)
     }
@@ -255,8 +259,7 @@ class PlayDataStore: ObservableObject {
         case .sameRepeat:
             playMode = .shuffle
         }
-        let filePaths = WillPlayDataStore.shared.willPlayMusicArray.map { $0.filePath }
-        guard WillPlayRepository.sortWillPlay(playMode: playMode, filePaths: filePaths) else { return }
+        guard WillPlayRepository.sortWillPlay(playMode: playMode, playGroup: playGroup) else { return }
         print("sortSucceeded")
         UserDefaultsRepository.savePlayMode(playMode: playMode)
     }

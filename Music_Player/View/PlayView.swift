@@ -257,7 +257,7 @@ struct PlayView: View {
     }
     func randomPlay() {
         guard let music = musicDataStore.musicArray.randomElement() else { return }
-        playDataStore.musicChoosed(music: music)
+        playDataStore.musicChoosed(music: music, playGroup: .music)
         playDataStore.setNextMusics(musicFilePaths: musicDataStore.musicArray.map { $0.filePath })
     }
 }

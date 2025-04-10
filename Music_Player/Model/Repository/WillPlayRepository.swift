@@ -24,7 +24,7 @@ class WillPlayRepository {
     //get
     static func getWillPlay() async -> [Music] {
         var musics: [Music] = []
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(2)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         for filePath in filePaths {
             if !FileService.isExistFile(filePath: filePath) {
                 guard M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath) else { continue }
@@ -38,7 +38,7 @@ class WillPlayRepository {
     }
     
     static func nextMusic() async -> Music? {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(2)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         if let nextFilePath = filePaths.first {
             guard FileService.isExistFile(filePath: nextFilePath) else { return nil }
             return await FileService.getFileMetadata(filePath: nextFilePath)
@@ -62,21 +62,39 @@ class WillPlayRepository {
     }
     
     static func moveWillPlay(from: IndexSet, to: Int) -> Bool {
-        var filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(2)
+        var filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         filePaths.move(fromOffsets: from, toOffset: to)
         return M3U8Service.updateM3U8(filePath: filePath, contents: filePaths)
     }
     
-    static func sortWillPlay(playMode: PlayDataStore.PlayMode, filePaths: [String]) -> Bool {
-        var filePaths = filePaths
+    @MainActor
+    static func sortWillPlay(playMode: PlayDataStore.PlayMode, playGroup: PlayDataStore.PlayGroup) -> Bool {
+        var musics: [Music] = []
+        switch playGroup {
+        case .music:
+            musics = MusicDataStore.shared.musicArray
+        case .artist:
+            musics = ArtistDataStore.shared.artistMusicArray
+        case .album:
+            musics = AlbumDataStore.shared.albumMusicArray
+        case .playlist:
+            musics = PlaylistDataStore.shared.playlistMusicArray
+        case .folder:
+            musics = FolderDataStore.shared.folderMusicArray
+        case .favorite:
+            musics = FavoriteMusicDataStore.shared.favoriteMusicArray
+        }
         switch playMode {
         case .shuffle:
-            filePaths.shuffle()
+            musics.shuffle()
         case .order:
-            filePaths.sort { $0 < $1 }
+            guard let playingMusic = PlayDataStore.shared.playingMusic else { return false }
+            guard let index = musics.firstIndex(of: playingMusic) else { return false }
+            musics = musics.droppedFisrt(index: index + 1)
         case .sameRepeat:
-            filePaths = []
+            musics = []
         }
+        let filePaths = musics.map { $0.filePath }
         return M3U8Service.updateM3U8(filePath: filePath, contents: filePaths)
     }
     
