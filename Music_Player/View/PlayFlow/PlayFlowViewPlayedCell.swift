@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PlayedViewCell: View {
+struct PlayFlowViewPlayedCell: View {
     @StateObject var playedDataStore = PlayedDataStore.shared
     @State var music: Music
     
@@ -36,7 +36,7 @@ struct PlayedViewCell: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            tapped()
+//            tapped()
         }
     }
     func secToMin(second: TimeInterval) -> String {
@@ -48,16 +48,16 @@ struct PlayedViewCell: View {
         return dateFormatter.string(from: second)!
     }
     func tapped() {
-        guard let index = playedDataStore.playedMusicArray.firstIndex(of: music) else { return }
-        let skipMusicFilePaths = playedDataStore.playedMusicArray.prefix(index - 1).map { $0.filePath }
-        guard PlayedRepository.removePlayed(filePaths: skipMusicFilePaths) else { return }
-        guard WillPlayRepository.insertWillPlay(newMusicFilePaths: skipMusicFilePaths, at: 0) else { return }
         Task {
+            guard let index = playedDataStore.playedMusicArray.firstIndex(of: music) else { return }
+            let skipMusicFilePaths = playedDataStore.playedMusicArray.prefix(index - 1).map { $0.filePath }
+            guard PlayedRepository.removePlayeds(filePaths: skipMusicFilePaths) else { return }
+            guard WillPlayRepository.insertWillPlays(newMusicFilePaths: skipMusicFilePaths, at: 0) else { return }
             playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
         }
     }
 }
 
 #Preview {
-    PlayedViewCell(music: Music())
+    PlayFlowViewPlayedCell(music: Music())
 }

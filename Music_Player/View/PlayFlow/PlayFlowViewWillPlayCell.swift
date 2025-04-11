@@ -7,8 +7,10 @@
 
 import SwiftUI
 
-struct WillPlayViewCell: View {
+struct PlayFlowViewWillPlayCell: View {
     @StateObject var willPlayDataStore = WillPlayDataStore.shared
+    @StateObject var playedDataStore = PlayedDataStore.shared
+    @StateObject var playDataStore = PlayDataStore.shared
     @State var music: Music
     
     var body: some View {
@@ -48,16 +50,21 @@ struct WillPlayViewCell: View {
         return dateFormatter.string(from: second)!
     }
     func tapped() {
-        guard let index = willPlayDataStore.willPlayMusicArray.firstIndex(of: music) else { return }
-        let skipMusicFilePaths = willPlayDataStore.willPlayMusicArray.prefix(index - 1).map { $0.filePath }
-        guard WillPlayRepository.removeWillPlay(filePaths: skipMusicFilePaths) else { return }
-        guard PlayedRepository.addPlayed(newMusicFilePaths: skipMusicFilePaths) else { return }
         Task {
+            guard let previousMusicFilePath = playDataStore.playingMusic?.filePath else { return }
+            guard PlayedRepository.addPlayed(newMusicFilePath: previousMusicFilePath) else { return }
+            guard let index = willPlayDataStore.willPlayMusicArray.firstIndex(of: music) else { return }
+            let skipMusicFilePaths = willPlayDataStore.willPlayMusicArray.prefix(index).map { $0.filePath }
+            guard WillPlayRepository.removeWillPlays(filePaths: skipMusicFilePaths) else { return }
+            guard PlayedRepository.addPlayeds(newMusicFilePaths: skipMusicFilePaths) else { return }
+            guard WillPlayRepository.removeWillPlay(filePath: music.filePath) else { return }
+            playDataStore.moveChoosedMusic(music: music)
             willPlayDataStore.willPlayMusicArray = await WillPlayRepository.getWillPlay()
+            playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
         }
     }
 }
 
 #Preview {
-    WillPlayViewCell(music: Music())
+    PlayFlowViewWillPlayCell(music: Music())
 }

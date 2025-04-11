@@ -120,7 +120,7 @@ class FileService {
     static func getFileMetadata(filePath: String) async -> Music {
         var music: Music = Music()
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return Music() }
-        let asset = AVAsset(url: fileURL)
+        let asset = AVURLAsset(url: fileURL)
         guard let metadata = try? await asset.load(.commonMetadata) else { return Music() }
         let musicName = try? await metadata.first(where: {$0.commonKey == .commonKeyTitle})?.load(.stringValue)
         let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)

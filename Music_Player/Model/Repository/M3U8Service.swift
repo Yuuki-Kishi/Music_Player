@@ -91,6 +91,16 @@ class M3U8Service {
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }
     
+    static func removeMusics(M3U8FilePath: String, musicFilePaths: [String]) -> Bool {
+        var contents = getM3U8Components(filePath: M3U8FilePath)
+        for musicFilePath in musicFilePaths {
+            guard let index = contents.firstIndex(of: musicFilePath) else { return false }
+            contents.remove(at: index)
+        }
+        let newContent = contents.joined(separator: "\n")
+        return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
+    }
+    
     static func cleanUpM3U8(filePath: String) -> Bool {
         let fileName = URL(fileURLWithPath: filePath).deletingPathExtension().lastPathComponent
         let content = "#EXTM3U\n" + "#\(fileName)"

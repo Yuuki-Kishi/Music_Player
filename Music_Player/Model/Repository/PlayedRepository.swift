@@ -47,18 +47,20 @@ class PlayedRepository {
     }
     
     //update
-    static func addPlayed(newMusicFilePaths: [String]) -> Bool {
-        for newMusicFilePath in newMusicFilePaths {
-            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { continue }
-        }
-        return true
+    static func addPlayed(newMusicFilePath: String) -> Bool {
+        M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath)
     }
     
-    static func insertPlayed(newMusicFilePaths: [String], at index: Int) -> Bool {
-        for newMusicFilePath in newMusicFilePaths.reversed() {
-            guard M3U8Service.insertMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath, index: index) else { continue }
-        }
-        return true
+    static func addPlayeds(newMusicFilePaths: [String]) -> Bool {
+        M3U8Service.addMusics(M3U8FilePath: filePath, musicFilePaths: newMusicFilePaths)
+    }
+    
+    static func insertPlayed(newMusicFilePath: String, at index: Int) -> Bool {
+        M3U8Service.insertMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath, index: index)
+    }
+    
+    static func insertPlayeds(newMusicFilePaths: [String], at index: Int) -> Bool {
+        M3U8Service.insertMusics(M3U8FilePath: filePath, musicFilePaths: newMusicFilePaths, index: index)
     }
     
     static func movePlayed(from: IndexSet, to: Int) -> Bool {
@@ -68,11 +70,12 @@ class PlayedRepository {
     }
     
     //delete
-    static func removePlayed(filePaths: [String]) -> Bool {
-        for filePath in filePaths {
-            guard M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath) else { continue }
-        }
-        return true
+    static func removePlayed(filePath: String) -> Bool {
+        M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath)
+    }
+    
+    static func removePlayeds(filePaths: [String]) -> Bool {
+        M3U8Service.removeMusics(M3U8FilePath: self.filePath, musicFilePaths: filePaths)
     }
     
     static func cleanUpPlayed() -> Bool {

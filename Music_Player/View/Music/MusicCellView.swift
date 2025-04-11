@@ -91,7 +91,7 @@ struct MusicCellView: View {
             })
             Divider()
             Button(action: {
-                if WillPlayRepository.insertWillPlay(newMusicFilePaths: [music.filePath], at: 0) {
+                if WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) {
                     print("succeeded")
                 }
             }, label: {
@@ -110,8 +110,11 @@ struct MusicCellView: View {
         }
     }
     func deleteMusicFile() {
-        if FileService.fileDelete(filePath: music.filePath) {
+        Task {
+            guard FileService.fileDelete(filePath: music.filePath) else { return }
             print("DeleteSucceeded")
+            musicDataStore.musicArray = await MusicRepository.getMusics()
+            musicDataStore.loadSort()
         }
     }
 }

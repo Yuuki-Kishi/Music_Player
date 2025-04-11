@@ -90,7 +90,7 @@ struct FolderMusicViewCell: View {
             })
             Divider()
             Button(action: {
-                if WillPlayRepository.insertWillPlay(newMusicFilePaths: [music.filePath], at: 0) {
+                if WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) {
                     print("succeeded")
                 }
             }, label: {

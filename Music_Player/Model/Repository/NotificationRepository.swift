@@ -28,12 +28,12 @@ class NotificationRepository {
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = String(playDataStore.playingMusic?.musicLength ?? 300)
         // 曲の速さ
         if playDataStore.isPlaying {
-            guard let filePath = playDataStore.playingMusic?.filePath else { return }
-            let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
-            let fullFilePath = directoryPath + "/" + filePath
-            let assetURL = URL(fileURLWithPath: fullFilePath)
-            guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
-            let sampleRate = audioFile.processingFormat.sampleRate
+//            guard let filePath = playDataStore.playingMusic?.filePath else { return }
+//            let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
+//            let fullFilePath = directoryPath + "/" + filePath
+//            let assetURL = URL(fileURLWithPath: fullFilePath)
+//            guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
+//            let sampleRate = audioFile.processingFormat.sampleRate
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
         } else {
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0

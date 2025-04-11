@@ -65,6 +65,7 @@ struct PlayView: View {
                 Slider(value: $displaySeekPosition, in: 0 ... (playDataStore.playingMusic?.musicLength ?? 300), onEditingChanged: { isEditing in
                     isEditingSeekPosition = isEditing
                     if !isEditing {
+                        playDataStore.seekPosition = displaySeekPosition
                         playDataStore.setSeek()
                     }
                 })
@@ -102,7 +103,7 @@ struct PlayView: View {
                     Spacer()
                     Spacer()
                     Button(action: {
-                        pathDataStore.playViewNavigationPath.append(.willPlay)
+                        pathDataStore.playViewNavigationPath.append(.playFlow)
                     }, label: {
                         Image(systemName: "list.bullet")
                     })
@@ -185,16 +186,6 @@ struct PlayView: View {
                 .frame(width: 40, height: 40)
         }
         .menuOrder(.fixed)
-//        .alert("設定完了", isPresented: $isShowAddFirstAlert, actions: {
-//            Button("OK") { isShowAddFirstAlert = false }
-//        }, message: {
-//            Text("再生予定曲の先頭に追加しました。")
-//        })
-//        .alert("設定完了", isPresented: $isShowAddLastAlert, actions: {
-//            Button("OK") { isShowAddLastAlert = false }
-//        }, message: {
-//            Text("再生予定曲の末尾に追加しました。")
-//        })
     }
     func secToMin(sec: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()
@@ -251,8 +242,8 @@ struct PlayView: View {
             AddPlaylistView(music: playDataStore.playingMusic ?? Music(), pathArray: .play)
         case .musicInfo:
             MusicInfoView(music: playDataStore.playingMusic ?? Music())
-        case .willPlay:
-            WillPlayView()
+        case .playFlow:
+            PlayFlowView()
         }
     }
     func randomPlay() {

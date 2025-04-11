@@ -97,7 +97,7 @@ struct PlaylistMusicViewCell: View {
             })
             Divider()
             Button(action: {
-                if WillPlayRepository.insertWillPlay(newMusicFilePaths: [music.filePath], at: 0) {
+                if WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) {
                     print("succeeded")
                 }
             }, label: {
@@ -121,9 +121,9 @@ struct PlaylistMusicViewCell: View {
         }
     }
     func excludeMusic() {
-        guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-        guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
         Task {
+            guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+            guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
             playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistFilePath)
         }
     }

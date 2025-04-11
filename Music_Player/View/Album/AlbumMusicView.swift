@@ -96,8 +96,8 @@ struct AlbumMusicView: View {
         }
     }
     func getAlbumMusics() {
-        guard let albumName = albumDataStore.selectedAlbum?.albumName else { return }
         Task {
+            guard let albumName = albumDataStore.selectedAlbum?.albumName else { return }
             albumDataStore.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumName)
             albumDataStore.loadMusicSort()
             isLoading = false

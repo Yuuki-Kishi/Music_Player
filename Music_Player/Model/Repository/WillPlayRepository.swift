@@ -47,18 +47,20 @@ class WillPlayRepository {
     }
     
     //update
-    static func addWillPlay(newMusicFilePaths: [String]) -> Bool {
-        for newMusicFilePath in newMusicFilePaths {
-            guard M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath) else { continue }
-        }
-        return true
+    static func addWillPlay(newMusicFilePath: String) -> Bool {
+        M3U8Service.addMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath)
     }
     
-    static func insertWillPlay(newMusicFilePaths: [String], at index: Int) -> Bool {
-        for newMusicFilePath in newMusicFilePaths.reversed() {
-            guard M3U8Service.insertMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath, index: index) else { continue }
-        }
-        return true
+    static func addWillPlays(newMusicFilePaths: [String]) -> Bool {
+        M3U8Service.addMusics(M3U8FilePath: filePath, musicFilePaths: newMusicFilePaths)
+    }
+    
+    static func insertWillPlay(newMusicFilePath: String, at index: Int) -> Bool {
+        M3U8Service.insertMusic(M3U8FilePath: filePath, musicFilePath: newMusicFilePath, index: index)
+    }
+    
+    static func insertWillPlays(newMusicFilePaths: [String], at index: Int) -> Bool {
+        M3U8Service.insertMusics(M3U8FilePath: filePath, musicFilePaths: newMusicFilePaths, index: index)
     }
     
     static func moveWillPlay(from: IndexSet, to: Int) -> Bool {
@@ -99,11 +101,15 @@ class WillPlayRepository {
     }
     
     //delete
-    static func removeWillPlay(filePaths: [String]) -> Bool {
-        for filePath in filePaths {
-            guard M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath) else { continue }
-
-        }
-        return true
+    static func removeWillPlay(filePath: String) -> Bool {
+        M3U8Service.removeMusic(M3U8FilePath: self.filePath, musicFilePath: filePath)
+    }
+    
+    static func removeWillPlays(filePaths: [String]) -> Bool {
+        M3U8Service.removeMusics(M3U8FilePath: self.filePath, musicFilePaths: filePaths)
+    }
+    
+    static func cleanUpWillPlay() -> Bool {
+        M3U8Service.cleanUpM3U8(filePath: filePath)
     }
 }

@@ -95,8 +95,8 @@ struct FolderMusicView: View {
         }
     }
     func getFolderMusics() {
-        guard let folderPath = folderDataStore.selectedFolder?.folderPath else { return }
         Task {
+            guard let folderPath = folderDataStore.selectedFolder?.folderPath else { return }
             folderDataStore.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderPath)
             folderDataStore.loadMusicSort()
             isLoading = false

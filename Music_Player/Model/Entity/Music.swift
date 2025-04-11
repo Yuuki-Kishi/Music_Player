@@ -9,7 +9,7 @@ import Foundation
 
 struct Music: Hashable, Identifiable, Equatable {
     static func == (lhs: Music, rhs: Music) -> Bool {
-        return lhs.filePath == rhs.filePath
+        return lhs.id == rhs.id
     }
     
     var id = UUID()
