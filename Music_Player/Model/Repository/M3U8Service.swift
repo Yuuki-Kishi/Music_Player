@@ -52,14 +52,14 @@ class M3U8Service {
     
     static func insertMusic(M3U8FilePath: String, musicFilePath: String, index: Int) -> Bool {
         var components = getM3U8Components(filePath: M3U8FilePath)
-        components.insert(musicFilePath, at: index)
+        components.insert(musicFilePath, at: index + 2)
         let newContent = components.joined(separator: "\n")
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }
     
     static func insertMusics(M3U8FilePath: String, musicFilePaths: [String], index: Int) -> Bool {
         var components = getM3U8Components(filePath: M3U8FilePath)
-        components.insert(contentsOf: musicFilePaths, at: index)
+        components.insert(contentsOf: musicFilePaths, at: index + 2)
         let newContent = components.joined(separator: "\n")
         return FileService.updateFile(filePath: M3U8FilePath, content: newContent)
     }

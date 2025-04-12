@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PlayFlowViewPlayedCell: View {
+    @StateObject var willPlayDataStore = WillPlayDataStore.shared
+    @StateObject var playDataStore = PlayDataStore.shared
     @StateObject var playedDataStore = PlayedDataStore.shared
     @State var music: Music
     
@@ -36,7 +38,7 @@ struct PlayFlowViewPlayedCell: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-//            tapped()
+            tapped()
         }
     }
     func secToMin(second: TimeInterval) -> String {
@@ -49,10 +51,16 @@ struct PlayFlowViewPlayedCell: View {
     }
     func tapped() {
         Task {
+            guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return }
+            guard WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusicFilePath, at: 0) else { return }
             guard let index = playedDataStore.playedMusicArray.firstIndex(of: music) else { return }
-            let skipMusicFilePaths = playedDataStore.playedMusicArray.prefix(index - 1).map { $0.filePath }
-            guard PlayedRepository.removePlayeds(filePaths: skipMusicFilePaths) else { return }
-            guard WillPlayRepository.insertWillPlays(newMusicFilePaths: skipMusicFilePaths, at: 0) else { return }
+            let suffix = playedDataStore.playedMusicArray.count - index - 1
+            let backMusicFilePaths = playedDataStore.playedMusicArray.suffix(suffix).map { $0.filePath }
+            guard PlayedRepository.removePlayeds(filePaths: backMusicFilePaths) else { return }
+            guard WillPlayRepository.insertWillPlays(newMusicFilePaths: backMusicFilePaths, at: 0) else { return }
+            guard PlayedRepository.removePlayed(filePath: music.filePath)  else { return }
+            playDataStore.moveChoosedMusic(music: music)
+            willPlayDataStore.willPlayMusicArray = await WillPlayRepository.getWillPlay()
             playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
         }
     }
