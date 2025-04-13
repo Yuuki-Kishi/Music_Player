@@ -86,6 +86,11 @@ struct MusicView: View {
                 Label("お気に入り", systemImage: "heart.fill")
             })
             Button(action: {
+                pathDataStore.musicViewNavigationPath.append(.equalizer)
+            }, label: {
+                Label("イコライザー", systemImage: "slider.vertical.3")
+            })
+            Button(action: {
                 pathDataStore.musicViewNavigationPath.append(.sleepTImer)
             }, label: {
                 Label("スリープタイマー", systemImage: "timer")
@@ -133,6 +138,8 @@ struct MusicView: View {
             FavoriteMusicView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .selectFavoriteMusic:
             FavoriteMusicSelectView(pathDataStore: pathDataStore)
+        case .equalizer:
+            EqualizerView(playDataStore: playDataStore, pathDataStore: pathDataStore)
         case .setting:
             EmptyView()
         case .sleepTImer:

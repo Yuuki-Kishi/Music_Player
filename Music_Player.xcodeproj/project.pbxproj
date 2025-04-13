@@ -70,6 +70,11 @@
 		DEDAB6E22DA2C04A00899C6A /* PlayedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6E12DA2C04A00899C6A /* PlayedDataStore.swift */; };
 		DEDAB6E42DA2C16100899C6A /* PlayFlowViewPlayedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6E32DA2C16100899C6A /* PlayFlowViewPlayedCell.swift */; };
 		DEDAB6E62DA2C1A400899C6A /* PlayedRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6E52DA2C1A400899C6A /* PlayedRepository.swift */; };
+		DEDCB0672DABD7FA0070E7E0 /* EqualizerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDCB0662DABD7FA0070E7E0 /* EqualizerParameter.swift */; };
+		DEDCB06A2DABD8EE0070E7E0 /* Persistance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDCB0692DABD8EE0070E7E0 /* Persistance.swift */; };
+		DEDCB06C2DABDA4D0070E7E0 /* EqualizerParameterRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDCB06B2DABDA4D0070E7E0 /* EqualizerParameterRepository.swift */; };
+		DEDCB0702DABDFAB0070E7E0 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDCB06F2DABDFAB0070E7E0 /* EqualizerView.swift */; };
+		DEDCB0732DABE00E0070E7E0 /* EqualizerViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDCB0722DABE00E0070E7E0 /* EqualizerViewCell.swift */; };
 		DEE5AC4F2AE8A1280082069C /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE5AC4E2AE8A1280082069C /* MusicView.swift */; };
 		DEE5AC512AE8A1A50082069C /* ArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE5AC502AE8A1A50082069C /* ArtistView.swift */; };
 		DEE5AC532AE8A1B30082069C /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE5AC522AE8A1B30082069C /* AlbumView.swift */; };
@@ -142,6 +147,11 @@
 		DEDAB6E12DA2C04A00899C6A /* PlayedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedDataStore.swift; sourceTree = "<group>"; };
 		DEDAB6E32DA2C16100899C6A /* PlayFlowViewPlayedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFlowViewPlayedCell.swift; sourceTree = "<group>"; };
 		DEDAB6E52DA2C1A400899C6A /* PlayedRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedRepository.swift; sourceTree = "<group>"; };
+		DEDCB0662DABD7FA0070E7E0 /* EqualizerParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerParameter.swift; sourceTree = "<group>"; };
+		DEDCB0692DABD8EE0070E7E0 /* Persistance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistance.swift; sourceTree = "<group>"; };
+		DEDCB06B2DABDA4D0070E7E0 /* EqualizerParameterRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerParameterRepository.swift; sourceTree = "<group>"; };
+		DEDCB06F2DABDFAB0070E7E0 /* EqualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerView.swift; sourceTree = "<group>"; };
+		DEDCB0722DABE00E0070E7E0 /* EqualizerViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerViewCell.swift; sourceTree = "<group>"; };
 		DEE5AC4E2AE8A1280082069C /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		DEE5AC502AE8A1A50082069C /* ArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistView.swift; sourceTree = "<group>"; };
 		DEE5AC522AE8A1B30082069C /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
@@ -247,6 +257,7 @@
 				DE6A176B2BA47B7A004BC71D /* Album.swift */,
 				DE6A176D2BA47B93004BC71D /* Playlist.swift */,
 				DE6A176F2BA47BA7004BC71D /* Folder.swift */,
+				DEDCB0662DABD7FA0070E7E0 /* EqualizerParameter.swift */,
 				DE86A8E62DA58F51003DABCC /* Extensions.swift */,
 			);
 			path = Entity;
@@ -265,6 +276,7 @@
 				DEC8CCC92BADC04800FA9D98 /* FavoriteMusicRepository.swift */,
 				DEC8CCC32BAA838600FA9D98 /* WillPlayRepository.swift */,
 				DEDAB6E52DA2C1A400899C6A /* PlayedRepository.swift */,
+				DEDCB06B2DABDA4D0070E7E0 /* EqualizerParameterRepository.swift */,
 				DE9EE1EF2DA19DA400C215D1 /* NotificationRepository.swift */,
 				DE86A8ED2DA76D54003DABCC /* UserDefaultsRepository.swift */,
 			);
@@ -277,6 +289,7 @@
 				DEE5AC4E2AE8A1280082069C /* MusicView.swift */,
 				DEC4CFF72B984CA4009F5296 /* MusicCellView.swift */,
 				DE9EE1E82DA17C0F00C215D1 /* FavoriteMusic */,
+				DEDCB0712DABDFF60070E7E0 /* Equalizer */,
 				DE2FBE8B2BF64192007247DE /* SleepTimer.swift */,
 			);
 			path = Music;
@@ -362,12 +375,30 @@
 		DED9FD662B74D49D0008B127 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				DEDCB0682DABD8E50070E7E0 /* SwiftData */,
 				DE9EE1B72D97ADDE00C215D1 /* DataStore */,
 				DE9EE1B82D97ADE700C215D1 /* Entity */,
 				DE9EE1B92D97ADF900C215D1 /* Repository */,
 				DE9EE1B62D97ADD600C215D1 /* Old */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		DEDCB0682DABD8E50070E7E0 /* SwiftData */ = {
+			isa = PBXGroup;
+			children = (
+				DEDCB0692DABD8EE0070E7E0 /* Persistance.swift */,
+			);
+			path = SwiftData;
+			sourceTree = "<group>";
+		};
+		DEDCB0712DABDFF60070E7E0 /* Equalizer */ = {
+			isa = PBXGroup;
+			children = (
+				DEDCB06F2DABDFAB0070E7E0 /* EqualizerView.swift */,
+				DEDCB0722DABE00E0070E7E0 /* EqualizerViewCell.swift */,
+			);
+			path = Equalizer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -458,6 +489,7 @@
 				DE9EE1E52D9DA37F00C215D1 /* FolderRepository.swift in Sources */,
 				DEDAB6E42DA2C16100899C6A /* PlayFlowViewPlayedCell.swift in Sources */,
 				DED9FD7D2B8229570008B127 /* PlaylistMusicView.swift in Sources */,
+				DEDCB0732DABE00E0070E7E0 /* EqualizerViewCell.swift in Sources */,
 				DEE5AC512AE8A1A50082069C /* ArtistView.swift in Sources */,
 				DEBC749A2B3EA2920012973B /* PlayView.swift in Sources */,
 				DE9EE1EC2DA17DBD00C215D1 /* FavoriteMusicViewCell.swift in Sources */,
@@ -492,18 +524,22 @@
 				DE6A17732BA529B0004BC71D /* FavoriteMusicView.swift in Sources */,
 				DE6A176A2BA47B6C004BC71D /* Artist.swift in Sources */,
 				DEC8CCCA2BADC04800FA9D98 /* FavoriteMusicRepository.swift in Sources */,
+				DEDCB0702DABDFAB0070E7E0 /* EqualizerView.swift in Sources */,
 				DE6A176C2BA47B7A004BC71D /* Album.swift in Sources */,
 				DEDAB6E02DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift in Sources */,
 				DE86A8F02DA81C3A003DABCC /* PlayFlowView.swift in Sources */,
 				DE9EE1DB2D9BEBDA00C215D1 /* PlaylistSelectMusicViewCell.swift in Sources */,
 				DE9EE1DF2D9C42D600C215D1 /* FolderMusicViewCell.swift in Sources */,
+				DEDCB06A2DABD8EE0070E7E0 /* Persistance.swift in Sources */,
 				DE9EE1CA2D984B4500C215D1 /* ViewDataStore.swift in Sources */,
 				DE9EE1C82D98465A00C215D1 /* PathDataStore.swift in Sources */,
 				DE9EE1C12D97CF3B00C215D1 /* AlbumDataStore.swift in Sources */,
+				DEDCB0672DABD7FA0070E7E0 /* EqualizerParameter.swift in Sources */,
 				DED9FD812B82360B0008B127 /* PlaylistSelectMusicView.swift in Sources */,
 				DEDAB6E22DA2C04A00899C6A /* PlayedDataStore.swift in Sources */,
 				DED9FD772B80DE860008B127 /* PlayController.swift in Sources */,
 				DE9EE1E72D9EE5D300C215D1 /* M3U8Service.swift in Sources */,
+				DEDCB06C2DABDA4D0070E7E0 /* EqualizerParameterRepository.swift in Sources */,
 				DE9EE1F02DA19DA400C215D1 /* NotificationRepository.swift in Sources */,
 				DE9EE1CE2D9AE6EB00C215D1 /* PlayDataStore.swift in Sources */,
 			);
