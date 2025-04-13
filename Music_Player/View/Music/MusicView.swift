@@ -88,7 +88,7 @@ struct MusicView: View {
             Button(action: {
                 pathDataStore.musicViewNavigationPath.append(.equalizer)
             }, label: {
-                Label("イコライザー", systemImage: "slider.vertical.3")
+                Label("イコライザ", systemImage: "slider.vertical.3")
             })
             Button(action: {
                 pathDataStore.musicViewNavigationPath.append(.sleepTImer)

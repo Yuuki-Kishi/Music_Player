@@ -18,10 +18,9 @@ class PlayDataStore: ObservableObject {
     @Published var isPlaying: Bool = false
     @Published var playMode: PlayMode = .shuffle
     @Published var playGroup: PlayGroup = .music
-    private let audioEngine: AVAudioEngine = .init()
-    private let playerNode: AVAudioPlayerNode = .init()
+    private let audioEngine: AVAudioEngine = AVAudioEngine()
+    private let playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
     private let equalizerNode: AVAudioUnitEQ = AVAudioUnitEQ(numberOfBands: 10)
-    @Published var equalizerParameters: [EqualizerParameter] = []
     
     enum PlayMode: String {
         case shuffle, order, sameRepeat
@@ -65,6 +64,7 @@ class PlayDataStore: ObservableObject {
                 param.bypass = false
                 param.bandwidth = equalizerParameters[index].bandWidth
                 param.frequency = equalizerParameters[index].frequency
+                print(equalizerParameters[index].frequency, ": ", equalizerParameters[index].gain)
                 param.gain = equalizerParameters[index].gain
             }
         }

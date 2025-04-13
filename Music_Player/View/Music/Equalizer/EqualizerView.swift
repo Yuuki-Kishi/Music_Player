@@ -56,7 +56,7 @@ struct EqualizerView: View {
             })
         })
         .padding(.horizontal)
-        .navigationTitle("イコライザー")
+        .navigationTitle("イコライザ")
         .onAppear() {
             onAppear()
         }
