@@ -8,66 +8,111 @@
 import SwiftUI
 
 struct FolderView: View {
-    @ObservedObject var mds: MusicDataStore
-    @ObservedObject var pc: PlayController
-    @Binding private var folderArray: [Folder]
-    @State private var toPlaylistMusicView = false
+    @StateObject var folderDataStore = FolderDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
+    @State private var isLoading: Bool = true
     
-    init(mds: MusicDataStore, pc: PlayController, folderArray: Binding<[Folder]>) {
-        self.mds = mds
-        self.pc = pc
-        self._folderArray = folderArray
-    }
     var body: some View {
-        NavigationStack {
-            VStack {
-                HStack {
-                    Text(String(folderArray.count) + "個のフォルダ")
-                        .lineLimit(1)
-                        .font(.system(size: 15))
-                        .frame(height: 20)
-                        .padding(.horizontal)
-                    Spacer()
-                }
-                List($folderArray) { folder in
-                    NavigationLink(value: folder.folderName.wrappedValue, label: {
-                        HStack {
-                            Text(folder.folderName.wrappedValue)
+        NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
+            ZStack {
+                VStack {
+                    if isLoading {
+                        Spacer()
+                        Text("読み込み中...")
+                        Spacer()
+                    } else {
+                        if folderDataStore.folderArray.isEmpty {
                             Spacer()
-                            Text(String(folder.musicCount.wrappedValue) + "曲")
-                                .foregroundStyle(Color.gray)
+                            Text("表示できるフォルダがありません")
+                            Spacer()
+                        } else {
+                            Text(String(folderDataStore.folderArray.count) + "個のフォルダ")
+                                .font(.system(size: 15))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            List(folderDataStore.folderArray) { folder in
+                                FolderViewCell(folderDataStore: folderDataStore, pathDataStore: pathDataStore, folder: folder)
+                            }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
                         }
-                    })
+                    }
                 }
-                .navigationDestination(for: String.self) { title in
-                    FolderMusicView(mds: mds, pc: pc, listMusicArray: $mds.listMusicArray, navigationTitle: title)
+                VStack {
+                    Spacer()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                PlayingMusicView(pc: pc, music: $pc.music, seekPosition: $pc.seekPosition, isPlay: $pc.isPlay)
             }
             .navigationTitle("フォルダ")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(for: PathDataStore.FolderViewPath.self) { path in
+                destination(path: path)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
-                    Menu {
-                        Button(action: { mds.folderSort(method: .nameAscending) }, label: {
-                            Text("フォルダ名昇順")
-                        })
-                        Button(action: { mds.folderSort(method: .nameDescending) }, label: {
-                            Text("フォルダ名降順")
-                        })
-                        Button(action: { mds.folderSort(method: .countAscending) }, label: {
-                            Text("曲数昇順")
-                        })
-                        Button(action: { mds.folderSort(method: .countDescending) }, label: {
-                            Text("曲数降順")
-                        })
-                    } label: {
-                        Label("並び替え", systemImage: "arrow.up.arrow.down.circle")
-                    }
+                    toolBarMenu()
                 })
+            }
+            .onAppear() {
+                getFolders()
+            }
+            .onDisappear() {
+                isLoading = true
             }
         }
     }
+    @ViewBuilder
+    func destination(path: PathDataStore.FolderViewPath) -> some View {
+        switch path {
+        case .folderMusic:
+            FolderMusicView(folderDataStore: folderDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+        case .addPlaylist:
+            AddPlaylistView(pathDataStore: pathDataStore, music: folderDataStore.selectedMusic ?? Music(), pathArray: .folder)
+        case .musicInfo:
+            MusicInfoView(music: folderDataStore.selectedMusic ?? Music())
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            Button(action: {
+                folderDataStore.folderArraySort(mode: .nameAscending)
+                folderDataStore.saveSortMode()
+            }, label: {
+                Text("フォルダ名昇順")
+            })
+            Button(action: {
+                folderDataStore.folderArraySort(mode: .nameDescending)
+                folderDataStore.saveSortMode()
+            }, label: {
+                Text("フォルダ名降順")
+            })
+            Button(action: {
+                folderDataStore.folderArraySort(mode: .countAscending)
+                folderDataStore.saveSortMode()
+            }, label: {
+                Text("曲数昇順")
+            })
+            Button(action: {
+                folderDataStore.folderArraySort(mode: .countDescending)
+                folderDataStore.saveSortMode()
+            }, label: {
+                Text("曲数降順")
+            })
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+    func getFolders() {
+        Task {
+            folderDataStore.folderArray = await FolderRepository.getFolders()
+            folderDataStore.loadSort()
+            isLoading = false
+        }
+    }
+}
+
+#Preview {
+    FolderView(folderDataStore: FolderDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

@@ -8,47 +8,89 @@
 import SwiftUI
 
 struct MusicInfoView: View {
-    @ObservedObject var pc: PlayController
-    @Binding private var music: Music
-    @State private var infoArray = [(title: String, value: String)]()
+    @State var music: Music
     @State private var isShowAlert = false
-    @Environment(\.presentationMode) var presentation
-    
-    init(pc: PlayController, music: Binding<Music>) {
-        self.pc = pc
-        self._music = music
-    }
     
     var body: some View {
         List {
-            ForEach(Array(infoArray.enumerated()), id: \.element.title) { index, info in
-                HStack {
-                    Text(info.title)
-                    Spacer()
-                    Text(info.value)
-                        .lineLimit(1)
-                        .truncationMode(.head)
-                }
-                .onTapGesture {
-                    if index == 3 {
-                        UIPasteboard.general.string = info.value
-                        isShowAlert = true
-                    }
-                }
-                .alert("ファイルパスをコピーしました", isPresented: $isShowAlert, actions: {
-                    Button(action: { isShowAlert = false }, label: {
-                        Text("OK")
-                    })
-                })
+            HStack {
+                Text("曲名")
+                Spacer()
+                Text(music.musicName)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("アーティスト名")
+                Spacer()
+                Text(music.artistName)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("アルバム名")
+                Spacer()
+                Text(music.albumName)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("曲の長さ")
+                Spacer()
+                Text(secToMin(second: music.musicLength))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("ファイルサイズ")
+                Spacer()
+                Text(music.fileSize)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .foregroundStyle(Color.gray)
+            }
+            .padding(.horizontal)
+            HStack {
+                Text("ファイルパス")
+                Spacer()
+                Text(music.filePath)
+                    .lineLimit(1)
+                    .truncationMode(.head)
+                    .foregroundStyle(Color.gray)
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal)
+            .onTapGesture {
+                UIPasteboard.general.string = music.filePath
+                isShowAlert = true
             }
         }
+        .listStyle(.plain)
         .navigationTitle("曲の情報")
-        .onAppear() {
-            infoArray.append((title: "曲名", value: music.musicName))
-            infoArray.append((title: "アーティスト名", value: music.artistName ?? ""))
-            infoArray.append((title: "アルバム名", value: music.albumName ?? ""))
-            infoArray.append((title: "ファイルパス", value: music.filePath ?? ""))
-            infoArray.append((title: "ファイルサイズ", value: music.fileSize ?? ""))
-        }
+        .alert("ファイルパスをコピーしました", isPresented: $isShowAlert, actions: {
+            Button(action: {}, label: {
+                Text("OK")
+            })
+        })
     }
+    func secToMin(second: TimeInterval) -> String {
+        let dateFormatter = DateComponentsFormatter()
+        dateFormatter.unitsStyle = .positional
+        if second < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
+        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
+        dateFormatter.zeroFormattingBehavior = .pad
+        return dateFormatter.string(from: second)!
+    }
+}
+
+#Preview {
+    MusicInfoView(music: Music())
 }
