@@ -9,7 +9,9 @@ import SwiftUI
 
 struct AlbumView: View {
     @StateObject var albumDataStore = AlbumDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -31,7 +33,7 @@ struct AlbumView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             List(albumDataStore.albumArray) { album in
-                                AlbumViewCell(album: album)
+                                AlbumViewCell(albumDataStore: albumDataStore, pathDataStore: pathDataStore, album: album)
                             }
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
@@ -40,7 +42,7 @@ struct AlbumView: View {
                 }
                 VStack {
                     Spacer()
-                    PlayWindowView()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
             }
             .navigationTitle("アルバム")
@@ -65,9 +67,9 @@ struct AlbumView: View {
     func destination(path: PathDataStore.AlbumViewPath) -> some View {
         switch path {
         case .albumMusic:
-            AlbumMusicView()
+            AlbumMusicView(albumDataStore: albumDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .addPlaylist:
-            AddPlaylistView(music: albumDataStore.selectedMusic ?? Music(), pathArray: .album)
+            AddPlaylistView(pathDataStore: pathDataStore, music: albumDataStore.selectedMusic ?? Music(), pathArray: .album)
         case .musicInfo:
             MusicInfoView(music: albumDataStore.selectedMusic ?? Music())
         }
@@ -112,5 +114,5 @@ struct AlbumView: View {
 }
 
 #Preview {
-    AlbumView()
+    AlbumView(albumDataStore: AlbumDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

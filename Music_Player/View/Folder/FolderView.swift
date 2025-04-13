@@ -9,7 +9,9 @@ import SwiftUI
 
 struct FolderView: View {
     @StateObject var folderDataStore = FolderDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -31,7 +33,7 @@ struct FolderView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             List(folderDataStore.folderArray) { folder in
-                                FolderViewCell(folder: folder)
+                                FolderViewCell(folderDataStore: folderDataStore, pathDataStore: pathDataStore, folder: folder)
                             }
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
@@ -40,7 +42,7 @@ struct FolderView: View {
                 }
                 VStack {
                     Spacer()
-                    PlayWindowView()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
             }
             .navigationTitle("フォルダ")
@@ -65,9 +67,9 @@ struct FolderView: View {
     func destination(path: PathDataStore.FolderViewPath) -> some View {
         switch path {
         case .folderMusic:
-            FolderMusicView()
+            FolderMusicView(folderDataStore: folderDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .addPlaylist:
-            AddPlaylistView(music: folderDataStore.selectedMusic ?? Music(), pathArray: .folder)
+            AddPlaylistView(pathDataStore: pathDataStore, music: folderDataStore.selectedMusic ?? Music(), pathArray: .folder)
         case .musicInfo:
             MusicInfoView(music: folderDataStore.selectedMusic ?? Music())
         }
@@ -112,5 +114,5 @@ struct FolderView: View {
 }
 
 #Preview {
-    FolderView()
+    FolderView(folderDataStore: FolderDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

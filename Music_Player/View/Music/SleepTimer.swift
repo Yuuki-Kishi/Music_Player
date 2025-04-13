@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SleepTimer: View {
-    @StateObject var viewDataStore = ViewDataStore.shared
+    @ObservedObject var viewDataStore: ViewDataStore
     @State private var hour: Int = 0
     @State private var min: Int = 0
     @State private var sec: Int = 0
@@ -89,4 +89,8 @@ struct SleepTimer: View {
             return .red
         }
     }
+}
+
+#Preview {
+    SleepTimer(viewDataStore: ViewDataStore.shared)
 }

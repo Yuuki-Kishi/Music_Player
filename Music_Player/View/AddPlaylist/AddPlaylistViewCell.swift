@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddPlaylistViewCell: View {
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var pathDataStore: PathDataStore
     @State var playlist: Playlist
     @State var music: Music
     @State private var isShowAlert: Bool = false
@@ -67,5 +67,5 @@ struct AddPlaylistViewCell: View {
 }
 
 #Preview {
-    AddPlaylistViewCell(playlist: Playlist(), music: Music(), pathArray: .music)
+    AddPlaylistViewCell(pathDataStore: PathDataStore.shared, playlist: Playlist(), music: Music(), pathArray: .music)
 }

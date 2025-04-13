@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct AddPlaylistView: View {
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var playlistArray: [Playlist] = []
     @State private var isLoading: Bool = true
     @State private var isShowCleateAlert: Bool = false
@@ -35,7 +35,7 @@ struct AddPlaylistView: View {
                     Spacer()
                 } else {
                     List(playlistArray) { playlist in
-                        AddPlaylistViewCell(playlist: playlist, music: music, pathArray: pathArray)
+                        AddPlaylistViewCell(pathDataStore: pathDataStore, playlist: playlist, music: music, pathArray: pathArray)
                     }
                     .listStyle(.plain)
                 }
@@ -103,5 +103,5 @@ struct AddPlaylistView: View {
 }
 
 #Preview {
-    AddPlaylistView(music: Music(), pathArray: .music)
+    AddPlaylistView(pathDataStore: PathDataStore.shared, music: Music(), pathArray: .music)
 }

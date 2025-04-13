@@ -7,9 +7,9 @@
 import SwiftUI
 
 struct PlaylistMusicViewCell: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playlistDataStore: PlaylistDataStore
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var music: Music
     @State private var isShowExcludeAlert = false
     @State private var isShowDeleteAlert = false
@@ -84,6 +84,13 @@ struct PlaylistMusicViewCell: View {
         return dateFormatter.string(from: second)!
     }
     func tapped() {
+        if !FileService.isExistFile(filePath: music.filePath) {
+            Task {
+                guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+                guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
+                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistFilePath)
+            }
+        }
         playDataStore.musicChoosed(music: music, playGroup: .playlist)
         playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
     }
@@ -128,11 +135,18 @@ struct PlaylistMusicViewCell: View {
         }
     }
     func deleteMusicFile() {
-        guard FileService.fileDelete(filePath: music.filePath) else { return }
-        print("DeleteSucceeded")
+        Task {
+            playDataStore.stop()
+            playDataStore.playingMusic = nil
+            guard FileService.fileDelete(filePath: music.filePath) else { return }
+            print("DeleteSucceeded")
+            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
+            playlistDataStore.loadMusicSort()
+        }
     }
 }
 
 #Preview {
-    PlaylistMusicViewCell(music: Music())
+    PlaylistMusicViewCell(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared, music: Music())
 }

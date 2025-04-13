@@ -39,10 +39,15 @@ class PlaylistRepository {
     }
     
     static func getPlaylistMusic(filePath: String) async -> [Music] {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
+        let musicFilePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         var musics: [Music] = []
-        for filePath in filePaths {
-            let music = await FileService.getFileMetadata(filePath: filePath)
+        for musicFilePath in musicFilePaths {
+            if !FileService.isExistFile(filePath: musicFilePath) {
+                guard removePlaylistMusic(playlistFilePath: filePath, musicFilePath: musicFilePath) else { return [] }
+                print("removeSucceeded")
+                continue
+            }
+            let music = await FileService.getFileMetadata(filePath: musicFilePath)
             musics.append(music)
         }
         return musics

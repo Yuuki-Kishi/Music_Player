@@ -19,6 +19,10 @@ class UserDefaultsRepository {
         userDefaults.set(sortMode, forKey: key)
     }
     
+    static func savePlayingMusicFilePath(filePath: String) {
+        userDefaults.set(filePath, forKey: "PlayingMusic")
+    }
+    
     //load
     static func loadPlayMode() -> PlayDataStore.PlayMode {
         guard let value = userDefaults.value(forKey: "PlayMode") as? String else { return .shuffle }
@@ -30,4 +34,9 @@ class UserDefaultsRepository {
         guard let value = userDefaults.value(forKey: key) as? String else { return nil }
         return value
     }
-}
+    
+    static func loadPlayingMusicFilePath() -> String? {
+        guard let filePath = userDefaults.value(forKey: "PlayingMusic") as? String else { return nil }
+        return filePath
+    }
+ }

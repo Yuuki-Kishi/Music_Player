@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct AlbumViewCell: View {
-    @StateObject var albumDataStore = AlbumDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var albumDataStore: AlbumDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var album: Album
     
     var body: some View {
@@ -39,5 +39,5 @@ struct AlbumViewCell: View {
 }
 
 #Preview {
-    AlbumViewCell(album: Album())
+    AlbumViewCell(albumDataStore: AlbumDataStore.shared, pathDataStore: PathDataStore.shared,  album: Album())
 }

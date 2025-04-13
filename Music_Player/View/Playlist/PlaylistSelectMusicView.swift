@@ -9,8 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct PlaylistSelectMusicView: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playlistDataStore: PlaylistDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var selectionValue: Set<Music> = []
     @State private var selectableMusicArray: [Music] = []
     @State private var isLoading: Bool = true
@@ -96,5 +96,5 @@ struct PlaylistSelectMusicView: View {
 }
 
 #Preview {
-    PlaylistSelectMusicView()
+    PlaylistSelectMusicView(playlistDataStore: PlaylistDataStore.shared, pathDataStore: PathDataStore.shared)
 }

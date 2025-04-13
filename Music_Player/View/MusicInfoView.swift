@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MusicInfoView: View {
-    @StateObject var viewDataStore = ViewDataStore.shared
     @State var music: Music
     @State private var isShowAlert = false
     

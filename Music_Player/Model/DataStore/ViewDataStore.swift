@@ -10,7 +10,6 @@ import Foundation
 @MainActor
 class ViewDataStore: ObservableObject {
     static let shared = ViewDataStore()
-    @Published var isShowLoadingView: Bool = false
     @Published var isShowPlayView: Bool = false
     @Published var sleepTimer: Timer? = nil
     @Published var remainTime: Int = 0

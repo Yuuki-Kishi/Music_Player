@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct PlaylistViewCell: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playlistDataStore: PlaylistDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var playlist: Playlist
     
     var body: some View {
@@ -40,5 +40,5 @@ struct PlaylistViewCell: View {
 }
 
 #Preview {
-    PlaylistViewCell(playlist: Playlist())
+    PlaylistViewCell(playlistDataStore: PlaylistDataStore.shared, pathDataStore: PathDataStore.shared, playlist: Playlist())
 }

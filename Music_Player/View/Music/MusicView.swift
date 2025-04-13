@@ -10,8 +10,9 @@ import SwiftData
 
 struct MusicView: View {
     @StateObject var musicDataStore = MusicDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -41,7 +42,7 @@ struct MusicView: View {
                             })
                             .foregroundStyle(.primary)
                             List(musicDataStore.musicArray) { music in
-                                MusicCellView(music: music)
+                                MusicCellView(musicDataStore: musicDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                             }
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
@@ -50,9 +51,8 @@ struct MusicView: View {
                 }
                 VStack {
                     Spacer()
-                    PlayWindowView()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
-                LoadingView()
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
@@ -126,17 +126,17 @@ struct MusicView: View {
     func destination(path: PathDataStore.MusicViewPath) -> some View {
         switch path {
         case .addPlaylist:
-            AddPlaylistView(music: musicDataStore.selectedMusic ?? Music(), pathArray: .music)
+            AddPlaylistView(pathDataStore: pathDataStore, music: musicDataStore.selectedMusic ?? Music(), pathArray: .music)
         case .musicInfo:
             MusicInfoView(music: musicDataStore.selectedMusic ?? Music())
         case .favoriteMusic:
-            FavoriteMusicView()
+            FavoriteMusicView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .selectFavoriteMusic:
-            FavoriteMusicSelectView()
+            FavoriteMusicSelectView(pathDataStore: pathDataStore)
         case .setting:
             EmptyView()
         case .sleepTImer:
-            SleepTimer()
+            SleepTimer(viewDataStore: viewDataStore)
         }
     }
     func getMusics() {
@@ -155,6 +155,6 @@ struct MusicView: View {
 }
 
 #Preview {
-    MusicView()
+    MusicView(playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }
 

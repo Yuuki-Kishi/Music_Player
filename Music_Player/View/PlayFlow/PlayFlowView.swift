@@ -10,7 +10,8 @@ import SwiftUI
 struct PlayFlowView: View {
     @StateObject var willPlayDataStore = WillPlayDataStore.shared
     @StateObject var playedDataStore = PlayedDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoadingWillPlay: Bool = true
     @State private var isLoadingPlayed: Bool = true
     @Environment(\.editMode) var editMode
@@ -28,7 +29,7 @@ struct PlayFlowView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
                         } else {
                             ForEach(playedDataStore.playedMusicArray, id: \.self) { music in
-                                PlayFlowViewPlayedCell(music: music)
+                                PlayFlowViewPlayedCell(willPlayDataStore: willPlayDataStore, playedDataStore: playedDataStore, playDataStore: playDataStore, music: music)
                             }
                         }
                     }
@@ -43,7 +44,7 @@ struct PlayFlowView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
                         } else {
                             ForEach(willPlayDataStore.willPlayMusicArray, id: \.self) { music in
-                                PlayFlowViewWillPlayCell(music: music)
+                                PlayFlowViewWillPlayCell(willPlayDataStore: willPlayDataStore, playedDataStore: playedDataStore, playDataStore: playDataStore, music: music)
                                     .onTapGesture {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                             withAnimation {
@@ -118,5 +119,5 @@ struct PlayFlowView: View {
 }
 
 #Preview {
-    PlayFlowView()
+    PlayFlowView(playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared)
 }

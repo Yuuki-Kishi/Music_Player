@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ArtistView: View {
     @StateObject var artistDataStore = ArtistDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -31,7 +33,7 @@ struct ArtistView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             List(artistDataStore.artistArray) { artist in
-                                ArtistViewCell(artist: artist)
+                                ArtistViewCell(artistDataStore: artistDataStore, pathDataStore: pathDataStore, artist: artist)
                             }
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
@@ -40,7 +42,7 @@ struct ArtistView: View {
                 }
                 VStack {
                     Spacer()
-                    PlayWindowView()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
             }
             .navigationTitle("アーティスト")
@@ -65,9 +67,9 @@ struct ArtistView: View {
     func destination(path: PathDataStore.ArtistViewPath) -> some View {
         switch path {
         case .artistMusic:
-            ArtistMusicView()
+            ArtistMusicView(artistDataStore: artistDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .addPlaylist:
-            AddPlaylistView(music: artistDataStore.selectedMusic ?? Music(), pathArray: .artist)
+            AddPlaylistView(pathDataStore: pathDataStore, music: artistDataStore.selectedMusic ?? Music(), pathArray: .artist)
         case .musicInfo:
             MusicInfoView(music: artistDataStore.selectedMusic ?? Music())
         }
@@ -112,5 +114,5 @@ struct ArtistView: View {
 }
 
 #Preview {
-    ArtistView()
+    ArtistView(playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

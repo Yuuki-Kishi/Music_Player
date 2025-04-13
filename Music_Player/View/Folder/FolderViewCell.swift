@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct FolderViewCell: View {
-    @StateObject var folderDataStore = FolderDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var folderDataStore: FolderDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var folder: Folder
     
     var body: some View {
@@ -40,5 +40,5 @@ struct FolderViewCell: View {
 }
 
 #Preview {
-    FolderViewCell(folder: Folder())
+    FolderViewCell(folderDataStore: FolderDataStore.shared, pathDataStore: PathDataStore.shared, folder: Folder())
 }

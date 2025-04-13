@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ArtistViewCell: View {
-    @StateObject var artistDataStore = ArtistDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var artistDataStore: ArtistDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var artist: Artist
     
     var body: some View {
@@ -41,5 +41,5 @@ struct ArtistViewCell: View {
 }
 
 #Preview {
-    ArtistViewCell(artist: Artist())
+    ArtistViewCell(artistDataStore: ArtistDataStore.shared, pathDataStore: PathDataStore.shared, artist: Artist())
 }

@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ArtistMusicView: View {
-    @StateObject var artistDataStore = ArtistDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var artistDataStore: ArtistDataStore
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -39,7 +40,7 @@ struct ArtistMusicView: View {
                         })
                         .foregroundStyle(.primary)
                         List(artistDataStore.artistMusicArray) { music in
-                            ArtistMusicViewCell(music: music)
+                            ArtistMusicViewCell(artistDataStore: artistDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
@@ -48,7 +49,7 @@ struct ArtistMusicView: View {
             }
             VStack {
                 Spacer()
-                PlayWindowView()
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
         }
         .navigationTitle(artistDataStore.selectedArtist?.artistName ?? "不明なアーティスト")
@@ -112,5 +113,5 @@ struct ArtistMusicView: View {
 }
 
 #Preview {
-    ArtistMusicView()
+    ArtistMusicView(artistDataStore: ArtistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

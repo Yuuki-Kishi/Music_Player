@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct PlayFlowViewPlayedCell: View {
-    @StateObject var willPlayDataStore = WillPlayDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var playedDataStore = PlayedDataStore.shared
+    @ObservedObject var willPlayDataStore: WillPlayDataStore
+    @ObservedObject var playedDataStore: PlayedDataStore
+    @ObservedObject var playDataStore: PlayDataStore
     @State var music: Music
     
     var body: some View {
@@ -59,7 +59,7 @@ struct PlayFlowViewPlayedCell: View {
             guard PlayedRepository.removePlayeds(filePaths: backMusicFilePaths) else { return }
             guard WillPlayRepository.insertWillPlays(newMusicFilePaths: backMusicFilePaths, at: 0) else { return }
             guard PlayedRepository.removePlayed(filePath: music.filePath)  else { return }
-            playDataStore.moveChoosedMusic(music: music)
+            await playDataStore.moveChoosedMusic(music: music)
             willPlayDataStore.willPlayMusicArray = await WillPlayRepository.getWillPlay()
             playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
         }
@@ -67,5 +67,5 @@ struct PlayFlowViewPlayedCell: View {
 }
 
 #Preview {
-    PlayFlowViewPlayedCell(music: Music())
+    PlayFlowViewPlayedCell(willPlayDataStore: WillPlayDataStore.shared, playedDataStore: PlayedDataStore.shared, playDataStore: PlayDataStore.shared, music: Music())
 }

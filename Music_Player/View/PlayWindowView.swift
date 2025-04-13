@@ -9,8 +9,8 @@ import SwiftUI
 
 struct PlayWindowView: View {
     @StateObject var musicDataStore = MusicDataStore.shared
-    @StateObject var viewDataStore = ViewDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var playDataStore: PlayDataStore
     
     var body: some View {
         ZStack {
@@ -105,5 +105,5 @@ struct PlayWindowView: View {
 }
 
 #Preview {
-    PlayWindowView()
+    PlayWindowView(viewDataStore: ViewDataStore.shared, playDataStore: PlayDataStore.shared)
 }

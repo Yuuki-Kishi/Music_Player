@@ -9,9 +9,10 @@ import SwiftUI
 import SwiftData
 
 struct PlaylistMusicView: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playlistDataStore: PlaylistDataStore
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     @State private var isShowRenameAlert: Bool = false
     @State private var isShowDeleteAlert: Bool = false
@@ -43,7 +44,7 @@ struct PlaylistMusicView: View {
                         })
                         .foregroundStyle(.primary)
                         List(playlistDataStore.playlistMusicArray) { music in
-                            PlaylistMusicViewCell(music: music)
+                            PlaylistMusicViewCell(playlistDataStore: playlistDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
@@ -52,7 +53,7 @@ struct PlaylistMusicView: View {
             }
             VStack {
                 Spacer()
-                PlayWindowView()
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
         }
         .navigationTitle(playlistDataStore.selectedPlaylist?.playlistName ?? "不明なプレイリスト")
@@ -174,5 +175,5 @@ struct PlaylistMusicView: View {
 }
 
 #Preview {
-    PlaylistMusicView()
+    PlaylistMusicView(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

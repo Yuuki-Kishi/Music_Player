@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct AlbumMusicView: View {
-    @StateObject var albumDataStore = AlbumDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var albumDataStore: AlbumDataStore
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     
     var body: some View {
@@ -39,7 +40,7 @@ struct AlbumMusicView: View {
                         })
                         .foregroundStyle(.primary)
                         List(albumDataStore.albumMusicArray) { music in
-                            AlbumMusicViewCell(music: music)
+                            AlbumMusicViewCell(albumDataStore: albumDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                         }
                         .frame(maxHeight: .infinity)
                         .listStyle(.plain)
@@ -49,7 +50,7 @@ struct AlbumMusicView: View {
             }
             VStack {
                 Spacer()
-                PlayWindowView()
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
         }
         .navigationTitle(albumDataStore.selectedAlbum?.albumName ?? "不明なアルバム")
@@ -112,5 +113,5 @@ struct AlbumMusicView: View {
 }
 
 #Preview {
-    AlbumMusicView()
+    AlbumMusicView(albumDataStore: AlbumDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

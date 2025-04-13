@@ -33,6 +33,8 @@ class PlayDataStore: ObservableObject {
         // 接続するオーディオノードをAudioEngineにアタッチする
         audioEngine.attach(playerNode)
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+        loadNextMusic()
+        playMode = UserDefaultsRepository.loadPlayMode()
         NotificationRepository.initRemoteCommand()
         NotificationRepository.setNotification()
         stop()
@@ -40,7 +42,6 @@ class PlayDataStore: ObservableObject {
     
     func setMusic(music: Music) {
         self.playingMusic = music
-//        savePlayingMusic(music: music)
     }
     
     func setScheduleFile() {
@@ -89,6 +90,28 @@ class PlayDataStore: ObservableObject {
         }
     }
     
+    func loadNextMusic() {
+        Task {
+            if let playingMusicFilePath = UserDefaultsRepository.loadPlayingMusicFilePath() {
+                if FileService.isExistFile(filePath: playingMusicFilePath) {
+                    let music = await FileService.getFileMetadata(filePath: playingMusicFilePath)
+                    setMusic(music: music)
+                    setScheduleFile()
+                    setTimer()
+                    return
+                } else {
+                    if let music = await WillPlayRepository.nextMusic() {
+                        setMusic(music: music)
+                        setScheduleFile()
+                        setTimer()
+                        return
+                    }
+                }
+            }
+            self.playingMusic = nil
+        }
+    }
+    
     func moveNextMusic() {
         stop()
         seekPosition = 0.0
@@ -97,13 +120,11 @@ class PlayDataStore: ObservableObject {
         case .shuffle:
             Task {
                 guard let playingMusic = self.playingMusic else { return }
-                if PlayedRepository.addPlayed(newMusicFilePath: playingMusic.filePath) {
-                    print("addSucceeded")
-                }
+                guard PlayedRepository.addPlayed(newMusicFilePath: playingMusic.filePath) else { return }
+                print("addSucceeded")
                 if let nextMusic = await WillPlayRepository.nextMusic() {
-                    if WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) {
-                        print("removeSucceeded")
-                    }
+                    guard WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) else { return }
+                    print("removeSucceeded")
                     musicChoosed(music: nextMusic, playGroup: playGroup)
                 } else {
                     seekPosition = 0.0
@@ -113,13 +134,11 @@ class PlayDataStore: ObservableObject {
         case .order:
             Task {
                 guard let playingMusic = self.playingMusic else { return }
-                if PlayedRepository.addPlayed(newMusicFilePath: playingMusic.filePath) {
-                    print("addSucceeded")
-                }
+                guard PlayedRepository.addPlayed(newMusicFilePath: playingMusic.filePath) else { return }
+                print("addSucceeded")
                 if let nextMusic = await WillPlayRepository.nextMusic() {
-                    if WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) {
-                        print("removeSucceeded")
-                    }
+                    guard WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) else { return }
+                    print("removeSucceeded")
                     musicChoosed(music: nextMusic, playGroup: playGroup)
                 } else {
                     seekPosition = 0.0
@@ -141,13 +160,11 @@ class PlayDataStore: ObservableObject {
         case .shuffle:
             Task {
                 guard let playingMusic = self.playingMusic else { return }
-                if WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusic.filePath, at: 0) {
-                    print("addSucceeded")
-                }
+                guard WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusic.filePath, at: 0) else { return }
+                print("addSucceeded")
                 if let previousMusic = await PlayedRepository.previousMusic() {
-                    if PlayedRepository.removePlayed(filePath: previousMusic.filePath) {
-                        print("removeSucceeded")
-                    }
+                    guard PlayedRepository.removePlayed(filePath: previousMusic.filePath) else { return }
+                    print("removeSucceeded")
                     musicChoosed(music: previousMusic, playGroup: playGroup)
                 } else {
                     seekPosition = 0.0
@@ -157,13 +174,11 @@ class PlayDataStore: ObservableObject {
         case .order:
             Task {
                 guard let playingMusic = self.playingMusic else { return }
-                if WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusic.filePath, at: 0) {
-                    print("addSucceeded")
-                }
+                guard WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusic.filePath, at: 0) else { return }
+                print("addSucceeded")
                 if let previousMusic = await PlayedRepository.previousMusic() {
-                    if PlayedRepository.removePlayed(filePath: previousMusic.filePath) {
-                        print("removeSucceeded")
-                    }
+                    guard PlayedRepository.removePlayed(filePath: previousMusic.filePath) else { return }
+                    print("removeSucceeded")
                     musicChoosed(music: previousMusic, playGroup: playGroup)
                 } else {
                     seekPosition = 0.0
@@ -206,7 +221,6 @@ class PlayDataStore: ObservableObject {
             playerNode.play()
             NotificationRepository.setNowPlayingInfo()
             isPlaying = true
-//            UserDefaults.standard.setValue(music?.musicName ?? "不明な曲", forKey: "plaingMusicName")
         }
         catch let error {
             print(error.localizedDescription)
@@ -227,22 +241,69 @@ class PlayDataStore: ObservableObject {
     }
     
     func musicChoosed(music: Music, playGroup: PlayGroup) {
-        self.playGroup = playGroup
-        setMusic(music: music)
-        setScheduleFile()
-        seekPosition = 0.0
-        cashedSeekBarSeconds = 0.0
-        play()
-        setTimer()
+        if FileService.isExistFile(filePath: music.filePath) {
+            self.playGroup = playGroup
+            setMusic(music: music)
+            UserDefaultsRepository.savePlayingMusicFilePath(filePath: music.filePath)
+            setScheduleFile()
+            seekPosition = 0.0
+            cashedSeekBarSeconds = 0.0
+            play()
+            setTimer()
+        } else {
+            Task {
+                switch playGroup {
+                case .music:
+                    MusicDataStore.shared.musicArray = await MusicRepository.getMusics()
+                    guard let music = MusicDataStore.shared.musicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .music)
+                case .artist:
+                    guard let artistName = ArtistDataStore.shared.selectedArtist?.artistName else { return }
+                    ArtistDataStore.shared.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistName)
+                    guard let music = ArtistDataStore.shared.artistMusicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .artist)
+                case .album:
+                    guard let albumName = AlbumDataStore.shared.selectedAlbum?.albumName else { return }
+                    AlbumDataStore.shared.albumMusicArray = await AlbumRepository.getAlbumMusic(albumName: albumName)
+                    guard let music = AlbumDataStore.shared.albumMusicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .album)
+                case .playlist:
+                    guard let filePath = PlaylistDataStore.shared.selectedPlaylist?.filePath else { return }
+                    PlaylistDataStore.shared.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
+                    guard let music = PlaylistDataStore.shared.playlistMusicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .playlist)
+                case .folder:
+                    guard let folderPath = FolderDataStore.shared.selectedFolder?.folderPath else { return }
+                    FolderDataStore.shared.folderMusicArray = await FolderRepository.getFolderMusic(folderPath: folderPath)
+                    guard let music = FolderDataStore.shared.folderMusicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .folder)
+                case .favorite:
+                    FavoriteMusicDataStore.shared.favoriteMusicArray = await FavoriteMusicRepository.getFavoriteMusics()
+                    guard let music = FavoriteMusicDataStore.shared.favoriteMusicArray.randomElement() else { return }
+                    musicChoosed(music: music, playGroup: .favorite)
+                }
+            }
+        }
     }
     
-    func moveChoosedMusic(music: Music) {
-        setMusic(music: music)
-        setScheduleFile()
-        seekPosition = 0.0
-        cashedSeekBarSeconds = 0.0
-        play()
-        setTimer()
+    func moveChoosedMusic(music: Music) async {
+        if FileService.isExistFile(filePath: music.filePath) {
+            setMusic(music: music)
+            UserDefaultsRepository.savePlayingMusicFilePath(filePath: music.filePath)
+            setScheduleFile()
+            seekPosition = 0.0
+            cashedSeekBarSeconds = 0.0
+            play()
+            setTimer()
+        } else {
+            if let nextMusic = await WillPlayRepository.nextMusic() {
+                print(nextMusic)
+                guard WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) else { return }
+                await moveChoosedMusic(music: nextMusic)
+            } else {
+                self.playingMusic = nil
+            }
+        }
     }
     
     func setNextMusics(musicFilePaths: [String]) {

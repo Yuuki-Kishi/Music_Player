@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FavoriteMusicSelectView: View {
     @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var selectionValue: Set<Music> = []
     @State private var selectableMusicArray: [Music] = []
     @State private var isLoading: Bool = true
@@ -80,5 +80,5 @@ struct FavoriteMusicSelectView: View {
 }
 
 #Preview {
-    FavoriteMusicView()
+    FavoriteMusicView(favoriteMusicDataStore: FavoriteMusicDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

@@ -9,7 +9,9 @@ import SwiftUI
 
 struct PlaylistView: View {
     @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var viewDataStore: ViewDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var isLoading: Bool = true
     @State private var isShowAlert = false
     @State private var text = ""
@@ -33,7 +35,7 @@ struct PlaylistView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             List(playlistDataStore.playlistArray) { playlist in
-                                PlaylistViewCell(playlist: playlist)
+                                PlaylistViewCell(playlistDataStore: playlistDataStore, pathDataStore: pathDataStore, playlist: playlist)
                             }
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
@@ -42,7 +44,7 @@ struct PlaylistView: View {
                 }
                 VStack {
                     Spacer()
-                    PlayWindowView()
+                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
             }
             .navigationTitle("プレイリスト")
@@ -84,9 +86,9 @@ struct PlaylistView: View {
     func destination(path: PathDataStore.PlaylistViewPath) -> some View {
         switch path {
         case .playlistMusic:
-            PlaylistMusicView()
+            PlaylistMusicView(playlistDataStore: playlistDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .selectMusic:
-            PlaylistSelectMusicView()
+            PlaylistSelectMusicView(playlistDataStore: playlistDataStore, pathDataStore: pathDataStore)
         case .musicInfo:
             MusicInfoView(music: playlistDataStore.selectedMusic ?? Music())
         }
@@ -135,5 +137,5 @@ struct PlaylistView: View {
 }
 
 #Preview {
-    PlaylistView()
+    PlaylistView(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
 }

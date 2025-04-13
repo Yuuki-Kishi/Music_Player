@@ -29,7 +29,6 @@
 		DE9EE1C52D98432D00C215D1 /* FolderDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1C42D98432D00C215D1 /* FolderDataStore.swift */; };
 		DE9EE1C82D98465A00C215D1 /* PathDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1C72D98465A00C215D1 /* PathDataStore.swift */; };
 		DE9EE1CA2D984B4500C215D1 /* ViewDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1C92D984B4500C215D1 /* ViewDataStore.swift */; };
-		DE9EE1CC2D9AE27E00C215D1 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1CB2D9AE27E00C215D1 /* LoadingView.swift */; };
 		DE9EE1CE2D9AE6EB00C215D1 /* PlayDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1CD2D9AE6EB00C215D1 /* PlayDataStore.swift */; };
 		DE9EE1D12D9BB1FC00C215D1 /* ArtistViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1D02D9BB1FC00C215D1 /* ArtistViewCell.swift */; };
 		DE9EE1D32D9BC92600C215D1 /* ArtistMusicViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9EE1D22D9BC92600C215D1 /* ArtistMusicViewCell.swift */; };
@@ -101,7 +100,6 @@
 		DE9EE1C42D98432D00C215D1 /* FolderDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderDataStore.swift; sourceTree = "<group>"; };
 		DE9EE1C72D98465A00C215D1 /* PathDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathDataStore.swift; sourceTree = "<group>"; };
 		DE9EE1C92D984B4500C215D1 /* ViewDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewDataStore.swift; sourceTree = "<group>"; };
-		DE9EE1CB2D9AE27E00C215D1 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		DE9EE1CD2D9AE6EB00C215D1 /* PlayDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayDataStore.swift; sourceTree = "<group>"; };
 		DE9EE1D02D9BB1FC00C215D1 /* ArtistViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistViewCell.swift; sourceTree = "<group>"; };
 		DE9EE1D22D9BC92600C215D1 /* ArtistMusicViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistMusicViewCell.swift; sourceTree = "<group>"; };
@@ -284,15 +282,6 @@
 			path = Music;
 			sourceTree = "<group>";
 		};
-		DE9EE1CF2D9AF0DC00C215D1 /* ViewParts */ = {
-			isa = PBXGroup;
-			children = (
-				DE9EE1CB2D9AE27E00C215D1 /* LoadingView.swift */,
-				DEBC74972B3E570A0012973B /* PlayWindowView.swift */,
-			);
-			path = ViewParts;
-			sourceTree = "<group>";
-		};
 		DE9EE1E82DA17C0F00C215D1 /* FavoriteMusic */ = {
 			isa = PBXGroup;
 			children = (
@@ -361,9 +350,9 @@
 				DE9DB2B02B8A2810007CE8FB /* Album */,
 				DE9DB2B12B8A2823007CE8FB /* Playlist */,
 				DEC4CFF92B98A3F0009F5296 /* Folder */,
-				DE9EE1CF2D9AF0DC00C215D1 /* ViewParts */,
 				DE86A8E82DA6D542003DABCC /* AddPlaylist */,
 				DE62458B2B849BEB003E856D /* MusicInfoView.swift */,
+				DEBC74972B3E570A0012973B /* PlayWindowView.swift */,
 				DEBC74992B3EA2920012973B /* PlayView.swift */,
 				DE86A8F12DA81C40003DABCC /* PlayFlow */,
 			);
@@ -507,7 +496,6 @@
 				DEDAB6E02DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift in Sources */,
 				DE86A8F02DA81C3A003DABCC /* PlayFlowView.swift in Sources */,
 				DE9EE1DB2D9BEBDA00C215D1 /* PlaylistSelectMusicViewCell.swift in Sources */,
-				DE9EE1CC2D9AE27E00C215D1 /* LoadingView.swift in Sources */,
 				DE9EE1DF2D9C42D600C215D1 /* FolderMusicViewCell.swift in Sources */,
 				DE9EE1CA2D984B4500C215D1 /* ViewDataStore.swift in Sources */,
 				DE9EE1C82D98465A00C215D1 /* PathDataStore.swift in Sources */,

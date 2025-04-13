@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct ArtistMusicViewCell: View {
-    @StateObject var artistDataStore = ArtistDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var artistDataStore: ArtistDataStore
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State var music: Music
     @State private var isShowAlert = false
     
@@ -110,12 +110,18 @@ struct ArtistMusicViewCell: View {
         }
     }
     func deleteMusicFile() {
-        if FileService.fileDelete(filePath: music.filePath) {
+        Task {
+            playDataStore.stop()
+            playDataStore.playingMusic = nil
+            guard FileService.fileDelete(filePath: music.filePath) else { return }
             print("DeleteSucceeded")
+            guard let artistName = artistDataStore.selectedArtist?.artistName else { return }
+            artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistName)
+            artistDataStore.loadMusicSort()
         }
     }
 }
 
 #Preview {
-    ArtistMusicViewCell(music: Music())
+    ArtistMusicViewCell(artistDataStore: ArtistDataStore.shared, playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared, music: Music())
 }

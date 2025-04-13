@@ -14,14 +14,14 @@ struct ContentView: View {
     
     var body: some View {
         TabView() {
-            MusicView()
+            MusicView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note")
                         Text("ミュージック")
                     }
                 }
-            ArtistView()
+            ArtistView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
@@ -29,21 +29,21 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("アーティスト")
-            AlbumView()
+            AlbumView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")
                         Text("アルバム")
                     }
                 }
-            PlaylistView()
+            PlaylistView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")
                         Text("プレイリスト")
                     }
                 }
-            FolderView()
+            FolderView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
                 .tabItem {
                     VStack {
                         Image(systemName: "folder.fill")
@@ -55,7 +55,7 @@ struct ContentView: View {
         .sheet(isPresented: $viewDataStore.isShowPlayView, onDismiss: {
             pathDataStore.playViewNavigationPath.removeAll()
         }, content: {
-            PlayView()
+            PlayView(playDataStore: playDataStore, pathDataStore: pathDataStore)
         })
         .onAppear() {
             onAppear()
@@ -76,6 +76,5 @@ struct ContentView: View {
             guard FavoriteMusicRepository.createFavoriteMusicM3U8() else { return }
             print("succeeded")
         }
-        playDataStore.playMode = UserDefaultsRepository.loadPlayMode()
     }
 }

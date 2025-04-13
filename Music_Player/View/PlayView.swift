@@ -11,8 +11,8 @@ import SwiftData
 struct PlayView: View {
     @StateObject var musicDataStore = MusicDataStore.shared
     @StateObject var favoriteMusicDataStore = FavoriteMusicDataStore.shared
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @ObservedObject var playDataStore: PlayDataStore
+    @ObservedObject var pathDataStore: PathDataStore
     @State private var displaySeekPosition: TimeInterval = 0.0
     @State private var isEditingSeekPosition: Bool = false
     @State private var isShowAddPlaylist = false
@@ -239,11 +239,11 @@ struct PlayView: View {
     func destination(path: PathDataStore.PlayViewPath) -> some View {
         switch path {
         case .addPlaylist:
-            AddPlaylistView(music: playDataStore.playingMusic ?? Music(), pathArray: .play)
+            AddPlaylistView(pathDataStore: pathDataStore, music: playDataStore.playingMusic ?? Music(), pathArray: .play)
         case .musicInfo:
             MusicInfoView(music: playDataStore.playingMusic ?? Music())
         case .playFlow:
-            PlayFlowView()
+            PlayFlowView(playDataStore: playDataStore, pathDataStore: pathDataStore)
         }
     }
     func randomPlay() {
@@ -254,5 +254,5 @@ struct PlayView: View {
 }
 
 #Preview {
-    PlayView()
+    PlayView(playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared)
 }
