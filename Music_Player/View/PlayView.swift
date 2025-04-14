@@ -21,14 +21,7 @@ struct PlayView: View {
         NavigationStack(path: $pathDataStore.playViewNavigationPath) {
             VStack {
                 Spacer()
-                Image(systemName: "music.note")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: UIScreen.main.bounds.width * 0.2, height: UIScreen.main.bounds.width * 0.2)
-                    .padding(100)
-                    .foregroundStyle(Color(UIColor.systemGray))
-                    .background(Color(UIColor.systemGray3))
-                    .clipShape(RoundedRectangle(cornerRadius: 50, style: .continuous))
+                coverImage()
                 Spacer()
                 HStack {
                     if playDataStore.playingMusic == nil {
@@ -186,6 +179,29 @@ struct PlayView: View {
                 .frame(width: 40, height: 40)
         }
         .menuOrder(.fixed)
+    }
+    func coverImage() -> some View {
+        if playDataStore.playingMusic?.coverImage.isEmpty == true || playDataStore.playingMusic == nil {
+            return AnyView (
+                Image(systemName: "music.note")
+                    .scaledToFit()
+                    .font(.system(size: UIScreen.main.bounds.height * 0.15))
+                    .foregroundStyle(Color(UIColor.systemGray))
+                    .frame(width: UIScreen.main.bounds.height * 0.3, height: UIScreen.main.bounds.height * 0.3)
+                    .background(
+                        RoundedRectangle(cornerRadius: UIScreen.main.bounds.height * 0.07)
+                            .frame(width: UIScreen.main.bounds.height * 0.3, height: UIScreen.main.bounds.height * 0.3)
+                            .foregroundStyle(Color(UIColor.systemGray4))
+                    )
+            )
+        } else {
+            return AnyView (
+                Image(uiImage: UIImage(data: playDataStore.playingMusic?.coverImage ?? Data()) ?? UIImage())
+                    .resizable()
+                    .frame(width: UIScreen.main.bounds.height * 0.3, height: UIScreen.main.bounds.height * 0.3)
+                    .clipShape(RoundedRectangle(cornerRadius: UIScreen.main.bounds.height * 0.07))
+            )
+        }
     }
     func secToMin(sec: TimeInterval) -> String {
         let dateFormatter = DateComponentsFormatter()

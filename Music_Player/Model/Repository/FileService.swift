@@ -92,21 +92,6 @@ class FileService {
         return filePaths
     }
     
-    static func getFolderPaths() -> [String] {
-        guard let directoryURL = documentDirectory else { return [] }
-        let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
-        var folderPaths: [String] = []
-        while let fileURL = fileURLs?.nextObject() as? URL {
-            if !fileURL.isMusicFile { continue }
-            let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
-            if resourceValues?.isDirectory == true { continue }
-            let path = fileURL.deletingLastPathComponent().planePath.replacingOccurrences(of: "/private", with: "")
-            let folderPath = path.replacingOccurrences(of: directoryURL.planePath, with: "")
-            folderPaths.append(folderPath)
-        }
-        return folderPaths
-    }
-    
     static func getFileContent(filePath: String) -> String? {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return nil }
         do {
@@ -122,23 +107,29 @@ class FileService {
         guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return Music() }
         let asset = AVURLAsset(url: fileURL)
         guard let metadata = try? await asset.load(.commonMetadata) else { return Music() }
-        let musicName = try? await metadata.first(where: {$0.commonKey == .commonKeyTitle})?.load(.stringValue)
-        let artistName = try? await metadata.first(where: {$0.commonKey == .commonKeyArtist})?.load(.stringValue)
-        let albumName = try? await metadata.first(where: {$0.commonKey == .commonKeyAlbumName})?.load(.stringValue)
+        let musicName = try? await metadata.first(where: { $0.commonKey == .commonKeyTitle })?.load(.stringValue)
+        let artistName = try? await metadata.first(where: { $0.commonKey == .commonKeyArtist })?.load(.stringValue)
+        let albumName = try? await metadata.first(where: { $0.commonKey == .commonKeyAlbumName })?.load(.stringValue)
+        let coverImage = try? await metadata.first(where: { $0.commonKey == .commonKeyArtwork })?.load(.dataValue)
+        let folderPath = getFolderPath(filePath: filePath)
+        let bcf = ByteCountFormatter()
+        bcf.allowedUnits = [.useAll]
+        bcf.countStyle = .file
         do {
-            let bcf = ByteCountFormatter()
-            bcf.allowedUnits = [.useAll]
-            bcf.countStyle = .file
             let attributes: [FileAttributeKey: Any] = try fileManager.attributesOfItem(atPath: fileURL.planePath)
             guard let editedDate = attributes[FileAttributeKey.modificationDate] as? Date else { return Music() }
             guard let bytes = attributes[.size] as? Int64 else { return Music() }
             let fileSize = bcf.string(fromByteCount: bytes)
             let musicLength = try await CMTimeGetSeconds(asset.load(.duration))
-            music = Music(musicName: musicName ?? "不明な曲", artistName: artistName ?? "不明なアーティスト", albumName: albumName ?? "不明なアルバム", editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, filePath: filePath)
+            music = Music(musicName: musicName, artistName: artistName, albumName: albumName, coverImage: coverImage, editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, folderPath: folderPath, filePath: filePath)
         } catch {
             print(error)
         }
         return music
+    }
+    
+    static func getFolderPath(filePath: String) -> String {
+        URL(fileURLWithPath: filePath).deletingLastPathComponent().planePath
     }
     
     //update

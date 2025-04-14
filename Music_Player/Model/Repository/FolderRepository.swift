@@ -15,10 +15,12 @@ class FolderRepository {
     
     //get
     static func getFolders() async -> [Folder] {
-        let folderPaths = FileService.getFolderPaths()
+        let filePaths = FileService.getAllFilePaths()
         var folders: [Folder] = []
-        for folderPath in folderPaths {
+        for filePath in filePaths {
+            let folderPath = FileService.getFolderPath(filePath: filePath)
             guard let folderName = URL(string: folderPath)?.lastPathComponent else { return [] }
+            if folderName == "." { continue }
             if let index = folders.firstIndex(where: { $0.folderName == folderName }) {
                 folders[index].musicCount += 1
             } else {

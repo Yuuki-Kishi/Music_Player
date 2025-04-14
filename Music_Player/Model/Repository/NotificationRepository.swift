@@ -20,7 +20,21 @@ class NotificationRepository {
         nowPlayingInfo[MPMediaItemPropertyArtist] = PlayDataStore.shared.playingMusic?.artistName
         nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = PlayDataStore.shared.playingMusic?.albumName
         // サムネ
-//        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
+        if PlayDataStore.shared.playingMusic?.coverImage.isEmpty == true {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = nil
+        } else {
+            guard let coverImage =   PlayDataStore.shared.playingMusic?.coverImage else {
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = nil
+                return
+            }
+            guard let image = UIImage(data: coverImage) else {
+                nowPlayingInfo[MPMediaItemPropertyArtwork] = nil
+                return
+            }
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in
+                return image
+            }
+        }
         // 再生位置
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = String(PlayDataStore.shared.seekPosition)
         // 現在の再生時間
