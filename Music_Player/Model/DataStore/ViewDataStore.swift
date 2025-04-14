@@ -25,6 +25,7 @@ class ViewDataStore: ObservableObject {
             remainTime -= 1
         } else {
             sleepTimer?.invalidate()
+            PlayDataStore.shared.pause()
             sleepTimer = nil
         }
     }
@@ -35,6 +36,9 @@ extension Int {
         let hour = self / 3600
         let min = (self - hour * 3600) / 60
         let sec = (self - hour * 3600) % 60
-        return String(hour) + ":" + String(min) + ":" + String(sec)
+        let hourString = hour < 10 ? "0" + String(hour) : String(hour)
+        let minString = min < 10 ? "0" + String(min) : String(min)
+        let secString = sec < 10 ? "0" + String(sec) : String(sec)
+        return hourString + ":" + minString + ":" + secString
     }
 }

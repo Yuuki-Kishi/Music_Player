@@ -53,7 +53,7 @@ struct PlayFlowViewWillPlayCell: View {
         Task {
             guard let previousMusicFilePath = playDataStore.playingMusic?.filePath else { return }
             guard PlayedRepository.addPlayed(newMusicFilePath: previousMusicFilePath) else { return }
-            guard let index = willPlayDataStore.willPlayMusicArray.firstIndex(of: music) else { return }
+            guard let index = willPlayDataStore.willPlayMusicArray.firstIndex(where: { $0.filePath == music.filePath }) else { return }
             let skipMusicFilePaths = willPlayDataStore.willPlayMusicArray.prefix(index).map { $0.filePath }
             guard WillPlayRepository.removeWillPlays(filePaths: skipMusicFilePaths) else { return }
             guard PlayedRepository.addPlayeds(newMusicFilePaths: skipMusicFilePaths) else { return }

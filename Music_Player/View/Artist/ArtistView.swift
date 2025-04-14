@@ -16,34 +16,29 @@ struct ArtistView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.artistViewNavigationPath) {
-            ZStack {
-                VStack {
-                    if isLoading {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if artistDataStore.artistArray.isEmpty {
                         Spacer()
-                        Text("読み込み中...")
+                        Text("表示できるアーティストがいません")
                         Spacer()
                     } else {
-                        if artistDataStore.artistArray.isEmpty {
-                            Spacer()
-                            Text("表示できるアーティストがいません")
-                            Spacer()
-                        } else {
-                            Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
-                                .font(.system(size: 15))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            List(artistDataStore.artistArray) { artist in
-                                ArtistViewCell(artistDataStore: artistDataStore, pathDataStore: pathDataStore, artist: artist)
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
+                        Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
+                            .font(.system(size: 15))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                        List(artistDataStore.artistArray) { artist in
+                            ArtistViewCell(artistDataStore: artistDataStore, pathDataStore: pathDataStore, artist: artist)
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                VStack {
-                    Spacer()
-                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
-                }
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
             .navigationTitle("アーティスト")
             .navigationBarTitleDisplayMode(.inline)

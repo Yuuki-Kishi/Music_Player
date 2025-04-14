@@ -57,7 +57,7 @@ struct AlbumMusicViewCell: View {
         })
     }
     func musicNameColor() -> Color {
-        if music == playDataStore.playingMusic {
+        if music.filePath == playDataStore.playingMusic?.filePath {
             return .accent
         } else {
             return .primary
@@ -91,11 +91,16 @@ struct AlbumMusicViewCell: View {
             })
             Divider()
             Button(action: {
-                if WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) {
-                    print("succeeded")
-                }
+                guard WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) else { return }
+                print("succeeded")
             }, label: {
                 Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
+            })
+            Button(action: {
+                guard WillPlayRepository.addWillPlay(newMusicFilePath: music.filePath) else { return }
+                print("succeeded")
+            }, label: {
+                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
             })
             Divider()
             Button(role: .destructive, action: {

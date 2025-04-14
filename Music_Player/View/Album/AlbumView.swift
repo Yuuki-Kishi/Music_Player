@@ -16,34 +16,29 @@ struct AlbumView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
-            ZStack {
-                VStack {
-                    if isLoading {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if albumDataStore.albumArray.isEmpty {
                         Spacer()
-                        Text("読み込み中...")
+                        Text("表示できるアルバムがありません")
                         Spacer()
                     } else {
-                        if albumDataStore.albumArray.isEmpty {
-                            Spacer()
-                            Text("表示できるアルバムがありません")
-                            Spacer()
-                        } else {
-                            Text(String(albumDataStore.albumArray.count) + "個のアルバム")
-                                .font(.system(size: 15))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            List(albumDataStore.albumArray) { album in
-                                AlbumViewCell(albumDataStore: albumDataStore, pathDataStore: pathDataStore, album: album)
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
+                        Text(String(albumDataStore.albumArray.count) + "個のアルバム")
+                            .font(.system(size: 15))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                        List(albumDataStore.albumArray) { album in
+                            AlbumViewCell(albumDataStore: albumDataStore, pathDataStore: pathDataStore, album: album)
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                VStack {
-                    Spacer()
-                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
-                }
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
             .navigationTitle("アルバム")
             .navigationBarTitleDisplayMode(.inline)

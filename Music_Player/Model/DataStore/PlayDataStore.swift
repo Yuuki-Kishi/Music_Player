@@ -11,6 +11,7 @@ import AVFoundation
 @MainActor
 class PlayDataStore: ObservableObject {
     static let shared = PlayDataStore()
+    let notificationRepository = NotificationRepository()
     @Published var playingMusic: Music? = nil
     @Published var seekPosition: Double = 0.0
     private var seekPositionUpdateTimer: Timer?
@@ -18,9 +19,10 @@ class PlayDataStore: ObservableObject {
     @Published var isPlaying: Bool = false
     @Published var playMode: PlayMode = .shuffle
     @Published var playGroup: PlayGroup = .music
-    private let audioEngine: AVAudioEngine = AVAudioEngine()
-    private let playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
-    private let equalizerNode: AVAudioUnitEQ = AVAudioUnitEQ(numberOfBands: 10)
+    private var audioEngine: AVAudioEngine = AVAudioEngine()
+    private var playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
+    private var equalizerNode: AVAudioUnitEQ = AVAudioUnitEQ(numberOfBands: 10)
+    private var audioSession: AVAudioSession = AVAudioSession.sharedInstance()
     
     enum PlayMode: String {
         case shuffle, order, sameRepeat
@@ -32,6 +34,7 @@ class PlayDataStore: ObservableObject {
     
     init() {
         // 接続するオーディオノードをAudioEngineにアタッチする
+        try? audioSession.setCategory(.playback)
         audioEngine.attach(playerNode)
         audioEngine.attach(equalizerNode)
         audioEngine.connect(playerNode, to: equalizerNode, format: nil)
@@ -42,8 +45,8 @@ class PlayDataStore: ObservableObject {
         }
         loadNextMusic()
         playMode = UserDefaultsRepository.loadPlayMode()
-        NotificationRepository.initRemoteCommand()
-        NotificationRepository.setNotification()
+        notificationRepository.initRemoteCommand()
+        notificationRepository.setNotification()
         stop()
     }
     
@@ -64,7 +67,6 @@ class PlayDataStore: ObservableObject {
                 param.bypass = false
                 param.bandwidth = equalizerParameters[index].bandWidth
                 param.frequency = equalizerParameters[index].frequency
-                print(equalizerParameters[index].frequency, ": ", equalizerParameters[index].gain)
                 param.gain = equalizerParameters[index].gain
             }
         }
@@ -82,7 +84,8 @@ class PlayDataStore: ObservableObject {
             // Source fileを取得する
             let audioFile = try AVAudioFile(forReading: fileURL)
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
-            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+            audioEngine.connect(playerNode, to: equalizerNode, format: nil)
+            audioEngine.connect(equalizerNode, to: audioEngine.mainMixerNode, format: nil)
             // 再生準備
             playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered)
         }
@@ -239,7 +242,7 @@ class PlayDataStore: ObservableObject {
         stop()
         // 曲の再生秒数の変更メソッド
         playerNode.scheduleSegment(audioFile, startingFrame: startSampleTime, frameCount: remainSampleTime, at: nil)
-        NotificationRepository.setNowPlayingInfo()
+        notificationRepository.setNowPlayingInfo()
         // 停止状態なので再生する
         play()
     }
@@ -247,9 +250,10 @@ class PlayDataStore: ObservableObject {
     func play() {
         // 再生処理
         do {
+            try audioSession.setActive(true, options: [])
             try audioEngine.start()
             playerNode.play()
-            NotificationRepository.setNowPlayingInfo()
+            notificationRepository.setNowPlayingInfo()
             isPlaying = true
         }
         catch let error {
@@ -261,7 +265,7 @@ class PlayDataStore: ObservableObject {
         isPlaying = false
         audioEngine.pause()
         playerNode.pause()
-        NotificationRepository.setNowPlayingInfo()
+        notificationRepository.setNowPlayingInfo()
     }
     
     func stop() {

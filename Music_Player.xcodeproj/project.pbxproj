@@ -65,6 +65,9 @@
 		DED9FD772B80DE860008B127 /* PlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD762B80DE860008B127 /* PlayController.swift */; };
 		DED9FD7D2B8229570008B127 /* PlaylistMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD7C2B8229570008B127 /* PlaylistMusicView.swift */; };
 		DED9FD812B82360B0008B127 /* PlaylistSelectMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED9FD802B82360B0008B127 /* PlaylistSelectMusicView.swift */; };
+		DEDA4AED2DAD422500836991 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDA4AEC2DAD422500836991 /* SettingView.swift */; };
+		DEDA4AEF2DAD424B00836991 /* SettingViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDA4AEE2DAD424B00836991 /* SettingViewCell.swift */; };
+		DEDA4AF22DAD51CE00836991 /* DisplayFolderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDA4AF12DAD51CE00836991 /* DisplayFolderView.swift */; };
 		DEDAB6DD2DA25D1500899C6A /* WillPlayDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6DC2DA25D1500899C6A /* WillPlayDataStore.swift */; };
 		DEDAB6E02DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6DF2DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift */; };
 		DEDAB6E22DA2C04A00899C6A /* PlayedDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDAB6E12DA2C04A00899C6A /* PlayedDataStore.swift */; };
@@ -142,6 +145,9 @@
 		DED9FD762B80DE860008B127 /* PlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayController.swift; sourceTree = "<group>"; };
 		DED9FD7C2B8229570008B127 /* PlaylistMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMusicView.swift; sourceTree = "<group>"; };
 		DED9FD802B82360B0008B127 /* PlaylistSelectMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSelectMusicView.swift; sourceTree = "<group>"; };
+		DEDA4AEC2DAD422500836991 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		DEDA4AEE2DAD424B00836991 /* SettingViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewCell.swift; sourceTree = "<group>"; };
+		DEDA4AF12DAD51CE00836991 /* DisplayFolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayFolderView.swift; sourceTree = "<group>"; };
 		DEDAB6DC2DA25D1500899C6A /* WillPlayDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WillPlayDataStore.swift; sourceTree = "<group>"; };
 		DEDAB6DF2DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFlowViewWillPlayCell.swift; sourceTree = "<group>"; };
 		DEDAB6E12DA2C04A00899C6A /* PlayedDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedDataStore.swift; sourceTree = "<group>"; };
@@ -289,8 +295,7 @@
 				DEE5AC4E2AE8A1280082069C /* MusicView.swift */,
 				DEC4CFF72B984CA4009F5296 /* MusicCellView.swift */,
 				DE9EE1E82DA17C0F00C215D1 /* FavoriteMusic */,
-				DEDCB0712DABDFF60070E7E0 /* Equalizer */,
-				DE2FBE8B2BF64192007247DE /* SleepTimer.swift */,
+				DEDA4AEB2DAD421900836991 /* Setting */,
 			);
 			path = Music;
 			sourceTree = "<group>";
@@ -382,6 +387,26 @@
 				DE9EE1B62D97ADD600C215D1 /* Old */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		DEDA4AEB2DAD421900836991 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				DEDA4AEC2DAD422500836991 /* SettingView.swift */,
+				DEDA4AEE2DAD424B00836991 /* SettingViewCell.swift */,
+				DEDA4AF02DAD51C100836991 /* DisplayFolder */,
+				DEDCB0712DABDFF60070E7E0 /* Equalizer */,
+				DE2FBE8B2BF64192007247DE /* SleepTimer.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		DEDA4AF02DAD51C100836991 /* DisplayFolder */ = {
+			isa = PBXGroup;
+			children = (
+				DEDA4AF12DAD51CE00836991 /* DisplayFolderView.swift */,
+			);
+			path = DisplayFolder;
 			sourceTree = "<group>";
 		};
 		DEDCB0682DABD8E50070E7E0 /* SwiftData */ = {
@@ -506,7 +531,9 @@
 				DE9EE1EA2DA17C4B00C215D1 /* FavoriteMusicDataStore.swift in Sources */,
 				DE9EE1D12D9BB1FC00C215D1 /* ArtistViewCell.swift in Sources */,
 				DE86A8EE2DA76D54003DABCC /* UserDefaultsRepository.swift in Sources */,
+				DEDA4AED2DAD422500836991 /* SettingView.swift in Sources */,
 				DE86A8E72DA58F51003DABCC /* Extensions.swift in Sources */,
+				DEDA4AF22DAD51CE00836991 /* DisplayFolderView.swift in Sources */,
 				DEC4CFFD2B98A785009F5296 /* FolderMusicView.swift in Sources */,
 				DEDAB6E62DA2C1A400899C6A /* PlayedRepository.swift in Sources */,
 				DE9EE1D52D9BD97000C215D1 /* AlbumViewCell.swift in Sources */,
@@ -528,6 +555,7 @@
 				DE6A176C2BA47B7A004BC71D /* Album.swift in Sources */,
 				DEDAB6E02DA25E9300899C6A /* PlayFlowViewWillPlayCell.swift in Sources */,
 				DE86A8F02DA81C3A003DABCC /* PlayFlowView.swift in Sources */,
+				DEDA4AEF2DAD424B00836991 /* SettingViewCell.swift in Sources */,
 				DE9EE1DB2D9BEBDA00C215D1 /* PlaylistSelectMusicViewCell.swift in Sources */,
 				DE9EE1DF2D9C42D600C215D1 /* FolderMusicViewCell.swift in Sources */,
 				DEDCB06A2DABD8EE0070E7E0 /* Persistance.swift in Sources */,

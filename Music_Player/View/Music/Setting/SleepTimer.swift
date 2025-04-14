@@ -42,25 +42,42 @@ struct SleepTimer: View {
                     })
                     .pickerStyle(.wheel)
                     Text("秒")
+                    
                 }
                 .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.5)
+                Spacer()
+                Button(action: {
+                    viewDataStore.setTimer(setTime: hour * 3600 + min * 60 + sec)
+                }, label: {
+                    Text(buttonText())
+                        .frame(width: UIScreen.main.bounds.width * 0.66, height: 30)
+                        .foregroundStyle(buttonColor())
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(lineWidth: 3)
+                                .foregroundStyle(buttonColor())
+                                .frame(width: UIScreen.main.bounds.width * 0.66, height: 30)
+                        )
+                })
+                Spacer()
             } else {
                 Text(viewDataStore.remainTime.toTime)
                     .font(.system(size: 50))
                     .frame(width: UIScreen.main.bounds.width * 0.8, height: UIScreen.main.bounds.height * 0.5)
+                Spacer()
+                Button(action: {
+                    viewDataStore.sleepTimer = nil
+                }, label: {
+                    Text("停止")
+                        .frame(width: UIScreen.main.bounds.width * 0.66, height: 30)
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(lineWidth: 3)
+                                .frame(width: UIScreen.main.bounds.width * 0.66, height: 30)
+                        )
+                })
+                Spacer()
             }
-            Spacer()
-            Button(action: {
-                viewDataStore.setTimer(setTime: hour * 3600 + min * 60 + sec)
-            }, label: {
-                Text(buttonText())
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .foregroundStyle(buttonColor())
-                            .frame(width: UIScreen.main.bounds.width * 0.66, height: 30)
-                    )
-            })
-            Spacer()
         }
         .navigationTitle("スリープタイマー")
         .navigationBarTitleDisplayMode(.inline)
@@ -81,7 +98,7 @@ struct SleepTimer: View {
     func buttonColor() -> Color {
         if viewDataStore.sleepTimer == nil {
             if hour == 0 && min == 0 && sec == 0 {
-                return Color.gray
+                return Color.secondary
             } else {
                 return Color.accent
             }

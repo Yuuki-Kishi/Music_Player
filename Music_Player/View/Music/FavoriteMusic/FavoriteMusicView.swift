@@ -17,42 +17,37 @@ struct FavoriteMusicView: View {
     @State private var isShowAlert: Bool = false
     
     var body: some View {
-        ZStack {
-            VStack {
-                if isLoading {
+        VStack {
+            if isLoading {
+                Spacer()
+                Text("読み込み中...")
+                Spacer()
+            } else {
+                if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
                     Spacer()
-                    Text("読み込み中...")
+                    Text("表示できる曲がありません")
                     Spacer()
                 } else {
-                    if favoriteMusicDataStore.favoriteMusicArray.isEmpty {
-                        Spacer()
-                        Text("表示できる曲がありません")
-                        Spacer()
-                    } else {
-                        Button(action: {
-                            randomPlay()
-                        }, label: {
-                            HStack {
-                                Image(systemName: "play.circle")
-                                    .foregroundStyle(.accent)
-                                Text("シャッフル再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            .padding(.horizontal)
-                        })
-                        .foregroundStyle(.primary)
-                        List(favoriteMusicDataStore.favoriteMusicArray) { music in
-                            FavoriteMusicViewCell(favoriteMusicDataStore: favoriteMusicDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
+                    Button(action: {
+                        randomPlay()
+                    }, label: {
+                        HStack {
+                            Image(systemName: "play.circle")
+                                .foregroundStyle(.accent)
+                            Text("シャッフル再生 (" + String(favoriteMusicDataStore.favoriteMusicArray.count) + "曲)")
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
+                        .padding(.horizontal)
+                    })
+                    .foregroundStyle(.primary)
+                    List(favoriteMusicDataStore.favoriteMusicArray) { music in
+                        FavoriteMusicViewCell(favoriteMusicDataStore: favoriteMusicDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
-            VStack {
-                Spacer()
-                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
-            }
+            PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
         }
         .navigationTitle("お気に入り")
         .toolbar {

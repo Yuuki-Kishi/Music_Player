@@ -17,42 +17,37 @@ struct MusicView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.musicViewNavigationPath) {
-            ZStack {
-                VStack {
-                    if isLoading {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if musicDataStore.musicArray.isEmpty {
                         Spacer()
-                        Text("読み込み中...")
+                        Text("表示できる曲がありません")
                         Spacer()
                     } else {
-                        if musicDataStore.musicArray.isEmpty {
-                            Spacer()
-                            Text("表示できる曲がありません")
-                            Spacer()
-                        } else {
-                            Button(action: {
-                                randomPlay()
-                            }, label: {
-                                HStack {
-                                    Image(systemName: "play.circle")
-                                        .foregroundStyle(.accent)
-                                    Text("シャッフル再生 (" + String(musicDataStore.musicArray.count) + "曲)")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                                .padding(.horizontal)
-                            })
-                            .foregroundStyle(.primary)
-                            List(musicDataStore.musicArray) { music in
-                                MusicCellView(musicDataStore: musicDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
+                        Button(action: {
+                            randomPlay()
+                        }, label: {
+                            HStack {
+                                Image(systemName: "play.circle")
+                                    .foregroundStyle(.accent)
+                                Text("シャッフル再生 (" + String(musicDataStore.musicArray.count) + "曲)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal)
+                        })
+                        .foregroundStyle(.primary)
+                        List(musicDataStore.musicArray) { music in
+                            MusicCellView(musicDataStore: musicDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                VStack {
-                    Spacer()
-                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
-                }
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
             .navigationTitle("ミュージック")
             .navigationBarTitleDisplayMode(.inline)
@@ -86,14 +81,9 @@ struct MusicView: View {
                 Label("お気に入り", systemImage: "heart.fill")
             })
             Button(action: {
-                pathDataStore.musicViewNavigationPath.append(.equalizer)
+                pathDataStore.musicViewNavigationPath.append(.setting)
             }, label: {
-                Label("イコライザ", systemImage: "slider.vertical.3")
-            })
-            Button(action: {
-                pathDataStore.musicViewNavigationPath.append(.sleepTImer)
-            }, label: {
-                Label("スリープタイマー", systemImage: "timer")
+                Label("設定", systemImage: "gearshape")
             })
             Menu {
                 Button(action: {
@@ -138,10 +128,12 @@ struct MusicView: View {
             FavoriteMusicView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
         case .selectFavoriteMusic:
             FavoriteMusicSelectView(pathDataStore: pathDataStore)
+        case .setting:
+            SettingView(pathDataStore: pathDataStore)
+        case .displayFolder:
+            EmptyView()
         case .equalizer:
             EqualizerView(playDataStore: playDataStore, pathDataStore: pathDataStore)
-        case .setting:
-            EmptyView()
         case .sleepTImer:
             SleepTimer(viewDataStore: viewDataStore)
         }

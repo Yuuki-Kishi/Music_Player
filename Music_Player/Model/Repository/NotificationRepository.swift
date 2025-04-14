@@ -10,30 +10,23 @@ import MediaPlayer
 
 @MainActor
 class NotificationRepository {
-    static let playDataStore = PlayDataStore.shared
     
-    static func setNowPlayingInfo() {
+    func setNowPlayingInfo() {
         let center = MPNowPlayingInfoCenter.default()
         var nowPlayingInfo = center.nowPlayingInfo ?? [String : Any]()
         
         // タイトル
-        nowPlayingInfo[MPMediaItemPropertyTitle] = playDataStore.playingMusic?.musicName
-        nowPlayingInfo[MPMediaItemPropertyArtist] = playDataStore.playingMusic?.artistName
-        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = playDataStore.playingMusic?.albumName
+        nowPlayingInfo[MPMediaItemPropertyTitle] = PlayDataStore.shared.playingMusic?.musicName
+        nowPlayingInfo[MPMediaItemPropertyArtist] = PlayDataStore.shared.playingMusic?.artistName
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = PlayDataStore.shared.playingMusic?.albumName
         // サムネ
-        //        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
+//        nowPlayingInfo[MPMediaItemPropertyArtwork] = UIImage(systemName: "music.note")
         // 再生位置
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = String(playDataStore.seekPosition)
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = String(PlayDataStore.shared.seekPosition)
         // 現在の再生時間
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = String(playDataStore.playingMusic?.musicLength ?? 300)
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = String(PlayDataStore.shared.playingMusic?.musicLength ?? 300)
         // 曲の速さ
-        if playDataStore.isPlaying {
-//            guard let filePath = playDataStore.playingMusic?.filePath else { return }
-//            let directoryPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first ?? ""
-//            let fullFilePath = directoryPath + "/" + filePath
-//            let assetURL = URL(fileURLWithPath: fullFilePath)
-//            guard let audioFile = try? AVAudioFile(forReading: assetURL) else { return }
-//            let sampleRate = audioFile.processingFormat.sampleRate
+        if PlayDataStore.shared.isPlaying {
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
         } else {
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
@@ -43,48 +36,64 @@ class NotificationRepository {
         center.nowPlayingInfo = nowPlayingInfo
     }
     
-    static func initRemoteCommand() {
+    func initRemoteCommand() {
         // 再生ボタン
         let commandCenter = MPRemoteCommandCenter.shared()
         commandCenter.playCommand.removeTarget(self)
         commandCenter.playCommand.isEnabled = true
         commandCenter.playCommand.addTarget { event in
-            NotificationRepository.playDataStore.play()
-            return .success
+            if PlayDataStore.shared.playingMusic == nil {
+                return .noActionableNowPlayingItem
+            } else {
+                PlayDataStore.shared.play()
+                return .success
+            }
         }
         // 一時停止ボタン
         commandCenter.pauseCommand.removeTarget(self)
         commandCenter.pauseCommand.isEnabled = true
         commandCenter.pauseCommand.addTarget { event in
-            NotificationRepository.playDataStore.pause()
-            return .success
+            if PlayDataStore.shared.playingMusic == nil {
+                return .noActionableNowPlayingItem
+            } else {
+                PlayDataStore.shared.pause()
+                return .success
+            }
         }
         // 前の曲ボタン
         commandCenter.previousTrackCommand.removeTarget(self)
         commandCenter.previousTrackCommand.isEnabled = true
         commandCenter.previousTrackCommand.addTarget { event in
-//            moveBeforeMusic()
-            return .success
+            if PlayDataStore.shared.playingMusic == nil {
+                return .noActionableNowPlayingItem
+            } else {
+                PlayDataStore.shared.movePreviousMusic()
+                return .success
+            }
         }
         // 次の曲ボタン
         commandCenter.nextTrackCommand.removeTarget(self)
         commandCenter.nextTrackCommand.isEnabled = true
         commandCenter.nextTrackCommand.addTarget { event in
-//            moveNextMusic()
-            return .success
+            if PlayDataStore.shared.playingMusic == nil {
+                return .noActionableNowPlayingItem
+            } else {
+                PlayDataStore.shared.moveNextMusic()
+                return .success
+            }
         }
         // シークバーでの秒数変更
         commandCenter.changePlaybackPositionCommand.removeTarget(self)
         commandCenter.changePlaybackPositionCommand.isEnabled = true
         commandCenter.changePlaybackPositionCommand.addTarget { event in
             guard let positionCommandEvent = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-            NotificationRepository.playDataStore.seekPosition = Double(positionCommandEvent.positionTime)
-            NotificationRepository.playDataStore.setSeek()
+            PlayDataStore.shared.seekPosition = Double(positionCommandEvent.positionTime)
+            PlayDataStore.shared.setSeek()
             return .success
         }
     }
     
-    static func setNotification() {
+    func setNotification() {
         NotificationCenter.default.addObserver(self, selector: #selector(onInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
         NotificationCenter.default.addObserver(self, selector: #selector(onAudioSessionRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
     }
@@ -97,13 +106,13 @@ class NotificationRepository {
         }
         switch type {
         case .began:
-            if NotificationRepository.playDataStore.isPlaying {
-                NotificationRepository.playDataStore.pause()
+            if PlayDataStore.shared.isPlaying {
+                PlayDataStore.shared.pause()
             }
             break
         case .ended:
-            if !NotificationRepository.playDataStore.isPlaying {
-                NotificationRepository.playDataStore.play()
+            if !PlayDataStore.shared.isPlaying {
+                PlayDataStore.shared.play()
             }
             break
         @unknown default:
@@ -120,13 +129,9 @@ class NotificationRepository {
         
         switch reason {
         case .newDeviceAvailable:
-            if !NotificationRepository.playDataStore.isPlaying {
-                NotificationRepository.playDataStore.play()
-            }
+            break
         case .oldDeviceUnavailable:
-            if NotificationRepository.playDataStore.isPlaying {
-                NotificationRepository.playDataStore.pause()
-            }
+            PlayDataStore.shared.pause()
         default:
             break
         }

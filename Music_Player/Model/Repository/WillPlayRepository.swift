@@ -91,10 +91,12 @@ class WillPlayRepository {
         }
         switch playMode {
         case .shuffle:
+            guard let playingMusic = PlayDataStore.shared.playingMusic else { return false }
+            musics.remove(item: playingMusic)
             musics.shuffle()
         case .order:
             guard let playingMusic = PlayDataStore.shared.playingMusic else { return false }
-            guard let index = musics.firstIndex(of: playingMusic) else { return false }
+            guard let index = musics.firstIndex(where: { $0.filePath == playingMusic.filePath }) else { return false }
             musics = musics.droppedFisrt(index: index + 1)
         case .sameRepeat:
             musics = []

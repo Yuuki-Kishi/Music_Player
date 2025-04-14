@@ -45,13 +45,6 @@ struct PlayFlowView: View {
                         } else {
                             ForEach(willPlayDataStore.willPlayMusicArray, id: \.self) { music in
                                 PlayFlowViewWillPlayCell(willPlayDataStore: willPlayDataStore, playedDataStore: playedDataStore, playDataStore: playDataStore, music: music)
-                                    .onTapGesture {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            withAnimation {
-                                                proxy.scrollTo("WillPlay", anchor: .top)
-                                            }
-                                        }
-                                    }
                             }
                             .onDelete(perform: delete)
                             .onMove(perform: move)

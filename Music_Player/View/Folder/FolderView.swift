@@ -16,34 +16,29 @@ struct FolderView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
-            ZStack {
-                VStack {
-                    if isLoading {
+            VStack {
+                if isLoading {
+                    Spacer()
+                    Text("読み込み中...")
+                    Spacer()
+                } else {
+                    if folderDataStore.folderArray.isEmpty {
                         Spacer()
-                        Text("読み込み中...")
+                        Text("表示できるフォルダがありません")
                         Spacer()
                     } else {
-                        if folderDataStore.folderArray.isEmpty {
-                            Spacer()
-                            Text("表示できるフォルダがありません")
-                            Spacer()
-                        } else {
-                            Text(String(folderDataStore.folderArray.count) + "個のフォルダ")
-                                .font(.system(size: 15))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            List(folderDataStore.folderArray) { folder in
-                                FolderViewCell(folderDataStore: folderDataStore, pathDataStore: pathDataStore, folder: folder)
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
+                        Text(String(folderDataStore.folderArray.count) + "個のフォルダ")
+                            .font(.system(size: 15))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                        List(folderDataStore.folderArray) { folder in
+                            FolderViewCell(folderDataStore: folderDataStore, pathDataStore: pathDataStore, folder: folder)
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                VStack {
-                    Spacer()
-                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
-                }
+                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
             }
             .navigationTitle("フォルダ")
             .navigationBarTitleDisplayMode(.inline)

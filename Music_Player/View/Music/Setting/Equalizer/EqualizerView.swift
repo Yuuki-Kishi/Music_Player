@@ -24,7 +24,7 @@ struct EqualizerView: View {
             Button(action: {
                 setEqualizerParameters()
             }, label: {
-                Text("イコライザーを設定")
+                Text("イコライザを設定")
                     .frame(width: UIScreen.main.bounds.width * 0.6, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -35,7 +35,7 @@ struct EqualizerView: View {
             Button(action: {
                 isShowAlert = true
             }, label: {
-                Text("イコライザーをリセット")
+                Text("イコライザをリセット")
                     .frame(width: UIScreen.main.bounds.width * 0.6, height: 30)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
@@ -77,9 +77,8 @@ struct EqualizerView: View {
                 let equalizerParameter = EqualizerParameter(type: 0, bandWidth: 1, frequency: frequency, gain: 0.0)
                 equalizerParameters.append(equalizerParameter)
             }
-            await EqualizerParameterRepository.deleteAll()
-            await EqualizerParameterRepository.create(equalizerParameters: equalizerParameters)
-            pathDataStore.musicViewNavigationPath.removeLast()
+            self.equalizerParameters = equalizerParameters
+            setEqualizerParameters()
         }
     }
     func onAppear() {

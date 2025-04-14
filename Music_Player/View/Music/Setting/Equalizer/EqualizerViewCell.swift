@@ -13,15 +13,22 @@ struct EqualizerViewCell: View {
     
     var body: some View {
         HStack {
-            Text(String(Int(frequency)) + "Hz")
-                .frame(width: 70, alignment: .trailing)
+            Text(frequencyString())
+                .frame(width: 60, alignment: .trailing)
             Slider(value: $gain, in: -24.0...24.0, step: 1.0)
             Text(String(Int(gain)) + "dB")
                 .frame(width: 60, alignment: .trailing)
         }
     }
+    func frequencyString() -> String {
+        if frequency >= 1000 {
+            return String(Int(frequency / 1000)) + "kHz"
+        } else {
+            return String(Int(frequency)) + "Hz"
+        }
+    }
 }
 
 #Preview {
-    EqualizerViewCell(gain: Binding(get: { 0.0 }, set: {_ in}), frequency: 16000.0)
+    EqualizerViewCell(gain: Binding(get: { 0.0 }, set: {_ in}), frequency: 500.0)
 }

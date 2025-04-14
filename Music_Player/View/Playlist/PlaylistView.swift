@@ -40,11 +40,8 @@ struct PlaylistView: View {
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
                         }
+                        PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                     }
-                }
-                VStack {
-                    Spacer()
-                    PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
                 }
             }
             .navigationTitle("プレイリスト")
