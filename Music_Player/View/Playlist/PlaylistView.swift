@@ -90,36 +90,6 @@ struct PlaylistView: View {
             MusicInfoView(music: playlistDataStore.selectedMusic ?? Music())
         }
     }
-    func toolBarMenu() -> some View {
-        Menu {
-            Button(action: {
-                playlistDataStore.playlistArraySort(mode: .nameAscending)
-                playlistDataStore.saveSortMode()
-            }, label: {
-                Text("プレイリスト名昇順")
-            })
-            Button(action: {
-                playlistDataStore.playlistArraySort(mode: .nameDescending)
-                playlistDataStore.saveSortMode()
-            }, label: {
-                Text("プレイリスト名降順")
-            })
-            Button(action: {
-                playlistDataStore.playlistArraySort(mode: .countAscending)
-                playlistDataStore.saveSortMode()
-            }, label: {
-                Text("曲数昇順")
-            })
-            Button(action: {
-                playlistDataStore.playlistArraySort(mode: .countDescending)
-                playlistDataStore.saveSortMode()
-            }, label: {
-                Text("曲数降順")
-            })
-        } label: {
-            Image(systemName: "arrow.up.arrow.down")
-        }
-    }
     func getPlaylists() {
         playlistDataStore.playlistArray = PlaylistRepository.getPlaylists()
         playlistDataStore.loadSort()

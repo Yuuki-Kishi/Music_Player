@@ -72,31 +72,40 @@ struct FolderView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                folderDataStore.folderArraySort(mode: .nameAscending)
-                folderDataStore.saveSortMode()
+                reloadData()
             }, label: {
-                Text("フォルダ名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                folderDataStore.folderArraySort(mode: .nameDescending)
-                folderDataStore.saveSortMode()
-            }, label: {
-                Text("フォルダ名降順")
-            })
-            Button(action: {
-                folderDataStore.folderArraySort(mode: .countAscending)
-                folderDataStore.saveSortMode()
-            }, label: {
-                Text("曲数昇順")
-            })
-            Button(action: {
-                folderDataStore.folderArraySort(mode: .countDescending)
-                folderDataStore.saveSortMode()
-            }, label: {
-                Text("曲数降順")
-            })
+            Menu {
+                Button(action: {
+                    folderDataStore.folderArraySort(mode: .nameAscending)
+                    folderDataStore.saveSortMode()
+                }, label: {
+                    Text("フォルダ名昇順")
+                })
+                Button(action: {
+                    folderDataStore.folderArraySort(mode: .nameDescending)
+                    folderDataStore.saveSortMode()
+                }, label: {
+                    Text("フォルダ名降順")
+                })
+                Button(action: {
+                    folderDataStore.folderArraySort(mode: .countAscending)
+                    folderDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数昇順")
+                })
+                Button(action: {
+                    folderDataStore.folderArraySort(mode: .countDescending)
+                    folderDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数降順")
+                })
+            } label: {
+                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Image(systemName: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getFolders() {
@@ -105,6 +114,10 @@ struct FolderView: View {
             folderDataStore.loadSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getFolders()
     }
 }
 

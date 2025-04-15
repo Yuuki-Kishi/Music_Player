@@ -64,31 +64,40 @@ struct ArtistMusicView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                artistDataStore.artistMusicArraySort(mode: .nameAscending)
-                artistDataStore.saveMusicSortMode()
+                reloadData()
             }, label: {
-                Text("曲名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                artistDataStore.artistMusicArraySort(mode: .nameDescending)
-                artistDataStore.saveMusicSortMode()
-            }, label: {
-                Text("曲名降順")
-            })
-            Button(action: {
-                artistDataStore.artistMusicArraySort(mode: .dateAscending)
-                artistDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日昇順")
-            })
-            Button(action: {
-                artistDataStore.artistMusicArraySort(mode: .dateDescending)
-                artistDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日降順")
-            })
+            Menu {
+                Button(action: {
+                    artistDataStore.artistMusicArraySort(mode: .nameAscending)
+                    artistDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名昇順")
+                })
+                Button(action: {
+                    artistDataStore.artistMusicArraySort(mode: .nameDescending)
+                    artistDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名降順")
+                })
+                Button(action: {
+                    artistDataStore.artistMusicArraySort(mode: .dateAscending)
+                    artistDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日昇順")
+                })
+                Button(action: {
+                    artistDataStore.artistMusicArraySort(mode: .dateDescending)
+                    artistDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日降順")
+                })
+            } label: {
+                Label("並び替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Label("並び替え", systemImage: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getArtistMusics() {
@@ -98,6 +107,10 @@ struct ArtistMusicView: View {
             artistDataStore.loadMusicSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getArtistMusics()
     }
     func randomPlay() {
         guard let music = artistDataStore.artistMusicArray.randomElement() else { return }

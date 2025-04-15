@@ -72,31 +72,40 @@ struct AlbumView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                albumDataStore.albumArraySort(mode: .nameAscending)
-                albumDataStore.saveSortMode()
+                reloadData()
             }, label: {
-                Text("アルバム名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                albumDataStore.albumArraySort(mode: .nameDescending)
-                albumDataStore.saveSortMode()
-            }, label: {
-                Text("アルバム名降順")
-            })
-            Button(action: {
-                albumDataStore.albumArraySort(mode: .countAscending)
-                albumDataStore.saveSortMode()
-            }, label: {
-                Text("曲数昇順")
-            })
-            Button(action: {
-                albumDataStore.albumArraySort(mode: .countDescending)
-                albumDataStore.saveSortMode()
-            }, label: {
-                Text("曲数降順")
-            })
+            Menu {
+                Button(action: {
+                    albumDataStore.albumArraySort(mode: .nameAscending)
+                    albumDataStore.saveSortMode()
+                }, label: {
+                    Text("アルバム名昇順")
+                })
+                Button(action: {
+                    albumDataStore.albumArraySort(mode: .nameDescending)
+                    albumDataStore.saveSortMode()
+                }, label: {
+                    Text("アルバム名降順")
+                })
+                Button(action: {
+                    albumDataStore.albumArraySort(mode: .countAscending)
+                    albumDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数昇順")
+                })
+                Button(action: {
+                    albumDataStore.albumArraySort(mode: .countDescending)
+                    albumDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数降順")
+                })
+            } label: {
+                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Image(systemName: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getAlbums() {
@@ -105,6 +114,10 @@ struct AlbumView: View {
             albumDataStore.loadSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getAlbums()
     }
 }
 

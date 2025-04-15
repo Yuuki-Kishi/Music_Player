@@ -72,31 +72,40 @@ struct ArtistView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                artistDataStore.artistArraySort(mode: .nameAscending)
-                artistDataStore.saveSortMode()
+                reloadData()
             }, label: {
-                Text("アーティスト名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                artistDataStore.artistArraySort(mode: .nameDescending)
-                artistDataStore.saveSortMode()
-            }, label: {
-                Text("アーティスト名降順")
-            })
-            Button(action: {
-                artistDataStore.artistArraySort(mode: .countAscending)
-                artistDataStore.saveSortMode()
-            }, label: {
-                Text("曲数昇順")
-            })
-            Button(action: {
-                artistDataStore.artistArraySort(mode: .countDescending)
-                artistDataStore.saveSortMode()
-            }, label: {
-                Text("曲数降順")
-            })
+            Menu {
+                Button(action: {
+                    artistDataStore.artistArraySort(mode: .nameAscending)
+                    artistDataStore.saveSortMode()
+                }, label: {
+                    Text("アーティスト名昇順")
+                })
+                Button(action: {
+                    artistDataStore.artistArraySort(mode: .nameDescending)
+                    artistDataStore.saveSortMode()
+                }, label: {
+                    Text("アーティスト名降順")
+                })
+                Button(action: {
+                    artistDataStore.artistArraySort(mode: .countAscending)
+                    artistDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数昇順")
+                })
+                Button(action: {
+                    artistDataStore.artistArraySort(mode: .countDescending)
+                    artistDataStore.saveSortMode()
+                }, label: {
+                    Text("曲数降順")
+                })
+            } label: {
+                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Image(systemName: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getArtists() {
@@ -105,6 +114,10 @@ struct ArtistView: View {
             artistDataStore.loadSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getArtists()
     }
 }
 

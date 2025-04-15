@@ -64,31 +64,40 @@ struct AlbumMusicView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                albumDataStore.albumMusicArraySort(mode: .nameAscending)
-                albumDataStore.saveMusicSortMode()
+                reloadData()
             }, label: {
-                Text("曲名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                albumDataStore.albumMusicArraySort(mode: .nameDescending)
-                albumDataStore.saveMusicSortMode()
-            }, label: {
-                Text("曲名降順")
-            })
-            Button(action: {
-                albumDataStore.albumMusicArraySort(mode: .dateAscending)
-                albumDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日昇順")
-            })
-            Button(action: {
-                albumDataStore.albumMusicArraySort(mode: .dateDescending)
-                albumDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日降順")
-            })
+            Menu {
+                Button(action: {
+                    albumDataStore.albumMusicArraySort(mode: .nameAscending)
+                    albumDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名昇順")
+                })
+                Button(action: {
+                    albumDataStore.albumMusicArraySort(mode: .nameDescending)
+                    albumDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名降順")
+                })
+                Button(action: {
+                    albumDataStore.albumMusicArraySort(mode: .dateAscending)
+                    albumDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日昇順")
+                })
+                Button(action: {
+                    albumDataStore.albumMusicArraySort(mode: .dateDescending)
+                    albumDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日降順")
+                })
+            } label: {
+                Label("並び替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Label("並び替え", systemImage: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getAlbumMusics() {
@@ -98,6 +107,10 @@ struct AlbumMusicView: View {
             albumDataStore.loadMusicSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getAlbumMusics()
     }
     func randomPlay() {
         guard let music = albumDataStore.albumMusicArray.randomElement() else { return }

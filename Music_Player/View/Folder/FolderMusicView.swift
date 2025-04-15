@@ -63,31 +63,40 @@ struct FolderMusicView: View {
     func toolBarMenu() -> some View {
         Menu {
             Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .nameAscending)
-                folderDataStore.saveMusicSortMode()
+                reloadData()
             }, label: {
-                Text("曲名昇順")
+                Label("再読み込み", systemImage: "arrow.clockwise")
             })
-            Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .nameDescending)
-                folderDataStore.saveMusicSortMode()
-            }, label: {
-                Text("曲名降順")
-            })
-            Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .dateAscending)
-                folderDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日昇順")
-            })
-            Button(action: {
-                folderDataStore.folderMusicArraySort(mode: .dateDescending)
-                folderDataStore.saveMusicSortMode()
-            }, label: {
-                Text("更新日降順")
-            })
+            Menu {
+                Button(action: {
+                    folderDataStore.folderMusicArraySort(mode: .nameAscending)
+                    folderDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名昇順")
+                })
+                Button(action: {
+                    folderDataStore.folderMusicArraySort(mode: .nameDescending)
+                    folderDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("曲名降順")
+                })
+                Button(action: {
+                    folderDataStore.folderMusicArraySort(mode: .dateAscending)
+                    folderDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日昇順")
+                })
+                Button(action: {
+                    folderDataStore.folderMusicArraySort(mode: .dateDescending)
+                    folderDataStore.saveMusicSortMode()
+                }, label: {
+                    Text("更新日降順")
+                })
+            } label: {
+                Label("並び替え", systemImage: "arrow.up.arrow.down")
+            }
         } label: {
-            Label("並び替え", systemImage: "arrow.up.arrow.down")
+            Image(systemName: "ellipsis.circle")
         }
     }
     func getFolderMusics() {
@@ -97,6 +106,10 @@ struct FolderMusicView: View {
             folderDataStore.loadMusicSort()
             isLoading = false
         }
+    }
+    func reloadData() {
+        isLoading = true
+        getFolderMusics()
     }
     func randomPlay() {
         guard let music = folderDataStore.folderMusicArray.randomElement() else { return }
