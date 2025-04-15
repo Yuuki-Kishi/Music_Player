@@ -21,13 +21,19 @@ struct FavoriteMusicSelectView: View {
                 Text("読み込み中...")
                 Spacer()
             } else {
-                List(selection: $selectionValue) {
-                    ForEach(selectableMusicArray, id: \.self) { music in
-                        FavoriteMusicSelectViewCell(music: music)
+                if selectableMusicArray.isEmpty {
+                    Spacer()
+                    Text("表示できる曲がありません")
+                    Spacer()
+                } else {
+                    List(selection: $selectionValue) {
+                        ForEach(selectableMusicArray, id: \.self) { music in
+                            FavoriteMusicSelectViewCell(music: music)
+                        }
                     }
+                    .environment(\.editMode, .constant(.active))
+                    .listStyle(.plain)
                 }
-                .environment(\.editMode, .constant(.active))
-                .listStyle(.plain)
             }
         }
         .navigationTitle("追加する曲を選択")
