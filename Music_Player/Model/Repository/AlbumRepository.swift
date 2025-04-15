@@ -19,6 +19,7 @@ class AlbumRepository {
         var albums: [Album] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             if let index = albums.firstIndex(where: { $0.albumName == music.albumName }) {
                 albums[index].musicCount += 1
             } else {
@@ -34,6 +35,7 @@ class AlbumRepository {
         var musics: [Music] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             if music.albumName == albumName {
                 musics.append(music)
             }

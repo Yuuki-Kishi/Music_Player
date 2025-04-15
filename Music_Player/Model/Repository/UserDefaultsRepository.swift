@@ -27,7 +27,6 @@ class UserDefaultsRepository {
     //load
     static func loadPlayMode() -> PlayDataStore.PlayMode {
         guard let value = userDefaults.value(forKey: "PlayMode") as? String else { return .shuffle }
-        print(value)
         guard let playMode = PlayDataStore.PlayMode(rawValue: value) else { return .shuffle }
         return playMode
     }

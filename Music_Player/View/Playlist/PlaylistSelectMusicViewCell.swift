@@ -22,16 +22,16 @@ struct PlaylistSelectMusicViewCell: View {
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(Color.gray)
+                        .foregroundStyle(.secondary)
                     Text(music.albumName)
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity,alignment: .leading)
-                        .foregroundStyle(Color.gray)
+                        .foregroundStyle(.secondary)
                 }
             }
             Text(secToMin(second:music.musicLength))
-                .foregroundStyle(Color.gray)
+                .foregroundStyle(.secondary)
         }
     }
     func secToMin(second: TimeInterval) -> String {

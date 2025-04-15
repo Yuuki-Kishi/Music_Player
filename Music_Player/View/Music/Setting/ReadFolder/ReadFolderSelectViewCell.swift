@@ -1,20 +1,18 @@
 //
-//  AlbumMusicViewCell.swift
+//  DisplayFolderSelectViewCell.swift
 //  Music_Player
 //
-//  Created by 岸　優樹 on 2025/04/01.
+//  Created by 岸　優樹 on 2025/04/15.
 //
 
 import SwiftUI
 
-struct AlbumViewCell: View {
-    @ObservedObject var albumDataStore: AlbumDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var album: Album
+struct ReadFolderSelectViewCell: View {
+    @State var folder: Folder
     
     var body: some View {
         HStack {
-            Image(systemName: "square.stack.fill")
+            Image(systemName: "folder.fill")
                 .font(.system(size: 30.0))
                 .foregroundStyle(.accent)
                 .background(
@@ -22,22 +20,19 @@ struct AlbumViewCell: View {
                         .foregroundStyle(Color(UIColor.systemGray5))
                         .frame(width: 50, height: 50)
                 )
-            Text(album.albumName)
+                .frame(width: 40, height: 40)
+            Text(folder.folderName)
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
-            Text(String(album.musicCount) + "曲")
+            Text(String(folder.musicCount) + "曲")
                 .font(.system(size: 15.0))
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            albumDataStore.selectedAlbum = album
-            pathDataStore.albumViewNavigationPath.append(.albumMusic)
-        }
     }
 }
 
 #Preview {
-    AlbumViewCell(albumDataStore: AlbumDataStore.shared, pathDataStore: PathDataStore.shared,  album: Album())
+    ReadFolderSelectViewCell(folder: Folder())
 }

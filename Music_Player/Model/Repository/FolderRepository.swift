@@ -19,6 +19,7 @@ class FolderRepository {
         var folders: [Folder] = []
         for filePath in filePaths {
             let folderPath = FileService.getFolderPath(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: folderPath) { continue }
             guard let folderName = URL(string: folderPath)?.lastPathComponent else { return [] }
             if folderName == "." { continue }
             if let index = folders.firstIndex(where: { $0.folderName == folderName }) {
@@ -36,6 +37,7 @@ class FolderRepository {
         var musics: [Music] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: folderPath + filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             musics.append(music)
         }
         FolderDataStore.shared.folderArraySort(mode: FolderDataStore.shared.folderSortMode)

@@ -42,7 +42,7 @@ struct PlayView: View {
                             Text(playDataStore.playingMusic?.artistName ?? "不明なアーティスト")
                                 .lineLimit(1)
                                 .font(.system(size: 20))
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .frame(height: 50)
@@ -71,11 +71,11 @@ struct PlayView: View {
                 HStack {
                     Text(secToMin(sec: displaySeekPosition))
                         .font(.system(size: 12.5))
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Text(secToMin(sec: displaySeekPosition - (playDataStore.playingMusic?.musicLength ?? 300)))
                         .font(.system(size: 12.5))
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                 }
                 .padding(.horizontal)
                 Spacer()

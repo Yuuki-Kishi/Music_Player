@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct PlayFlowViewPlayedCell: View {
-    @ObservedObject var willPlayDataStore: WillPlayDataStore
-    @ObservedObject var playedDataStore: PlayedDataStore
+    @ObservedObject var playFlowDataStore: PlayFlowDataStore
     @ObservedObject var playDataStore: PlayDataStore
     @State var music: Music
     
@@ -25,16 +24,16 @@ struct PlayFlowViewPlayedCell: View {
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                     Text(music.albumName)
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity,alignment: .leading)
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.secondary)
                 }
             }
             Text(secToMin(second:music.musicLength))
-                .foregroundStyle(Color.gray)
+                .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -53,19 +52,19 @@ struct PlayFlowViewPlayedCell: View {
         Task {
             guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return }
             guard WillPlayRepository.insertWillPlay(newMusicFilePath: playingMusicFilePath, at: 0) else { return }
-            guard let index = playedDataStore.playedMusicArray.firstIndex(where: { $0.filePath == music.filePath }) else { return }
-            let suffix = playedDataStore.playedMusicArray.count - index - 1
-            let backMusicFilePaths = playedDataStore.playedMusicArray.suffix(suffix).map { $0.filePath }
+            guard let index = playFlowDataStore.playedMusicArray.firstIndex(where: { $0.filePath == music.filePath }) else { return }
+            let suffix = playFlowDataStore.playedMusicArray.count - index - 1
+            let backMusicFilePaths = playFlowDataStore.playedMusicArray.suffix(suffix).map { $0.filePath }
             guard PlayedRepository.removePlayeds(filePaths: backMusicFilePaths) else { return }
             guard WillPlayRepository.insertWillPlays(newMusicFilePaths: backMusicFilePaths, at: 0) else { return }
             guard PlayedRepository.removePlayed(filePath: music.filePath)  else { return }
             await playDataStore.moveChoosedMusic(music: music)
-            willPlayDataStore.willPlayMusicArray = await WillPlayRepository.getWillPlay()
-            playedDataStore.playedMusicArray = await PlayedRepository.getPlayed()
+            playFlowDataStore.willPlayMusicArray = await WillPlayRepository.getWillPlay()
+            playFlowDataStore.playedMusicArray = await PlayedRepository.getPlayed()
         }
     }
 }
 
 #Preview {
-    PlayFlowViewPlayedCell(willPlayDataStore: WillPlayDataStore.shared, playedDataStore: PlayedDataStore.shared, playDataStore: PlayDataStore.shared, music: Music())
+    PlayFlowViewPlayedCell(playFlowDataStore: PlayFlowDataStore.shared, playDataStore: PlayDataStore.shared, music: Music())
 }

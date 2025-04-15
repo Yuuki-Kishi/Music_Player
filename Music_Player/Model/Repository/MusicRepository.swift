@@ -19,6 +19,7 @@ class MusicRepository {
         var musics: [Music] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             musics.append(music)
         }
         MusicDataStore.shared.arraySort(mode: MusicDataStore.shared.musicArraySortMode)

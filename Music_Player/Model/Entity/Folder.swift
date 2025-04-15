@@ -9,7 +9,7 @@ import Foundation
 
 struct Folder: Hashable, Identifiable, Equatable {
     static func == (lhs: Folder, rhs: Folder) -> Bool {
-        return lhs.folderPath == rhs.folderPath
+        return lhs.id == rhs.id
     }
     
     var id = UUID()

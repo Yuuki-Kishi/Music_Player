@@ -10,7 +10,7 @@ import SwiftData
 
 class Persistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([EqualizerParameter.self])
+        let schema = Schema([EqualizerParameter.self, ReadFolder.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

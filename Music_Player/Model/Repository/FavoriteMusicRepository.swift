@@ -37,6 +37,7 @@ class FavoriteMusicRepository {
                 continue
             }
             let music = await FileService.getFileMetadata(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             musics.append(music)
         }
         return musics
@@ -47,6 +48,7 @@ class FavoriteMusicRepository {
         var musics: [Music] = []
         for filePath in filePaths {
             let music = await FileService.getFileMetadata(filePath: filePath)
+            if await !ReadFolderRepository.isRead(folderPath: music.folderPath) { continue }
             musics.append(music)
         }
         return musics

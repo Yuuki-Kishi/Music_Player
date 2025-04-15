@@ -30,7 +30,7 @@ struct ArtistViewCell: View {
                 .padding(.leading)
             Text(String(artist.musicCount) + "曲")
                 .font(.system(size: 15.0))
-                .foregroundStyle(.gray)
+                .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {

@@ -19,7 +19,7 @@ struct MusicInfoView: View {
                 Text(music.musicName)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             HStack {
@@ -28,7 +28,7 @@ struct MusicInfoView: View {
                 Text(music.artistName)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             HStack {
@@ -37,7 +37,7 @@ struct MusicInfoView: View {
                 Text(music.albumName)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             HStack {
@@ -46,7 +46,7 @@ struct MusicInfoView: View {
                 Text(secToMin(second: music.musicLength))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             HStack {
@@ -55,7 +55,7 @@ struct MusicInfoView: View {
                 Text(music.fileSize)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal)
             HStack {
@@ -64,7 +64,7 @@ struct MusicInfoView: View {
                 Text(music.filePath)
                     .lineLimit(1)
                     .truncationMode(.head)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(.secondary)
             }
             .contentShape(Rectangle())
             .padding(.horizontal)

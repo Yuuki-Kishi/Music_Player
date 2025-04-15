@@ -130,8 +130,8 @@ struct MusicView: View {
             FavoriteMusicSelectView(pathDataStore: pathDataStore)
         case .setting:
             SettingView(pathDataStore: pathDataStore)
-        case .displayFolder:
-            EmptyView()
+        case .readFolderSelect:
+            ReadFolderSelectView(pathDataStore: pathDataStore)
         case .equalizer:
             EqualizerView(playDataStore: playDataStore, pathDataStore: pathDataStore)
         case .sleepTImer:

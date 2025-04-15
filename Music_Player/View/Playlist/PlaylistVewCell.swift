@@ -29,7 +29,7 @@ struct PlaylistViewCell: View {
                 .padding(.leading)
             Text(String(playlist.musicCount) + "曲")
                 .font(.system(size: 15.0))
-                .foregroundStyle(.gray)
+                .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
