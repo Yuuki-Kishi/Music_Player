@@ -63,9 +63,14 @@ struct EqualizerView: View {
     }
     func setEqualizerParameters() {
         Task {
-            await EqualizerParameterRepository.deleteAll()
-            await EqualizerParameterRepository.create(equalizerParameters: equalizerParameters)
+            let parameters = await EqualizerParameterRepository.read()
+            if parameters.isEmpty {
+                await EqualizerParameterRepository.create(equalizerParameters: equalizerParameters)
+            } else {
+                await EqualizerParameterRepository.save()
+            }
             let equalizerParameters = await EqualizerParameterRepository.read()
+            print("equalizerParameters:\(equalizerParameters.map({ $0.gain }))")
             playDataStore.setEqualizer(equalizerParameters: equalizerParameters)
             pathDataStore.musicViewNavigationPath.removeLast()
         }

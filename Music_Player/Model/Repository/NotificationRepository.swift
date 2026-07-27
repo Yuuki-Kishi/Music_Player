@@ -36,12 +36,12 @@ class NotificationRepository {
             }
         }
         // 再生位置
-        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = String(PlayDataStore.shared.seekPosition)
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = PlayDataStore.shared.seekPosition
         // 現在の再生時間
-        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = String(PlayDataStore.shared.playingMusic?.musicLength ?? 300)
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = PlayDataStore.shared.playingMusic?.musicLength ?? 300
         // 曲の速さ
         if PlayDataStore.shared.isPlaying {
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
         } else {
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 0.0
         }

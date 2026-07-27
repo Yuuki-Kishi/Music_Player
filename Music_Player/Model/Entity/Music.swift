@@ -59,3 +59,18 @@ struct Music: Hashable, Identifiable, Equatable {
         self.filePath = "unknownFilePath"
     }
 }
+
+extension Array where Element == Music {
+    mutating func append(noDuplicate item: Element) {
+        if let index = self.firstIndex(of: item) {
+            self[index] = item
+        } else {
+            self.append(item)
+        }
+    }
+    mutating func remove(Music item: Element) {
+        if let index = self.firstIndex(of: item) {
+            self.remove(at: index)
+        }
+    }
+}

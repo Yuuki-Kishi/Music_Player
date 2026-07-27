@@ -41,7 +41,7 @@ class WillPlayRepository {
         let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
         for filePath in filePaths {
             if !FileService.isExistFile(filePath: filePath) {
-                guard WillPlayRepository.removeWillPlay(filePath: filePath) else { return nil }
+                guard removeWillPlay(filePath: filePath) else { return nil }
                 continue
             }
             return await FileService.getFileMetadata(filePath: filePath)

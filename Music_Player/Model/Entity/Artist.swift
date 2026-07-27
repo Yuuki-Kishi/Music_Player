@@ -26,3 +26,18 @@ struct Artist: Hashable, Identifiable, Equatable {
         self.musicCount = 0
     }
 }
+
+extension Array where Element == Artist {
+    mutating func append(noDuplicate item: Element) {
+        if let index = self.firstIndex(of: item) {
+            self[index] = item
+        } else {
+            self.append(item)
+        }
+    }
+    mutating func remove(Music item: Element) {
+        if let index = self.firstIndex(of: item) {
+            self.remove(at: index)
+        }
+    }
+}

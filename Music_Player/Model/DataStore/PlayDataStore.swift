@@ -112,6 +112,7 @@ class PlayDataStore: ObservableObject {
         let currentTime = Double(sampleTime) / sampleRate + cashedSeekBarSeconds
         isEndOfFile(currentTime: currentTime)
         seekPosition = currentTime
+        notificationRepository.setNowPlayingInfo()
     }
     
     func isEndOfFile(currentTime: Double) {
@@ -331,7 +332,6 @@ class PlayDataStore: ObservableObject {
             setTimer()
         } else {
             if let nextMusic = await WillPlayRepository.nextMusic() {
-                print(nextMusic)
                 guard WillPlayRepository.removeWillPlay(filePath: nextMusic.filePath) else { return }
                 await moveChoosedMusic(music: nextMusic)
             } else {

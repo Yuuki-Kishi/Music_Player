@@ -38,10 +38,13 @@ class PlayedRepository {
     }
     
     static func previousMusic() async -> Music? {
-        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2)
-        if let nextFilePath = filePaths.last {
-            guard FileService.isExistFile(filePath: nextFilePath) else { return nil }
-            return await FileService.getFileMetadata(filePath: nextFilePath)
+        let filePaths = M3U8Service.getM3U8Components(filePath: filePath).droppedFisrt(index: 2).reversed()
+        for filePath in filePaths {
+            if !FileService.isExistFile(filePath: filePath) {
+                guard removePlayed(filePath: filePath) else { return nil }
+                continue
+            }
+            return await FileService.getFileMetadata(filePath: filePath)
         }
         return nil
     }

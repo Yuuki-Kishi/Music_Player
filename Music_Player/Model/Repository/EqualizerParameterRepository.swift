@@ -13,12 +13,14 @@ class EqualizerParameterRepository {
         return PersistanceActor(modelContainer: Persistance.sharedModelContainer)
     }()
     
+    //create
     static func create(equalizerParameters: [EqualizerParameter]) async {
         for equalizerParameter in equalizerParameters {
             await actor.insert(equalizerParameter)
         }
     }
     
+    //get
     static func read() async -> [EqualizerParameter] {
         let predicate = #Predicate<EqualizerParameter> { equalizerParameter in
             return true
@@ -29,6 +31,12 @@ class EqualizerParameterRepository {
         return equalizerParameters
     }
     
+    //update
+    static func save() async {
+        await actor.save()
+    }
+    
+    //delete
     static func deleteAll() async {
         for equalizerParameter in await read() {
             await actor.delete(equalizerParameter)

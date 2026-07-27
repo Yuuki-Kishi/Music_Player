@@ -24,6 +24,7 @@ class FileService {
     
     static func createDirectory(folderPath: String) {
         guard let folderURL = documentDirectory?.appendingPathComponent(folderPath) else { return }
+        print(folderURL)
         do {
             try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
         } catch {
@@ -49,7 +50,9 @@ class FileService {
         do {
             let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
             for fileURL in fileURLs {
-                if fileURL.planePath.contains("/.Trash/") || fileURL.planePath.contains("/Playlist/") { continue }
+                guard !fileURL.planePath.contains("/.Trash/") else { continue }
+                guard !fileURL.planePath.contains("/Playlist/") else { continue }
+                guard !fileURL.lastPathComponent.hasPrefix(".") else { continue }
                 let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
                 let filePath = path.replacingOccurrences(of: "/private", with: "")
                 filePaths.append(filePath)
@@ -104,9 +107,10 @@ class FileService {
     
     static func getFileMetadata(filePath: String) async -> Music {
         var music: Music = Music()
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return Music() }
+        music.filePath = filePath
+        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return music }
         let asset = AVURLAsset(url: fileURL)
-        guard let metadata = try? await asset.load(.commonMetadata) else { return Music() }
+        guard let metadata = try? await asset.load(.commonMetadata) else { return music }
         let musicName = try? await metadata.first(where: { $0.commonKey == .commonKeyTitle })?.load(.stringValue)
         let artistName = try? await metadata.first(where: { $0.commonKey == .commonKeyArtist })?.load(.stringValue)
         let albumName = try? await metadata.first(where: { $0.commonKey == .commonKeyAlbumName })?.load(.stringValue)
@@ -117,8 +121,8 @@ class FileService {
         bcf.countStyle = .file
         do {
             let attributes: [FileAttributeKey: Any] = try fileManager.attributesOfItem(atPath: fileURL.planePath)
-            guard let editedDate = attributes[FileAttributeKey.modificationDate] as? Date else { return Music() }
-            guard let bytes = attributes[.size] as? Int64 else { return Music() }
+            guard let editedDate = attributes[FileAttributeKey.modificationDate] as? Date else { return music }
+            guard let bytes = attributes[.size] as? Int64 else { return music }
             let fileSize = bcf.string(fromByteCount: bytes)
             let musicLength = try await CMTimeGetSeconds(asset.load(.duration))
             music = Music(musicName: musicName, artistName: artistName, albumName: albumName, coverImage: coverImage, editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, folderPath: folderPath, filePath: filePath)
