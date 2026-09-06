@@ -8,53 +8,42 @@
 import SwiftUI
 
 struct FolderView: View {
-    @StateObject var folderDataStore = FolderDataStore.shared
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
+    @EnvironmentObject private var folderDataStore: FolderDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
     
     var body: some View {
         NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
             VStack {
-                if isLoading {
-                    Spacer()
-                    Text("読み込み中...")
-                    Spacer()
-                } else {
-                    if folderDataStore.folderArray.isEmpty {
-                        Spacer()
-                        Text("表示できるフォルダがありません")
-                        Spacer()
-                    } else {
-                        Text(String(folderDataStore.folderArray.count) + "個のフォルダ")
-                            .font(.system(size: 15))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
-                        List(folderDataStore.folderArray) { folder in
-                            FolderViewCell(folderDataStore: folderDataStore, pathDataStore: pathDataStore, folder: folder)
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
+                BoolSwitchView(isEmpty: folderDataStore.folderArray.isEmpty, isLoading: folderDataStore.isLoading) {
+                    Text("\(String(folderDataStore.folderArray.count))FolderView.content.Text")
+                        .font(.system(size: 15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    List(folderDataStore.folderArray) { folder in
+                        FolderViewCell(folder: folder)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                } emptyContent: {
+                    Text("FolderView.emptyContent.Text")
                 }
-                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+                PlayWindowView()
             }
-            .navigationTitle("フォルダ")
+            .navigationTitle("FolderView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: PathDataStore.FolderViewPath.self) { path in
                 destination(path: path)
             }
+            .sheet(isPresented: $folderDataStore.isShowAddPlaylistView) {
+                AddPlaylistView(music: folderDataStore.folderMusicArray.selected)
+            }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
+                ToolbarItem(placement: .topBarTrailing) {
                     toolBarMenu()
-                })
+                }
             }
             .onAppear() {
                 getFolders()
-            }
-            .onDisappear() {
-                isLoading = true
             }
         }
     }
@@ -62,47 +51,40 @@ struct FolderView: View {
     func destination(path: PathDataStore.FolderViewPath) -> some View {
         switch path {
         case .folderMusic:
-            FolderMusicView(folderDataStore: folderDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
-        case .addPlaylist:
-            AddPlaylistView(pathDataStore: pathDataStore, music: folderDataStore.selectedMusic ?? Music(), pathArray: .folder)
+            FolderMusicView()
         case .musicInfo:
-            MusicInfoView(music: folderDataStore.selectedMusic ?? Music())
+//            MusicInfoView(playGroup: .folder)
+            MusicInfoView(music: folderDataStore.folderMusicArray.selected)
         }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: {
-                reloadData()
-            }, label: {
-                Label("再読み込み", systemImage: "arrow.clockwise")
-            })
+            ReloadButton {
+                getFolders()
+            }
             Menu {
-                Button(action: {
-                    folderDataStore.folderArraySort(mode: .nameAscending)
-                    folderDataStore.saveSortMode()
-                }, label: {
-                    Text("フォルダ名昇順")
-                })
-                Button(action: {
-                    folderDataStore.folderArraySort(mode: .nameDescending)
-                    folderDataStore.saveSortMode()
-                }, label: {
-                    Text("フォルダ名降順")
-                })
-                Button(action: {
-                    folderDataStore.folderArraySort(mode: .countAscending)
-                    folderDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数昇順")
-                })
-                Button(action: {
-                    folderDataStore.folderArraySort(mode: .countDescending)
-                    folderDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数降順")
-                })
+                Button {
+                    FolderRepository.sortAndUpdateFolderSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("FolderView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button {
+                    FolderRepository.sortAndUpdateFolderSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("FolderView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    FolderRepository.sortAndUpdateFolderSortMode(sortMode: .countAscending)
+                } label: {
+                    Text("FolderView.toolBarMenu.sort.countAscending.Text")
+                }
+                Button {
+                    FolderRepository.sortAndUpdateFolderSortMode(sortMode: .countDescending)
+                } label: {
+                    Text("FolderView.toolBarMenu.sort.countDescending.Text")
+                }
             } label: {
-                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+                Label("FolderView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -110,17 +92,14 @@ struct FolderView: View {
     }
     func getFolders() {
         Task {
+            folderDataStore.isLoading = true
             folderDataStore.folderArray = await FolderRepository.getFolders()
-            folderDataStore.loadSort()
-            isLoading = false
+            FolderRepository.sortFolderArray()
+            folderDataStore.isLoading = false
         }
-    }
-    func reloadData() {
-        isLoading = true
-        getFolders()
     }
 }
 
 #Preview {
-    FolderView(folderDataStore: FolderDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    FolderView()
 }

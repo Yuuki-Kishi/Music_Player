@@ -27,7 +27,12 @@ struct Album: Hashable, Identifiable, Equatable {
     }
 }
 
+@MainActor
 extension Array where Element == Album {
+    var selected: Element? {
+        guard let selectedAlbumName = AlbumDataStore.shared.selectedAlbumName else { return nil }
+        return self.first { $0.albumName == selectedAlbumName }
+    }
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
             self[index] = item
@@ -35,7 +40,7 @@ extension Array where Element == Album {
             self.append(item)
         }
     }
-    mutating func remove(Music item: Element) {
+    mutating func remove(Album item: Element) {
         if let index = self.firstIndex(of: item) {
             self.remove(at: index)
         }

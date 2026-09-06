@@ -7,14 +7,6 @@
 
 import Foundation
 
-extension Array where Element == Music {
-    mutating func remove(item: Element) {
-        if let index = firstIndex(where: { $0.filePath == item.filePath }) {
-            self.remove(at: index)
-        }
-    }
-}
-
 extension Array where Element == String {
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
@@ -23,15 +15,10 @@ extension Array where Element == String {
             self.append(item)
         }
     }
-    
-    func droppedFisrt(index: Int) -> [Element] {
-        return Array(self.dropFirst(index))
-    }
-}
-
-extension Array where Element == Music {
-    func droppedFisrt(index: Int) -> [Element] {
-        return Array(self.dropFirst(index))
+    mutating func remove(item: Element) {
+        if let index = firstIndex(of: item) {
+            self.remove(at: index)
+        }
     }
 }
 
@@ -40,11 +27,17 @@ extension URL {
         self.path(percentEncoded: false)
     }
     var isMusicFile: Bool {
-        let isTrashed = self.planePath.contains("/.Trash")
-        let isPlaylist = self.planePath.contains("/playlist")
-        let isSystem = self.planePath.contains("/System")
-        let isM3U8 = self.planePath.contains(".m3u8")
-        let isDSStore = self.planePath.contains(".DS_Store")
-        return !isTrashed && !isPlaylist && !isSystem && !isM3U8 && !isDSStore
+        let musicExtensions: Set<String> = ["mp3", "m4a", "aac", "flac", "wav", "ogg"]
+        return musicExtensions.contains(pathExtension.lowercased())
+    }
+}
+
+extension Int {
+    var timeFormatted: String {
+        let hours = self / 3600
+        let minutes = (self % 3600) / 60
+        let seconds = self % 60
+        if hours > 0 { return String(format: "%02d:%02d:%02d", hours, minutes, seconds) }
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

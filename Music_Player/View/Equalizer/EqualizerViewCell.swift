@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct EqualizerViewCell: View {
-    @Binding var gain: Float
-    @State var frequency: Float
+    @Binding private var gain: Float
+    private let frequency: Float
+    
+    init(gain: Binding<Float>, frequency: Float) {
+        self._gain = gain
+        self.frequency = frequency
+    }
     
     var body: some View {
         HStack {
@@ -21,11 +26,8 @@ struct EqualizerViewCell: View {
         }
     }
     func frequencyString() -> String {
-        if frequency >= 1000 {
-            return String(Int(frequency / 1000)) + "kHz"
-        } else {
-            return String(Int(frequency)) + "Hz"
-        }
+        guard frequency >= 1000 else { return String(Int(frequency)) + "Hz" }
+        return String(Int(frequency / 1000)) + "kHz"
     }
 }
 

@@ -7,20 +7,18 @@
 
 import SwiftUI
 
-struct SettingView: View {
-    @ObservedObject var pathDataStore: PathDataStore
-    
+struct SettingView: View {    
     var body: some View {
         List {
-            SettingViewCell(pathDataStore: pathDataStore, title: "読み込むフォルダの管理", systemIcon: "folder.fill.badge.gearshape", destination: .readFolderSelect)
-            SettingViewCell(pathDataStore: pathDataStore, title: "イコライザ", systemIcon: "slider.vertical.3", destination: .equalizer)
-            SettingViewCell(pathDataStore: pathDataStore, title: "スリープタイマー", systemIcon: "timer", destination: .sleepTImer)
+            SettingViewCell(cellType: .excludeFolder)
+            SettingViewCell(cellType: .equalizer)
+            SettingViewCell(cellType: .sleepTimer)
         }
         .listStyle(.plain)
-        .navigationTitle("設定")
+        .navigationTitle("SettingView.navigationTitle")
     }
 }
 
 #Preview {
-    SettingView(pathDataStore: PathDataStore.shared)
+    SettingView()
 }

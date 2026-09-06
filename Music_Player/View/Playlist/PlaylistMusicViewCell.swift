@@ -7,12 +7,16 @@
 import SwiftUI
 
 struct PlaylistMusicViewCell: View {
-    @ObservedObject var playlistDataStore: PlaylistDataStore
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var music: Music
-    @State private var isShowExcludeAlert = false
-    @State private var isShowDeleteAlert = false
+    @EnvironmentObject private var playlistDataStore: PlaylistDataStore
+    @EnvironmentObject private var playDataStore: PlayDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let music: Music
+    @State private var isShowExcludeAlert: Bool = false
+    @State private var isShowDeleteAlert: Bool = false
+    
+    init(music: Music) {
+        self.music = music
+    }
     
     var body: some View {
         HStack {
@@ -21,137 +25,101 @@ struct PlaylistMusicViewCell: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundStyle(musicNameColor())
-                HStack {
-                    Text(music.artistName)
-                        .lineLimit(1)
-                        .font(.system(size: 12.5))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(.secondary)
-                    Text(music.albumName)
-                        .lineLimit(1)
-                        .font(.system(size: 12.5))
-                        .frame(maxWidth: .infinity,alignment: .leading)
-                        .foregroundStyle(.secondary)
-                }
+                    .foregroundStyle(music.filePath == playDataStore.playingMusic?.filePath ? .accent : .primary)
+                Text(music.artistName + " - " + music.albumName)
+                    .lineLimit(1)
+                    .font(.system(size: 12.5))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundStyle(.secondary)
             }
-            Text(secToMin(second:music.musicLength))
+            Text(music.musicLength.formattedTime)
                 .foregroundStyle(.secondary)
             menuButton()
+                .frame(width: 40, height: 40)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            tapped()
+            PlayRepository.musicSelected(music: music)
+            PlayRepository.setPlayNextMusics(musics: playlistDataStore.playlistMusicArray)
         }
-        .alert("本当に除外しますか？", isPresented: $isShowExcludeAlert, actions: {
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-            Button(role: .destructive, action: {
-                excludeMusic()
-            }, label: {
-                Text("除外")
-            })
-        }, message: {
-            Text("再度プレイリストに入れたい場合は、再度追加してください。")
-        })
-        .alert("本当に削除しますか？", isPresented: $isShowDeleteAlert, actions: {
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-            Button(role: .destructive, action: {
-                deleteMusicFile()
-            }, label: {
-                Text("削除")
-            })
-        }, message: {
-            Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
-        })
-    }
-    func musicNameColor() -> Color {
-        if music.filePath == playDataStore.playingMusic?.filePath {
-            return .accent
-        } else {
-            return .primary
+        .alert("PlaylistMusicViewCell.excludeAlert.title", isPresented: $isShowExcludeAlert) {
+            excludeAlertActions()
+        } message: {
+            Text("PlaylistMusicViewCell.excludeAlert.message")
         }
-    }
-    func secToMin(second: TimeInterval) -> String {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.unitsStyle = .positional
-        if second < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
-        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
-        dateFormatter.zeroFormattingBehavior = .pad
-        return dateFormatter.string(from: second)!
-    }
-    func tapped() {
-        if !FileService.isExistFile(filePath: music.filePath) {
-            Task {
-                guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-                guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
-                playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistFilePath)
-            }
+        .alert("\(music.musicName)PlaylistMusicViewCell.deleteAlert.title", isPresented: $isShowDeleteAlert) {
+            deleteAlertActions()
+        } message: {
+            Text("PlaylistMusicViewCell.deleteAlert.message")
         }
-        playDataStore.musicChoosed(music: music, playGroup: .playlist)
-        playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
     }
     func menuButton() -> some View {
         Menu {
-            Button(action: {
-                playlistDataStore.selectedMusic = music
+            Button {
+                playlistDataStore.selectedMusicFilePath = music.filePath
                 pathDataStore.playlistViewNavigationPath.append(.musicInfo)
-            }, label: {
-                Label("曲の情報", systemImage: "info.circle")
-            })
+            } label: {
+                Label("PlaylistMusicViewCell.menuButton.musicInfo.Label", systemImage: "info.circle")
+            }
             Divider()
-            Button(action: {
-                guard WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) else { return }
-                print("succeeded")
-            }, label: {
-                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-            })
-            Button(action: {
-                guard WillPlayRepository.addWillPlay(newMusicFilePath: music.filePath) else { return }
-                print("succeeded")
-            }, label: {
-                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-            })
+            Button {
+                guard PlayFlowRepository.insertFirstPlayNextM3U8(filePath: music.filePath) else { return }
+                print("insertSucceeded")
+            } label: {
+                Label("PlaylistMusicViewCell.menuButton.insertPlayNext.Label", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            Button {
+                guard PlayFlowRepository.addPlayNextM3U8(filePath: music.filePath) else { return }
+                print("addSucceeded")
+            } label: {
+                Label("PlaylistMusicViewCell.menuButton.addPlayNext.Label", systemImage: "text.line.last.and.arrowtriangle.forward")
+            }
             Divider()
-            Button(role: .destructive, action: {
+            Button(role: .destructive) {
                 isShowExcludeAlert = true
-            }, label: {
-                Label("プレイリストから除外", systemImage: "minus.circle")
-            })
-            Button(role: .destructive, action: {
+            } label: {
+                Label("PlaylistMusicViewCell.menuButton.exclude.Label", systemImage: "minus.circle")
+            }
+            Button(role: .destructive) {
                 isShowDeleteAlert = true
-            }, label: {
-                Label("ファイルを削除", systemImage: "trash")
-            })
+            } label: {
+                Label("PlaylistMusicViewCell.menuButton.delete.Label", systemImage: "trash")
+            }
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(Color.primary)
                 .frame(width: 40, height: 40)
         }
     }
-    func excludeMusic() {
-        Task {
-            guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return }
+    @ViewBuilder
+    func excludeAlertActions() -> some View {
+        CancelButton()
+        Button(role: .destructive) {
+            guard let playlistFilePath = playlistDataStore.playlistArray.selected?.filePath else { return }
             guard PlaylistRepository.removePlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
-            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: playlistFilePath)
+            print("removeSucceeded")
+            playlistDataStore.playlistMusicArray.remove(Music: music)
+        } label: {
+            Text("PlaylistMusicViewCell.excludeAlertActions.Button.Text")
+        }
+    }
+    @ViewBuilder
+    func deleteAlertActions() -> some View {
+        CancelButton()
+        DeleteButton {
+            deleteMusicFile()
         }
     }
     func deleteMusicFile() {
-        Task {
-            playDataStore.stop()
+        if music.isPlayingMusic {
+            PlayRepository.stop()
             playDataStore.playingMusic = nil
-            guard FileService.fileDelete(filePath: music.filePath) else { return }
-            print("DeleteSucceeded")
-            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
-            playlistDataStore.loadMusicSort()
         }
+        guard PlaylistRepository.fileDelete(music: music) else { return }
+        print("DeleteSucceeded")
     }
 }
 
 #Preview {
-    PlaylistMusicViewCell(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared, music: Music())
+    PlaylistMusicViewCell(music: Music())
 }

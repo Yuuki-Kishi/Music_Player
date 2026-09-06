@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct ArtistMusicViewCell: View {
-    @ObservedObject var artistDataStore: ArtistDataStore
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var music: Music
-    @State private var isShowAlert = false
+    @EnvironmentObject private var artistDataStore: ArtistDataStore
+    @EnvironmentObject private var playDataStore: PlayDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let music: Music
+    @State private var isShowAlert: Bool = false
+    
+    init(music: Music) {
+        self.music = music
+    }
     
     var body: some View {
         HStack {
@@ -21,112 +25,86 @@ struct ArtistMusicViewCell: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundStyle(musicNameColor())
+                    .foregroundStyle(music.filePath == playDataStore.playingMusic?.filePath ? .accent : .primary)
                 HStack {
-                    Text(music.artistName)
+                    Text(music.artistName + " - " + music.albumName)
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundStyle(.secondary)
-                    Text(music.albumName)
-                        .lineLimit(1)
-                        .font(.system(size: 12.5))
-                        .frame(maxWidth: .infinity,alignment: .leading)
-                        .foregroundStyle(.secondary)
                 }
             }
-            Text(secToMin(second:music.musicLength))
+            Text(music.musicLength.formattedTime)
                 .foregroundStyle(.secondary)
             menuButton()
+                .frame(width: 40, height: 40)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            tapped()
+            PlayRepository.musicSelected(music: music)
+            PlayRepository.setPlayNextMusics(musics: artistDataStore.artistMusicArray)
         }
-        .alert("本当に削除しますか？", isPresented: $isShowAlert, actions: {
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-            Button(role: .destructive, action: {
-                deleteMusicFile()
-            }, label: {
-                Text("削除")
-            })
-        }, message: {
-                Text("この操作は取り消すことができません。この項目はゴミ箱に移動されます。")
-        })
-    }
-    func musicNameColor() -> Color {
-        if music.filePath == playDataStore.playingMusic?.filePath {
-            return .accent
-        } else {
-            return .primary
+        .alert("\(music.musicName)ArtistMusicViewCell.Alert.title", isPresented: $isShowAlert) {
+            alertActions()
+        } message: {
+            Text("ArtistMusicViewCell.Alert.message")
         }
-    }
-    func secToMin(second: TimeInterval) -> String {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.unitsStyle = .positional
-        if second < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
-        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
-        dateFormatter.zeroFormattingBehavior = .pad
-        return dateFormatter.string(from: second)!
-    }
-    func tapped() {
-        playDataStore.musicChoosed(music: music, playGroup: .artist)
-        playDataStore.setNextMusics(musicFilePaths: artistDataStore.artistMusicArray.map { $0.filePath })
     }
     func menuButton() -> some View {
         Menu {
-            Button(action: {
-                artistDataStore.selectedMusic = music
-                pathDataStore.artistViewNavigationPath.append(.addPlaylist)
-            }, label: {
-                Label("プレイリストに追加", systemImage: "text.badge.plus")
-            })
-            Button(action: {
-                artistDataStore.selectedMusic = music
+            Button {
+                artistDataStore.selectedMusicFilePath = music.filePath
+                artistDataStore.isShowAddPlaylistView = true
+            } label: {
+                Label("ArtistMusicViewCell.menuButton.addPlaylist.Label", systemImage: "text.badge.plus")
+            }
+            Button {
+                artistDataStore.selectedMusicFilePath = music.filePath
                 pathDataStore.artistViewNavigationPath.append(.musicInfo)
-            }, label: {
-                Label("曲の情報", systemImage: "info.circle")
-            })
+            } label: {
+                Label("ArtistMusicViewCell.menuButton.musicInfo.Label", systemImage: "info.circle")
+            }
             Divider()
-            Button(action: {
-                guard WillPlayRepository.insertWillPlay(newMusicFilePath: music.filePath, at: 0) else { return }
-                print("succeeded")
-            }, label: {
-                Label("次に再生", systemImage: "text.line.first.and.arrowtriangle.forward")
-            })
-            Button(action: {
-                guard WillPlayRepository.addWillPlay(newMusicFilePath: music.filePath) else { return }
-                print("succeeded")
-            }, label: {
-                Label("最後に再生", systemImage: "text.line.last.and.arrowtriangle.forward")
-            })
+            Button {
+                guard PlayFlowRepository.insertFirstPlayNextM3U8(filePath: music.filePath) else { return }
+                print("insertSucceeded")
+            } label: {
+                Label("ArtistMusicViewCell.menuButton.insertPlayNext.Label", systemImage: "text.line.first.and.arrowtriangle.forward")
+            }
+            Button {
+                guard PlayFlowRepository.addPlayNextM3U8(filePath: music.filePath) else { return }
+                print("addSucceeded")
+            } label: {
+                Label("ArtistMusicViewCell.menuButton.addPlayNext.Label", systemImage: "text.line.last.and.arrowtriangle.forward")
+            }
             Divider()
-            Button(role: .destructive, action: {
+            Button(role: .destructive) {
                 isShowAlert = true
-            }, label: {
-                Label("ファイルを削除", systemImage: "trash")
-            })
+            } label: {
+                Label("ArtistMusicViewCell.menuButton.delete.Label", systemImage: "trash")
+            }
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(Color.primary)
-                .frame(width: 40, height: 40)
+        }
+    }
+    @ViewBuilder
+    func alertActions() -> some View {
+        CancelButton()
+        DeleteButton {
+            deleteMusicFile()
         }
     }
     func deleteMusicFile() {
-        Task {
-            playDataStore.stop()
+        if music.isPlayingMusic {
+            PlayRepository.stop()
             playDataStore.playingMusic = nil
-            guard FileService.fileDelete(filePath: music.filePath) else { return }
-            print("DeleteSucceeded")
-            guard let artistName = artistDataStore.selectedArtist?.artistName else { return }
-            artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistName)
-            artistDataStore.loadMusicSort()
         }
+        guard ArtistRepository.fileDelete(music: music) else { return }
+        print("DeleteSucceeded")
     }
 }
 
 #Preview {
-    ArtistMusicViewCell(artistDataStore: ArtistDataStore.shared, playDataStore: PlayDataStore.shared, pathDataStore: PathDataStore.shared, music: Music())
+    ArtistMusicViewCell(music: Music())
 }

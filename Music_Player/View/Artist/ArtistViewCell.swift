@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct ArtistViewCell: View {
-    @ObservedObject var artistDataStore: ArtistDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var artist: Artist
+    @EnvironmentObject private var artistDataStore: ArtistDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let artist: Artist
+    
+    init(artist: Artist) {
+        self.artist = artist
+    }
     
     var body: some View {
         HStack {
@@ -28,18 +32,20 @@ struct ArtistViewCell: View {
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
-            Text(String(artist.musicCount) + "曲")
+            Text("\(String(artist.musicCount))ArtistViewCell.musicCount.Text")
                 .font(.system(size: 15.0))
+                .foregroundStyle(.secondary)
+            Image(systemName: "chevron.right")
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            artistDataStore.selectedArtist = artist
+            artistDataStore.selectedArtistName = artist.artistName
             pathDataStore.artistViewNavigationPath.append(.artistMusic)
         }
     }
 }
 
 #Preview {
-    ArtistViewCell(artistDataStore: ArtistDataStore.shared, pathDataStore: PathDataStore.shared, artist: Artist())
+    ArtistViewCell(artist: Artist())
 }

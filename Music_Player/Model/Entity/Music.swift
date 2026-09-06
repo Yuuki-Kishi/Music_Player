@@ -7,11 +7,7 @@
 
 import Foundation
 
-struct Music: Hashable, Identifiable, Equatable {
-    static func == (lhs: Music, rhs: Music) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
+struct Music: Hashable, Identifiable {
     var id = UUID()
     var musicName: String
     var artistName: String
@@ -20,10 +16,9 @@ struct Music: Hashable, Identifiable, Equatable {
     var editedDate: Date
     var fileSize: String
     var musicLength: TimeInterval
-    var folderPath: String
     var filePath: String
     
-    init(musicName: String, artistName: String, albumName: String, coverImage: Data, editedDate: Date, fileSize: String, musicLength: TimeInterval, folderPath: String, filePath: String) {
+    init(musicName: String, artistName: String, albumName: String, coverImage: Data, editedDate: Date, fileSize: String, musicLength: TimeInterval, filePath: String) {
         self.musicName = musicName
         self.artistName = artistName
         self.albumName = albumName
@@ -31,11 +26,10 @@ struct Music: Hashable, Identifiable, Equatable {
         self.editedDate = editedDate
         self.fileSize = fileSize
         self.musicLength = musicLength
-        self.folderPath = folderPath
         self.filePath = filePath
     }
     
-    init(musicName: String?, artistName: String?, albumName: String?, coverImage: Data?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, folderPath: String?, filePath: String?) {
+    init(musicName: String?, artistName: String?, albumName: String?, coverImage: Data?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, filePath: String?) {
         self.musicName = musicName ?? "不明な曲"
         self.artistName = artistName ?? "不明なアーティスト"
         self.albumName = albumName ?? "不明なアルバム"
@@ -43,7 +37,6 @@ struct Music: Hashable, Identifiable, Equatable {
         self.editedDate = editedDate ?? Date()
         self.fileSize = fileSize ?? "0MB"
         self.musicLength = musicLength ?? 0.0
-        self.folderPath = folderPath ?? "unknownFolderPath"
         self.filePath = filePath ?? "unknownFilePath"
     }
     
@@ -55,12 +48,16 @@ struct Music: Hashable, Identifiable, Equatable {
         self.editedDate = Date()
         self.fileSize = "0MB"
         self.musicLength = 0.0
-        self.folderPath = "unknownFolderPath"
         self.filePath = "unknownFilePath"
     }
 }
 
+@MainActor
 extension Array where Element == Music {
+    var selected: Element? {
+        guard let selectedMusicFilePath = MusicDataStore.shared.selectedMusicFilePath else { return nil }
+        return self.first { $0.filePath == selectedMusicFilePath }
+    }
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
             self[index] = item
@@ -72,5 +69,23 @@ extension Array where Element == Music {
         if let index = self.firstIndex(of: item) {
             self.remove(at: index)
         }
+    }
+}
+
+@MainActor
+extension Music {
+    var isPlayingMusic: Bool {
+        return self.filePath == PlayDataStore.shared.playingMusic?.filePath
+    }
+}
+
+extension TimeInterval {
+    var formattedTime: String {
+        let totalSeconds = Int(self)
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        if hours > 0 { return String(format: "%02d:%02d:%02d", hours, minutes, seconds) }
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }

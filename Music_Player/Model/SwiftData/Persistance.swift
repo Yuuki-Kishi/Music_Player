@@ -10,7 +10,7 @@ import SwiftData
 
 class Persistance {
     static var sharedModelContainer: ModelContainer = {
-        let schema = Schema([EqualizerParameter.self, ReadFolder.self])
+        let schema = Schema([EqualizerParameter.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
@@ -48,6 +48,16 @@ actor PersistanceActor: ModelActor {
             print("error get")
         }
         return fetched
+    }
+    
+    func getCount<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> Int? {
+        var count: Int?
+        do {
+            count = try modelContext.fetchCount(descriptor)
+        } catch {
+            print("error getCount")
+        }
+        return count
     }
     
     func insert<T:PersistentModel>(_ value:T) {

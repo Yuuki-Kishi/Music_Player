@@ -1,5 +1,5 @@
 //
-//  PlaylistVewCell.swift
+//  PlaylistViewCell.swift
 //  Music_Player
 //
 //  Created by 岸　優樹 on 2025/04/01.
@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct PlaylistViewCell: View {
-    @ObservedObject var playlistDataStore: PlaylistDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var playlist: Playlist
+    @EnvironmentObject private var playlistDataStore: PlaylistDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let playlist: Playlist
+    
+    init(playlist: Playlist) {
+        self.playlist = playlist
+    }
     
     var body: some View {
         HStack {
@@ -24,21 +28,24 @@ struct PlaylistViewCell: View {
                 )
                 .frame(width: 40, height: 40)
             Text(playlist.playlistName)
+                .lineLimit(1)
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
-            Text(String(playlist.musicCount) + "曲")
+            Text("\(String(playlist.musicCount))PlaylistViewCell.musicCount.Text")
                 .font(.system(size: 15.0))
+                .foregroundStyle(.secondary)
+            Image(systemName: "chevron.right")
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            playlistDataStore.selectedPlaylist = playlist
+            playlistDataStore.selectedPlaylistFilePath = playlist.filePath
             pathDataStore.playlistViewNavigationPath.append(.playlistMusic)
         }
     }
 }
 
 #Preview {
-    PlaylistViewCell(playlistDataStore: PlaylistDataStore.shared, pathDataStore: PathDataStore.shared, playlist: Playlist())
+    PlaylistViewCell(playlist: Playlist())
 }

@@ -18,21 +18,21 @@ class PathDataStore: ObservableObject {
     @Published var playViewNavigationPath: [PlayViewPath] = []
     
     enum MusicViewPath {
-        case addPlaylist, musicInfo, favoriteMusic, selectFavoriteMusic, setting, readFolderSelect, equalizer, sleepTImer
+        case musicInfo, favoriteMusic, selectFavoriteMusic, setting, excludeFolderSelect, equalizer, sleepTimer
     }
     enum ArtistViewPath {
-        case artistMusic, addPlaylist, musicInfo
+        case artistMusic, musicInfo
     }
     enum AlbumViewPath {
-        case albumMusic, addPlaylist, musicInfo
+        case albumMusic, musicInfo
     }
     enum PlaylistViewPath {
         case playlistMusic, selectMusic, musicInfo
     }
     enum FolderViewPath {
-        case folderMusic, addPlaylist, musicInfo
+        case folderMusic, musicInfo
     }
     enum PlayViewPath {
-        case addPlaylist, musicInfo, playFlow
+        case musicInfo, playFlow
     }
 }

@@ -8,53 +8,42 @@
 import SwiftUI
 
 struct ArtistView: View {
-    @StateObject var artistDataStore = ArtistDataStore.shared
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
+    @EnvironmentObject private var artistDataStore: ArtistDataStore
+    @EnvironmentObject private var playDataStore: PlayDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
     
     var body: some View {
         NavigationStack(path: $pathDataStore.artistViewNavigationPath) {
             VStack {
-                if isLoading {
-                    Spacer()
-                    Text("読み込み中...")
-                    Spacer()
-                } else {
-                    if artistDataStore.artistArray.isEmpty {
-                        Spacer()
-                        Text("表示できるアーティストがいません")
-                        Spacer()
-                    } else {
-                        Text(String(artistDataStore.artistArray.count) + "人のアーティスト")
-                            .font(.system(size: 15))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
-                        List(artistDataStore.artistArray) { artist in
-                            ArtistViewCell(artistDataStore: artistDataStore, pathDataStore: pathDataStore, artist: artist)
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
+                BoolSwitchView(isEmpty: artistDataStore.artistArray.isEmpty, isLoading: artistDataStore.isLoading) {
+                    Text("\(String(artistDataStore.artistArray.count))ArtistView.content.Text")
+                        .font(.system(size: 15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    List(artistDataStore.artistArray) { artist in
+                        ArtistViewCell(artist: artist)
                     }
+                    .listStyle(.plain)
+                } emptyContent: {
+                    Text("ArtistView.emptyContent.Text")
                 }
-                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+                PlayWindowView()
             }
-            .navigationTitle("アーティスト")
+            .navigationTitle("ArtistView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: PathDataStore.ArtistViewPath.self) { path in
                 destination(path: path)
             }
+            .sheet(isPresented: $artistDataStore.isShowAddPlaylistView) {
+                AddPlaylistView(music: artistDataStore.artistMusicArray.selected)
+            }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
+                ToolbarItem(placement: .topBarTrailing) {
                     toolBarMenu()
-                })
+                }
             }
             .onAppear() {
                 getArtists()
-            }
-            .onDisappear() {
-                isLoading = true
             }
         }
     }
@@ -62,47 +51,40 @@ struct ArtistView: View {
     func destination(path: PathDataStore.ArtistViewPath) -> some View {
         switch path {
         case .artistMusic:
-            ArtistMusicView(artistDataStore: artistDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
-        case .addPlaylist:
-            AddPlaylistView(pathDataStore: pathDataStore, music: artistDataStore.selectedMusic ?? Music(), pathArray: .artist)
+            ArtistMusicView()
         case .musicInfo:
-            MusicInfoView(music: artistDataStore.selectedMusic ?? Music())
+//            MusicInfoView(playGroup: .artist)
+            MusicInfoView(music: artistDataStore.artistMusicArray.selected)
         }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: {
-                reloadData()
-            }, label: {
-                Label("再読み込み", systemImage: "arrow.clockwise")
-            })
+            ReloadButton {
+                getArtists()
+            }
             Menu {
-                Button(action: {
-                    artistDataStore.artistArraySort(mode: .nameAscending)
-                    artistDataStore.saveSortMode()
-                }, label: {
-                    Text("アーティスト名昇順")
-                })
-                Button(action: {
-                    artistDataStore.artistArraySort(mode: .nameDescending)
-                    artistDataStore.saveSortMode()
-                }, label: {
-                    Text("アーティスト名降順")
-                })
-                Button(action: {
-                    artistDataStore.artistArraySort(mode: .countAscending)
-                    artistDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数昇順")
-                })
-                Button(action: {
-                    artistDataStore.artistArraySort(mode: .countDescending)
-                    artistDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数降順")
-                })
+                Button {
+                    ArtistRepository.sortAndUpdateArtistSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("ArtistView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("ArtistView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistSortMode(sortMode: .countAscending)
+                } label: {
+                    Text("ArtistView.toolBarMenu.sort.countAscending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistSortMode(sortMode: .countDescending)
+                } label: {
+                    Text("ArtistView.toolBarMenu.sort.countDescending.Text")
+                }
             } label: {
-                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+                Label("ArtistView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -110,17 +92,14 @@ struct ArtistView: View {
     }
     func getArtists() {
         Task {
+            artistDataStore.isLoading = true
             artistDataStore.artistArray = await ArtistRepository.getArtists()
-            artistDataStore.loadSort()
-            isLoading = false
+            ArtistRepository.sortArtistArray()
+            artistDataStore.isLoading = false
         }
-    }
-    func reloadData() {
-        isLoading = true
-        getArtists()
     }
 }
 
 #Preview {
-    ArtistView(playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    ArtistView()
 }

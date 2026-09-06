@@ -9,7 +9,7 @@ import Foundation
 
 struct Playlist: Hashable, Identifiable, Equatable, Sendable {
     static func == (lhs: Playlist, rhs: Playlist) -> Bool {
-        return lhs.playlistName == rhs.playlistName
+        return lhs.filePath == rhs.filePath
     }
     
     var id = UUID()
@@ -36,7 +36,12 @@ struct Playlist: Hashable, Identifiable, Equatable, Sendable {
     }
 }
 
+@MainActor
 extension Array where Element == Playlist {
+    var selected: Element? {
+        guard let selectedPlaylistFilePath = PlaylistDataStore.shared.selectedPlaylistFilePath else { return nil }
+        return self.first { $0.filePath == selectedPlaylistFilePath }
+    }
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
             self[index] = item
@@ -44,7 +49,7 @@ extension Array where Element == Playlist {
             self.append(item)
         }
     }
-    mutating func remove(Music item: Element) {
+    mutating func remove(Playlist item: Element) {
         if let index = self.firstIndex(of: item) {
             self.remove(at: index)
         }

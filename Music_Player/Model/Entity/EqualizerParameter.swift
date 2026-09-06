@@ -23,3 +23,13 @@ final class EqualizerParameter: Sendable {
         self.gain = gain
     }
 }
+
+extension Array where Element == EqualizerParameter {
+    mutating func append(noDuplicate item: Element) {
+        if let index = self.firstIndex(of: item) {
+            self[index] = item
+        } else {
+            self.append(item)
+        }
+    }
+}

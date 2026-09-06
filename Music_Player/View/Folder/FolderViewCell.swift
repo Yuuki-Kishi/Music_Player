@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct FolderViewCell: View {
-    @ObservedObject var folderDataStore: FolderDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var folder: Folder
+    @EnvironmentObject private var folderDataStore: FolderDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let folder: Folder
+    
+    init(folder: Folder) {
+        self.folder = folder
+    }
     
     var body: some View {
         HStack {
@@ -24,21 +28,24 @@ struct FolderViewCell: View {
                 )
                 .frame(width: 40, height: 40)
             Text(folder.folderName)
+                .lineLimit(1)
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
-            Text(String(folder.musicCount) + "曲")
+            Text("\(String(folder.musicCount))FolderViewCell.musicCount.Text")
                 .font(.system(size: 15.0))
+                .foregroundStyle(.secondary)
+            Image(systemName: "chevron.right")
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            folderDataStore.selectedFolder = folder
+            folderDataStore.selectedFolderPath = folder.folderPath
             pathDataStore.folderViewNavigationPath.append(.folderMusic)
         }
     }
 }
 
 #Preview {
-    FolderViewCell(folderDataStore: FolderDataStore.shared, pathDataStore: PathDataStore.shared, folder: Folder())
+    FolderViewCell(folder: Folder())
 }

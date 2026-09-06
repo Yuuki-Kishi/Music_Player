@@ -1,5 +1,5 @@
 //
-//  DisplayFolderSelectViewCell.swift
+//  ExcludeFolderSelectViewCell.swift
 //  Music_Player
 //
 //  Created by 岸　優樹 on 2025/04/15.
@@ -7,8 +7,12 @@
 
 import SwiftUI
 
-struct ReadFolderSelectViewCell: View {
-    @State var folder: Folder
+struct ExcludeFolderSelectViewCell: View {
+    private let folder: Folder
+    
+    init(folder: Folder) {
+        self.folder = folder
+    }
     
     var body: some View {
         HStack {
@@ -34,5 +38,5 @@ struct ReadFolderSelectViewCell: View {
 }
 
 #Preview {
-    ReadFolderSelectViewCell(folder: Folder())
+    ExcludeFolderSelectViewCell(folder: Folder())
 }

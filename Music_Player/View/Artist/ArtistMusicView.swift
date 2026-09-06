@@ -8,118 +8,77 @@
 import SwiftUI
 
 struct ArtistMusicView: View {
-    @ObservedObject var artistDataStore: ArtistDataStore
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
+    @EnvironmentObject private var artistDataStore: ArtistDataStore
+    @EnvironmentObject private var playDataStore: PlayDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
     
     var body: some View {
         VStack {
-            if isLoading {
-                Spacer()
-                Text("読み込み中...")
-                Spacer()
-            } else {
-                if artistDataStore.artistMusicArray.isEmpty {
-                    Spacer()
-                    Text("表示できる曲がありません")
-                    Spacer()
-                } else {
-                    Button(action: {
-                        randomPlay()
-                    }, label: {
-                        HStack {
-                            Image(systemName: "play.circle")
-                                .foregroundStyle(.accent)
-                            Text("シャッフル再生 (" + String(artistDataStore.artistMusicArray.count) + "曲)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding(.horizontal)
-                    })
-                    .foregroundStyle(.primary)
-                    List(artistDataStore.artistMusicArray) { music in
-                        ArtistMusicViewCell(artistDataStore: artistDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
+            BoolSwitchView(isEmpty: artistDataStore.artistMusicArray.isEmpty, isLoading: artistDataStore.isLoading) {
+                RandomPlayButton(dataStore: .artist)
+                List(artistDataStore.artistMusicArray) { music in
+                    ArtistMusicViewCell(music: music)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            } emptyContent: {
+                Text("ArtistMusicView.emptyContent.Text")
             }
-            PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+            PlayWindowView()
         }
-        .navigationTitle(artistDataStore.selectedArtist?.artistName ?? "不明なアーティスト")
+        .navigationTitle(artistDataStore.artistArray.selected?.artistName ?? String(localized: "ArtistMusicView.navigationTitle.unknownArtistName"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing, content: {
+            ToolbarItem(placement: .topBarTrailing) {
                 toolBarMenu()
-            })
+            }
         }
         .onAppear() {
             getArtistMusics()
         }
-        .onDisappear() {
-            artistDataStore.artistMusicArray.removeAll()
-            isLoading = true
-        }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: {
-                reloadData()
-            }, label: {
-                Label("再読み込み", systemImage: "arrow.clockwise")
-            })
+            ReloadButton {
+                getArtistMusics()
+            }
             Menu {
-                Button(action: {
-                    artistDataStore.artistMusicArraySort(mode: .nameAscending)
-                    artistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("曲名昇順")
-                })
-                Button(action: {
-                    artistDataStore.artistMusicArraySort(mode: .nameDescending)
-                    artistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("曲名降順")
-                })
-                Button(action: {
-                    artistDataStore.artistMusicArraySort(mode: .dateAscending)
-                    artistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("更新日昇順")
-                })
-                Button(action: {
-                    artistDataStore.artistMusicArraySort(mode: .dateDescending)
-                    artistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("更新日降順")
-                })
+                Button {
+                    ArtistRepository.sortAndUpdateArtistMusicSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("ArtistMusicView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistMusicSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("ArtistMusicView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistMusicSortMode(sortMode: .dateAscending)
+                } label: {
+                    Text("ArtistMusicView.toolBarMenu.sort.dateAscending.Text")
+                }
+                Button {
+                    ArtistRepository.sortAndUpdateArtistMusicSortMode(sortMode: .dateDescending)
+                } label: {
+                    Text("ArtistMusicView.toolBarMenu.sort.dateDescending.Text")
+                }
             } label: {
-                Label("並び替え", systemImage: "arrow.up.arrow.down")
+                Label("ArtistMusicView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
             }
         } label: {
             Image(systemName: "ellipsis.circle")
         }
     }
     func getArtistMusics() {
-        guard let artistName = artistDataStore.selectedArtist?.artistName else { return }
         Task {
-            artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic(artistName: artistName)
-            artistDataStore.loadMusicSort()
-            isLoading = false
+            artistDataStore.isLoading = true
+            artistDataStore.artistMusicArray = await ArtistRepository.getArtistMusic()
+            ArtistRepository.sortArtistMusicArray()
+            artistDataStore.isLoading = false
         }
-    }
-    func reloadData() {
-        isLoading = true
-        getArtistMusics()
-    }
-    func randomPlay() {
-        guard let music = artistDataStore.artistMusicArray.randomElement() else { return }
-        playDataStore.setPlayMode(playMode: .shuffle)
-        playDataStore.musicChoosed(music: music, playGroup: .artist)
-        playDataStore.setNextMusics(musicFilePaths: artistDataStore.artistMusicArray.map { $0.filePath })
     }
 }
 
 #Preview {
-    ArtistMusicView(artistDataStore: ArtistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    ArtistMusicView()
 }

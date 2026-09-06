@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct AlbumViewCell: View {
-    @ObservedObject var albumDataStore: AlbumDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var album: Album
+    @EnvironmentObject private var albumDataStore: AlbumDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    private let album: Album
+    
+    init(album: Album) {
+        self.album = album
+    }
     
     var body: some View {
         HStack {
-            Image(systemName: "square.stack.fill")
+            Image(systemName: "music.pages")
                 .font(.system(size: 30.0))
                 .foregroundStyle(.accent)
                 .background(
@@ -23,21 +27,24 @@ struct AlbumViewCell: View {
                         .frame(width: 50, height: 50)
                 )
             Text(album.albumName)
+                .lineLimit(1)
                 .font(.system(size: 20.0))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading)
-            Text(String(album.musicCount) + "曲")
+            Text("\(String(album.musicCount))AlbumViewCell.musicCount.Text")
                 .font(.system(size: 15.0))
+                .foregroundStyle(.secondary)
+            Image(systemName: "chevron.right")
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            albumDataStore.selectedAlbum = album
+            albumDataStore.selectedAlbumName = album.albumName
             pathDataStore.albumViewNavigationPath.append(.albumMusic)
         }
     }
 }
 
 #Preview {
-    AlbumViewCell(albumDataStore: AlbumDataStore.shared, pathDataStore: PathDataStore.shared,  album: Album())
+    AlbumViewCell(album: Album())
 }

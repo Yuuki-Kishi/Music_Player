@@ -11,34 +11,14 @@ import Foundation
 class FavoriteMusicDataStore: ObservableObject {
     static let shared = FavoriteMusicDataStore()
     @Published var favoriteMusicArray: [Music] = []
-    @Published var selectedMusic: Music? = nil
+    @Published var selectedMusicFilePath: String? = nil
     @Published var favoriteMusicSortMode: FavoriteMusicSortMode = .nameAscending
+    @Published var isLoading: Bool = false
+    @Published var isShowAddPlaylistView: Bool = false
+    @Published var selectionValue: Set<Music> = []
+    @Published var selectableMusicArray: [Music] = []
     
     enum FavoriteMusicSortMode: String {
         case nameAscending, nameDescending, dateAscending, dateDescending
-    }
-    
-    func arraySort(mode: FavoriteMusicSortMode) {
-        switch mode {
-        case .nameAscending:
-            favoriteMusicArray.sort { $0.musicName < $1.musicName }
-        case .nameDescending:
-            favoriteMusicArray.sort { $0.musicName > $1.musicName }
-        case .dateAscending:
-            favoriteMusicArray.sort { $0.editedDate < $1.editedDate }
-        case .dateDescending:
-            favoriteMusicArray.sort { $0.editedDate > $1.editedDate }
-        }
-        favoriteMusicSortMode = mode
-    }
-    
-    func saveMusicSortMode() {
-        UserDefaultsRepository.saveSortMode(sortMode: favoriteMusicSortMode.rawValue, key: "FavoriteMusicSortMode")
-    }
-    
-    func loadMusicSort() {
-        let sortModeString = UserDefaultsRepository.loadSortMode(key: "FavoriteMusicSortMode") ?? "nameAscending"
-        guard let sortMode = FavoriteMusicSortMode(rawValue: sortModeString) else { return }
-        arraySort(mode: sortMode)
     }
 }

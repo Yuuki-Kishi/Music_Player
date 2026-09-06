@@ -8,73 +8,102 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var playDataStore = PlayDataStore.shared
-    @StateObject var viewDataStore = ViewDataStore.shared
-    @StateObject var pathDataStore = PathDataStore.shared
+    @EnvironmentObject private var playDataStore: PlayDataStore
     
     var body: some View {
         TabView() {
-            MusicView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            MusicView()
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note")
-                        Text("ミュージック")
+                        Text("ContentView.MusicView.tabItem.Text")
                     }
                 }
-            ArtistView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            ArtistView()
                 .tabItem {
                     VStack {
                         Image(systemName: "music.mic")
-                        Text("アーティスト")
+                        Text("ContentView.ArtistView.tabItem.Text")
                     }
                 }
-                .navigationTitle("アーティスト")
-            AlbumView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            AlbumView()
                 .tabItem {
                     VStack {
                         Image(systemName: "square.stack")
-                        Text("アルバム")
+                        Text("ContentView.AlbumView.tabItem.Text")
                     }
                 }
-            PlaylistView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            PlaylistView()
                 .tabItem {
                     VStack {
                         Image(systemName: "music.note.list")
-                        Text("プレイリスト")
+                        Text("ContentView.PlaylistView.tabItem.Text")
                     }
                 }
-            FolderView(playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            FolderView()
                 .tabItem {
                     VStack {
                         Image(systemName: "folder.fill")
-                        Text("フォルダ")
+                        Text("ContentView.FolderView.tabItem.Text")
                     }
                 }
         }
         .accentColor(.accent)
-        .sheet(isPresented: $viewDataStore.isShowPlayView, onDismiss: {
-            pathDataStore.playViewNavigationPath.removeAll()
-        }, content: {
-            PlayView(playDataStore: playDataStore, pathDataStore: pathDataStore)
-        })
+        .sheet(isPresented: $playDataStore.isShowPlayView) {
+            PlayView()
+        }
         .onAppear() {
             onAppear()
         }
     }
     func onAppear() {
-        FileService.createDirectory(folderPath: "Playlist")
-        FileService.createDirectory(folderPath: "Playlist/System")
-        if !WillPlayRepository.isExistWillPlayM3U8() {
-            guard WillPlayRepository.createWillPlayM3U8() else { return }
-            print("succeeded")
-        }
-        if !PlayedRepository.isExistPlayedM3U8() {
-            guard PlayedRepository.createPlayedM3U8() else { return }
-            print("succeeded")
-        }
-        if !FavoriteMusicRepository.isExistFavoriteMusicM3U8() {
-            guard FavoriteMusicRepository.createFavoriteMusicM3U8() else { return }
-            print("succeeded")
+        Task {
+            FileService.createDirectory(folderPath: "Playlist")
+            FileService.createDirectory(folderPath: "System")
+            if !ExcludeFolderRepository.isExistExcludeFolder() {
+                if ExcludeFolderRepository.createExcludeFolder() {
+                    print("succeeded")
+                }
+            }
+            if !PlayFlowRepository.isExistPlayNextM3U8() {
+                if PlayFlowRepository.createPlayNextM3U8() {
+                    print("succeeded")
+                }
+            }
+            if !PlayFlowRepository.isExistPlayBackM3U8() {
+                if PlayFlowRepository.createPlayBackM3U8() {
+                    print("succeeded")
+                }
+            }
+            if FileService.isExist(path: "Playlist/System/Favorite.m3u8") {
+                if FavoriteMusicRepository.migrationFavoriteMusic() {
+                    print("migrateSucceeded")
+                    if FileService.isExist(path: "Playlist/System") {
+                        if FileService.fileDelete(filePath: "Playlist/System") {
+                            print("fileDeleted")
+                        }
+                    }
+                }
+            }
+            if !FavoriteMusicRepository.isExistFavoriteMusicM3U8() {
+                if FavoriteMusicRepository.createFavoriteMusicM3U8() {
+                    print("succeeded")
+                }
+            }
+            if await EqualizerParameterRepository.isEmpty() {
+                await EqualizerParameterRepository.createDefault()
+            }
+            if let playingMusic = await PlayRepository.loadPlayingMusic() {
+                PlayRepository.setMusic(music: playingMusic)
+                PlayRepository.setScheduleFile()
+                PlayRepository.setTimer()
+            }
+            if let isShuffle = UserDefaultsRepository.load(key: "isShuffle", as: Bool.self) {
+                playDataStore.isShuffle = isShuffle
+            }
+            if let repeatModeString = UserDefaultsRepository.load(key: "repeatMode", as: String.self), let repeatMode = PlayDataStore.RepeatModeEnum(rawValue: repeatModeString) {
+                playDataStore.repeatMode = repeatMode
+            }
         }
     }
 }

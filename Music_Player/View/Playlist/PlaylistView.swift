@@ -8,74 +8,52 @@
 import SwiftUI
 
 struct PlaylistView: View {
-    @StateObject var playlistDataStore = PlaylistDataStore.shared
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
-    @State private var isShowAlert = false
-    @State private var text = ""
+    @EnvironmentObject private var playlistDataStore: PlaylistDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+    @State private var isShowAlert: Bool = false
+    @State private var newPlaylistNameText: String = ""
     
     var body: some View {
         NavigationStack(path: $pathDataStore.playlistViewNavigationPath) {
-            ZStack {
-                if isLoading {
-                    Spacer()
-                    Text("読み込み中...")
-                    Spacer()
-                } else {
-                    VStack {
-                        if playlistDataStore.playlistArray.isEmpty {
-                            Spacer()
-                            Text("表示できるプレイリストがありません")
-                            Spacer()
-                        } else {
-                            Text(String(playlistDataStore.playlistArray.count) + "個のプレイリスト")
-                                .font(.system(size: 15))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            List(playlistDataStore.playlistArray) { playlist in
-                                PlaylistViewCell(playlistDataStore: playlistDataStore, pathDataStore: pathDataStore, playlist: playlist)
-                            }
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
-                        }
-                        PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+            VStack {
+                BoolSwitchView(isEmpty: playlistDataStore.playlistArray.isEmpty, isLoading: playlistDataStore.isLoading) {
+                    Text("\(String(playlistDataStore.playlistArray.count))PlaylistView.content.Text")
+                        .font(.system(size: 15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    List(playlistDataStore.playlistArray) { playlist in
+                        PlaylistViewCell(playlist: playlist)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                } emptyContent: {
+                    Text("PlaylistView.emptyContent.Text")
                 }
             }
-            .navigationTitle("プレイリスト")
+            PlayWindowView()
+            .navigationTitle("PlaylistView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: PathDataStore.PlaylistViewPath.self) { path in
                 destination(path: path)
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    Button(action: {
+                ToolbarItem(placement: .topBarTrailing) {
+                    PlusButton {
                         isShowAlert = true
-                    }, label: {
-                        Image(systemName: "plus")
-                    })
-                })
+                    }
+                }
+                ToolbarSpacer()
+                ToolbarItem(placement: .topBarTrailing) {
+                    toolBarMenu()
+                }
             }
-            .alert("プレイリストを作成", isPresented: $isShowAlert, actions: {
-                TextField("プレイリスト名", text: $text)
-                Button(role: .cancel, action: {}, label: {
-                    Text("キャンセル")
-                })
-                Button(action: {
-                    createPlaylist()
-                }, label: {
-                    Text("作成")
-                })
-            }, message: {
-                Text("作成するプレイリストの名前を入力してください。")
-            })
+            .alert("PlaylistView.Alert.title", isPresented: $isShowAlert) {
+                alertActions()
+            } message: {
+                Text("PlaylistView.Alert.message")
+            }
             .onAppear() {
                 getPlaylists()
-            }
-            .onDisappear() {
-                isLoading = true
             }
         }
     }
@@ -83,26 +61,70 @@ struct PlaylistView: View {
     func destination(path: PathDataStore.PlaylistViewPath) -> some View {
         switch path {
         case .playlistMusic:
-            PlaylistMusicView(playlistDataStore: playlistDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
+            PlaylistMusicView()
         case .selectMusic:
-            PlaylistSelectMusicView(playlistDataStore: playlistDataStore, pathDataStore: pathDataStore)
+            PlaylistSelectMusicView()
         case .musicInfo:
-            MusicInfoView(music: playlistDataStore.selectedMusic ?? Music())
+//            MusicInfoView(playGroup: .playlist)
+            MusicInfoView(music: playlistDataStore.playlistMusicArray.selected)
+        }
+    }
+    func toolBarMenu() -> some View {
+        Menu {
+            ReloadButton {
+                getPlaylists()
+            }
+            Menu {
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("PlaylistView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button{
+                    PlaylistRepository.sortAndUpdatePlaylistSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("PlaylistView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistSortMode(sortMode: .countAscending)
+                } label: {
+                    Text("PlaylistView.toolBarMenu.sort.countAscending.Text")
+                }
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistSortMode(sortMode: .countDescending)
+                } label: {
+                    Text("PlaylistView.toolBarMenu.sort.countDescending.Text")
+                }
+            } label: {
+                Label("PlaylistView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+    }
+    @ViewBuilder
+    func alertActions() -> some View {
+        TextField("PlaylistView.Alert.textField", text: $newPlaylistNameText)
+        CancelButton()
+        Button {
+            createPlaylist()
+        } label: {
+            Text("PlaylistView.AlertAction.createButton.Text")
         }
     }
     func getPlaylists() {
+        playlistDataStore.isLoading = true
         playlistDataStore.playlistArray = PlaylistRepository.getPlaylists()
-        playlistDataStore.loadSort()
-        isLoading = false
+        PlaylistRepository.sortPlaylistArray()
+        playlistDataStore.isLoading = false
     }
     func createPlaylist() {
-        if text != "" {
-            guard PlaylistRepository.createPlaylist(playlistName: text) else { return }
-            getPlaylists()
-        }
+        guard newPlaylistNameText != "" else { return }
+        guard PlaylistRepository.createPlaylist(playlistName: newPlaylistNameText) else { return }
+        getPlaylists()
     }
 }
 
 #Preview {
-    PlaylistView(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    PlaylistView()
 }

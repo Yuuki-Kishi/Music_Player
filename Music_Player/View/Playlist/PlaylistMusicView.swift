@@ -9,166 +9,127 @@ import SwiftUI
 import SwiftData
 
 struct PlaylistMusicView: View {
-    @ObservedObject var playlistDataStore: PlaylistDataStore
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
+    @EnvironmentObject private var playlistDataStore: PlaylistDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
     @State private var isShowRenameAlert: Bool = false
     @State private var isShowDeleteAlert: Bool = false
-    @State private var text: String = ""
+    @State private var renameText: String = ""
     
     var body: some View {
         VStack {
-            if isLoading {
-                Spacer()
-                Text("読み込み中...")
-                Spacer()
-            } else {
-                if playlistDataStore.playlistMusicArray.isEmpty {
-                    Spacer()
-                    Text("表示できる曲がありません")
-                    Spacer()
-                } else {
-                    Button(action: {
-                        randomPlay()
-                    }, label: {
-                        HStack {
-                            Image(systemName: "play.circle")
-                                .foregroundStyle(.accent)
-                            Text("シャッフル再生 (" + String(playlistDataStore.playlistMusicArray.count) + "曲)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding(.horizontal)
-                    })
-                    .foregroundStyle(.primary)
-                    List(playlistDataStore.playlistMusicArray) { music in
-                        PlaylistMusicViewCell(playlistDataStore: playlistDataStore, playDataStore: playDataStore, pathDataStore: pathDataStore, music: music)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
+            BoolSwitchView(isEmpty: playlistDataStore.playlistMusicArray.isEmpty, isLoading: playlistDataStore.isLoading) {
+                RandomPlayButton(dataStore: .playlist)
+                List(playlistDataStore.playlistMusicArray) { music in
+                    PlaylistMusicViewCell(music: music)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            } emptyContent: {
+                Text("PlaylistMusicView.emptyContent.Text")
             }
-            PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+            PlayWindowView()
         }
-        .navigationTitle(playlistDataStore.selectedPlaylist?.playlistName ?? "不明なプレイリスト")
+        .navigationTitle(playlistDataStore.playlistArray.selected?.playlistName ?? String(localized: "PlaylistMusicView.navigationTitle.unknownPlaylistName"))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing, content: {
+            ToolbarItem(placement: .topBarTrailing) {
                 toolBarMenu()
-            })
+            }
         }
-        .alert("プレイリスト名の変更", isPresented: $isShowRenameAlert, actions: {
-            TextField("新しい名前", text: $text)
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-            Button(action: {
-                renamePlaylist()
-            }, label: {
-                Text("変更")
-            })
-        }, message: {
-            Text("プレイリストの新しい名前を入力してください。")
-        })
-        .alert("本当に削除しますか？", isPresented: $isShowDeleteAlert, actions: {
-            Button(role: .cancel, action: {}, label: {
-                Text("キャンセル")
-            })
-            Button(role: .destructive, action: {
-                deletePlaylist()
-            }, label: {
-                Text("削除")
-            })
-        }, message: {
-            Text("作成するプレイリストの名前を入力してください。")
-        })
+        .alert("PlaylistMusicView.renameAlert.title", isPresented: $isShowRenameAlert) {
+            renameAlertActions()
+        } message: {
+            Text("PlaylistMusicView.renameAlert.message")
+        }
+        .alert("\(playlistDataStore.playlistArray.selected?.playlistName ?? "PlaylistMusicView.deleteAlert.unknownPlaylistName")PlaylistMusicView.deleteAlert.title", isPresented: $isShowDeleteAlert) {
+            deleteAlertActions()
+        } message: {
+            Text("PlaylistMusicView.deleteAlert.message")
+        }
         .onAppear() {
             getPlaylistMusics()
-        }
-        .onDisappear() {
-            isLoading = true
         }
     }
     func toolBarMenu() -> some View{
         Menu {
-            Button(action: {
+            Button {
                 pathDataStore.playlistViewNavigationPath.append(.selectMusic)
-            }, label: {
-                Label("登録曲を編集", systemImage: "pencil.and.list.clipboard")
-            })
-            Button(action: {
-                text = playlistDataStore.selectedPlaylist?.playlistName ?? ""
-                isShowRenameAlert = true
-            }, label: {
-                Label("名前を変更する", systemImage: "arrow.triangle.2.circlepath")
-            })
-            Menu {
-                Button(action: {
-                    playlistDataStore.playlistMusicArraySort(mode: .nameAscending)
-                    playlistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("曲名昇順")
-                })
-                Button(action: {
-                    playlistDataStore.playlistMusicArraySort(mode: .nameDescending)
-                    playlistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("曲名降順")
-                })
-                Button(action: {
-                    playlistDataStore.playlistMusicArraySort(mode: .dateAscending)
-                    playlistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("更新日昇順")
-                })
-                Button(action: {
-                    playlistDataStore.playlistMusicArraySort(mode: .dateDescending)
-                    playlistDataStore.saveMusicSortMode()
-                }, label: {
-                    Text("更新日降順")
-                })
             } label: {
-                Label("並び替え", systemImage: "arrow.up.arrow.down")
+                Label("PlaylistMusicView.toolBarMenu.selectMusic.Label", systemImage: "pencil.and.list.clipboard")
+            }
+            Button {
+                renameText = playlistDataStore.playlistArray.selected?.playlistName ?? ""
+                isShowRenameAlert = true
+            } label: {
+                Label("PlaylistMusicView.toolBarMenu.renamePlaylist.Label", systemImage: "arrow.triangle.2.circlepath")
+            }
+            Menu {
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistMusicSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("PlaylistMusicView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button{
+                    PlaylistRepository.sortAndUpdatePlaylistMusicSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("PlaylistMusicView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistMusicSortMode(sortMode: .dateAscending)
+                } label: {
+                    Text("PlaylistMusicView.toolBarMenu.sort.dateAscending.Text")
+                }
+                Button {
+                    PlaylistRepository.sortAndUpdatePlaylistMusicSortMode(sortMode: .dateDescending)
+                } label: {
+                    Text("PlaylistMusicView.toolBarMenu.sort.dateDescending.Text")
+                }
+            } label: {
+                Label("PlaylistMusicView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
             }
             Divider()
-            Button(role: .destructive, action: {
+            Button(role: .destructive) {
                 isShowDeleteAlert = true
-            }, label: {
-                Label("プレイリストを削除", systemImage: "trash")
-            })
+            } label: {
+                Label("PlaylistMusicView.toolBarMenu.deleteButton.Label", systemImage: "trash")
+            }
         } label: {
             Image(systemName: "ellipsis.circle")
         }
     }
+    @ViewBuilder
+    func renameAlertActions() -> some View {
+        TextField("PlaylistMusicView.renameAlertActions.TextField", text: $renameText)
+        CancelButton()
+        Button(role: .confirm) {
+            guard let playlist = playlistDataStore.playlistArray.selected else { return }
+            guard let newPlaylist = PlaylistRepository.renamePlaylist(playlist: playlist, newName: renameText) else { return }
+            playlistDataStore.playlistArray.append(noDuplicate: newPlaylist)
+            playlistDataStore.selectedPlaylistFilePath = newPlaylist.filePath
+            playlistDataStore.playlistArray.remove(Playlist: playlist)
+        } label: {
+            Text("PlaylistMusicView.renameAlertAction.renameButton.Text")
+        }
+    }
+    @ViewBuilder
+    func deleteAlertActions() -> some View {
+        CancelButton()
+        DeleteButton {
+            guard let playlist = playlistDataStore.playlistArray.selected else { return }
+            guard PlaylistRepository.deletePlaylist(playlist: playlist) else { return }
+            print("deleteSucceeded")
+            pathDataStore.playlistViewNavigationPath.removeAll()
+        }
+    }
     func getPlaylistMusics() {
         Task {
-            guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic(filePath: filePath)
-            playlistDataStore.loadMusicSort()
-            isLoading = false
+            playlistDataStore.isLoading = true
+            playlistDataStore.playlistMusicArray = await PlaylistRepository.getPlaylistMusic()
+            PlaylistRepository.sortPlaylistMusicArray()
+            playlistDataStore.isLoading = false
         }
-    }
-    func randomPlay() {
-        guard let music = playlistDataStore.playlistMusicArray.randomElement() else { return }
-        playDataStore.setPlayMode(playMode: .shuffle)
-        playDataStore.musicChoosed(music: music, playGroup: .playlist)
-        playDataStore.setNextMusics(musicFilePaths: playlistDataStore.playlistMusicArray.map { $0.filePath })
-    }
-    func renamePlaylist() {
-        if text != "" {
-            guard let playlist = playlistDataStore.selectedPlaylist else { return }
-            let newPlaylist = PlaylistRepository.renamePlaylist(playlist: playlist, newName: text)
-            playlistDataStore.selectedPlaylist = newPlaylist
-            getPlaylistMusics()
-        }
-    }
-    func deletePlaylist() {
-        guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-        guard PlaylistRepository.deletePlaylist(playlistFilePath: filePath) else { return }
-        pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }
 
 #Preview {
-    PlaylistMusicView(playlistDataStore: PlaylistDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    PlaylistMusicView()
 }

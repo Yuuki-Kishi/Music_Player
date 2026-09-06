@@ -7,11 +7,7 @@
 
 import Foundation
 
-struct Folder: Hashable, Identifiable, Equatable {
-    static func == (lhs: Folder, rhs: Folder) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
+struct Folder: Hashable, Identifiable {
     var id = UUID()
     var folderName: String
     var musicCount: Int
@@ -30,7 +26,12 @@ struct Folder: Hashable, Identifiable, Equatable {
     }
 }
 
+@MainActor
 extension Array where Element == Folder {
+    var selected: Element? {
+        guard let selectedFolderPath = FolderDataStore.shared.selectedFolderPath else { return nil }
+        return self.first { $0.folderPath == selectedFolderPath }
+    }
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
             self[index] = item
@@ -38,9 +39,19 @@ extension Array where Element == Folder {
             self.append(item)
         }
     }
-    mutating func remove(Music item: Element) {
+    mutating func remove(Folder item: Element) {
         if let index = self.firstIndex(of: item) {
             self.remove(at: index)
         }
+    }
+}
+
+@MainActor
+extension Folder {
+    var isExclude: Bool {
+        ExcludeFolderDataStore.shared.excludeFolderArray.contains { $0.folderPath == self.folderPath }
+    }
+    var isSelected: Bool {
+        ExcludeFolderDataStore.shared.selectionValue.contains { $0.folderPath == self.folderPath }
     }
 }

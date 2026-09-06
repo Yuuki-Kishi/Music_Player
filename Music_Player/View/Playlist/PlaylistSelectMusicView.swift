@@ -9,92 +9,59 @@ import SwiftUI
 import SwiftData
 
 struct PlaylistSelectMusicView: View {
-    @ObservedObject var playlistDataStore: PlaylistDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var selectionValue: Set<Music> = []
-    @State private var selectableMusicArray: [Music] = []
-    @State private var isLoading: Bool = true
-    
+    @EnvironmentObject private var playlistDataStore: PlaylistDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
+        
     var body: some View {
         ZStack {
-            if isLoading {
-                Spacer()
-                Text("読み込み中...")
-                Spacer()
-            } else {
-                List(selection: $selectionValue) {
-                    ForEach(selectableMusicArray, id: \.self) { music in
+            BoolSwitchView(isEmpty: playlistDataStore.selectableMusicArray.isEmpty) {
+                List(selection: $playlistDataStore.selectionValue) {
+                    ForEach(playlistDataStore.selectableMusicArray, id: \.self) { music in
                         PlaylistSelectMusicViewCell(music: music)
                     }
                 }
                 .environment(\.editMode, .constant(.active))
                 .listStyle(.plain)
+            } emptyContent: {
+                Text("PlaylistSelectMusicView.emptyContent.Text")
             }
         }
-        .navigationTitle("追加する曲を選択")
+        .navigationTitle("PlaylistSelectMusicView.navigationTitle")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing, content: {
-                toolBarMenu()
-            })
+            ToolbarItem(placement: .topBarTrailing) {
+                CheckMarkButton {
+                    updateMusic()
+                }
+            }
         }
         .onAppear() {
             getSelectableMusicArray()
         }
     }
-    func toolBarMenu() -> some View {
-        HStack {
-            Button(action: {
-                if selectionValue.isEmpty {
-                    selectionValue = Set(selectableMusicArray)
-                } else {
-                    selectionValue = []
-                }
-            }, label: {
-                if selectionValue.isEmpty {
-                    Text("全て選択")
-                } else {
-                    Text("全て解除")
-                }
-            })
-            Button(action: {
-                addMusic()
-            }, label: {
-                Text("完了")
-            })
-        }
-    }
     func getSelectableMusicArray() {
         Task {
-            selectableMusicArray = await MusicRepository.getMusics()
-            sortSelectableMusicArray()
-            selectionValue = Set(selectableMusicArray.filter { isInclude(musicFilePath: $0.filePath) })
-            isLoading = false
+            playlistDataStore.isLoading = true
+            playlistDataStore.selectableMusicArray = await MusicRepository.getMusics()
+            playlistDataStore.selectionValue = includeMusics()
+            playlistDataStore.isLoading = false
         }
     }
-    func sortSelectableMusicArray() {
-        switch playlistDataStore.playlistMusicSortMode {
-        case .nameAscending:
-            selectableMusicArray.sort { $0.musicName < $1.musicName }
-        case .nameDescending:
-            selectableMusicArray.sort { $0.musicName > $1.musicName }
-        case .dateAscending:
-            selectableMusicArray.sort { $0.editedDate < $1.editedDate }
-        case .dateDescending:
-            selectableMusicArray.sort { $0.editedDate > $1.editedDate }
+    func includeMusics() -> Set<Music> {
+        let includeMusicFilePaths = PlaylistRepository.getIncludeMusicFilePaths()
+        var includeMusics = Set<Music>()
+        for filePath in includeMusicFilePaths {
+            guard let music = playlistDataStore.selectableMusicArray.first(where: { $0.filePath == filePath }) else { continue }
+            includeMusics.insert(music)
         }
+        return includeMusics
     }
-    func isInclude(musicFilePath: String) -> Bool {
-        guard let playlistFilePath = playlistDataStore.selectedPlaylist?.filePath else { return false }
-        return PlaylistRepository.isIncludeMusic(playlistFilePath: playlistFilePath, musicFilePath: musicFilePath)
-    }
-    func addMusic() {
-        guard let filePath = playlistDataStore.selectedPlaylist?.filePath else { return }
-        let musicFilePaths = selectionValue.map { $0.filePath }
-        guard PlaylistRepository.updatePlaylistMusics(playlistFilePath: filePath, musicFilePaths: musicFilePaths) else { return }
+    func updateMusic() {
+        guard PlaylistRepository.updatePlaylistMusics() else { return }
+        print("updateSuccessed")
         pathDataStore.playlistViewNavigationPath.removeLast()
     }
 }
 
 #Preview {
-    PlaylistSelectMusicView(playlistDataStore: PlaylistDataStore.shared, pathDataStore: PathDataStore.shared)
+    PlaylistSelectMusicView()
 }

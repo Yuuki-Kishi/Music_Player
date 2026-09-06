@@ -8,16 +8,22 @@
 import SwiftUI
 
 struct AddPlaylistViewCell: View {
-    @ObservedObject var pathDataStore: PathDataStore
-    @State var playlist: Playlist
-    @State var music: Music
+//    private let playGroup: PlayDataStore.PlayGroup
+    private let music: Music?
+    private let playlist: Playlist
     @State private var isShowAlert: Bool = false
-    @State var pathArray: AddPlaylistView.PathArray
+    @Environment(\.dismiss) private var dismiss
+    
+    init(music: Music?, playlist: Playlist) {
+        self.music = music
+        self.playlist = playlist
+    }
     
     var body: some View {
         HStack {
             Image(systemName: "music.note.list")
                 .font(.system(size: 30.0))
+                .foregroundStyle(.accent)
                 .background(
                     RoundedRectangle(cornerRadius: 5.0)
                         .foregroundStyle(Color(UIColor.systemGray5))
@@ -33,39 +39,24 @@ struct AddPlaylistViewCell: View {
                 .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
-        .alert("追加完了", isPresented: $isShowAlert, actions: {
-            Button(action: {
-                added()
-            }, label: {
-                Text("OK")
-            })
-        }, message: {
-            Text("プレイリストに追加しました。")
-        })
+        .alert("\(playlist.playlistName)AddPlaylistViewCell.Alert.title", isPresented: $isShowAlert) {
+            OKButton {
+                dismiss()
+            }
+        } message: {
+            Text("AddPlaylistViewCell.Alert.message")
+        }
         .onTapGesture {
-            tapped(playlistFilePath: playlist.filePath)
+            tapped()
         }
     }
-    func tapped(playlistFilePath: String) {
-        guard PlaylistRepository.addPlaylistMusic(playlistFilePath: playlistFilePath, musicFilePath: music.filePath) else { return }
+    func tapped() {
+        guard let filePath = music?.filePath else { return }
+        guard PlaylistRepository.addPlaylistMusic(playlistFilePath: playlist.filePath, musicFilePath: filePath) else { return }
         isShowAlert = true
-    }
-    func added() {
-        switch pathArray {
-        case .music:
-            pathDataStore.musicViewNavigationPath.removeLast()
-        case .artist:
-            pathDataStore.artistViewNavigationPath.removeLast()
-        case .album:
-            pathDataStore.albumViewNavigationPath.removeLast()
-        case .folder:
-            pathDataStore.folderViewNavigationPath.removeLast()
-        case .play:
-            pathDataStore.playViewNavigationPath.removeLast()
-        }
     }
 }
 
 #Preview {
-    AddPlaylistViewCell(pathDataStore: PathDataStore.shared, playlist: Playlist(), music: Music(), pathArray: .music)
+    AddPlaylistViewCell(music: Music(), playlist: Playlist())
 }

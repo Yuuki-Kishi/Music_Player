@@ -14,68 +14,51 @@ class FileService {
         guard let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
         return documentDirectory
     }()
+    static let fileSizeFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = .useAll
+        formatter.countStyle = .file
+        return formatter
+    }()
     
     //create
     static func createFile(filePath: String, content: String) -> Bool {
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
+        guard let fileURL = documentDirectory?.appending(path:filePath) else { return false }
         guard let data = content.data(using: .utf8) else { return false }
         return fileManager.createFile(atPath: fileURL.planePath, contents: data)
     }
     
     static func createDirectory(folderPath: String) {
-        guard let folderURL = documentDirectory?.appendingPathComponent(folderPath) else { return }
-        print(folderURL)
+        guard let folderURL = documentDirectory?.appending(path:folderPath) else { return }
         do {
             try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
         } catch {
-            print(error)
+            print(error.localizedDescription)
         }
     }
     
     //check
-    static func isExistFile(filePath: String) -> Bool {
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
-        return fileManager.fileExists(atPath: fileURL.planePath)
-    }
-    
-    static func isExistDirectory(folderPath: String) -> Bool {
-        guard let folderURL = documentDirectory?.appendingPathComponent(folderPath) else { return false }
-        return fileManager.fileExists(atPath: folderURL.planePath)
+    static func isExist(path: String) -> Bool {
+        guard let url = documentDirectory?.appending(path: path) else { return false }
+        return fileManager.fileExists(atPath: url.planePath)
     }
     
     //get
     static func getFilePaths(folderPath: String) -> [String] {
-        guard let folderURL = documentDirectory?.appendingPathComponent(folderPath) else { return [] }
+        guard let folderURL = documentDirectory?.appending(path:folderPath) else { return [] }
         var filePaths: [String] = []
         do {
             let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
             for fileURL in fileURLs {
                 guard !fileURL.planePath.contains("/.Trash/") else { continue }
-                guard !fileURL.planePath.contains("/Playlist/") else { continue }
-                guard !fileURL.lastPathComponent.hasPrefix(".") else { continue }
+//                guard !fileURL.planePath.contains("/Playlist/") else { continue }
+//                guard !fileURL.lastPathComponent.hasPrefix(".") else { continue }
                 let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
                 let filePath = path.replacingOccurrences(of: "/private", with: "")
                 filePaths.append(filePath)
             }
         } catch {
-            print(error)
-        }
-        return filePaths
-    }
-    
-    static func getPlaylistFilePaths() -> [String] {
-        guard let folderURL = documentDirectory?.appendingPathComponent("Playlist") else { return [] }
-        var filePaths: [String] = []
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil).filter { $0.planePath.contains(".m3u8") }
-            for fileURL in fileURLs {
-                if fileURL.planePath.contains("/.Trash/") { continue }
-                let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
-                let filePath = path.replacingOccurrences(of: "/private", with: "")
-                filePaths.append(filePath)
-            }
-        } catch {
-            print(error)
+            print(error.localizedDescription)
         }
         return filePaths
     }
@@ -85,9 +68,8 @@ class FileService {
         let fileURLs = fileManager.enumerator(at: directoryURL, includingPropertiesForKeys: [])
         var filePaths: [String] = []
         while let fileURL = fileURLs?.nextObject() as? URL {
-            if !fileURL.isMusicFile { continue }
-            let resourceValues = try? fileURL.resourceValues(forKeys: [.isDirectoryKey])
-            if resourceValues?.isDirectory == true { continue }
+            guard fileURL.isMusicFile else { continue }
+            guard !fileURL.planePath.contains("/.Trash/") else { continue }
             let path = fileURL.planePath.replacingOccurrences(of: directoryURL.planePath, with: "")
             let filePath = path.replacingOccurrences(of: "/private", with: "")
             filePaths.append(filePath)
@@ -95,81 +77,82 @@ class FileService {
         return filePaths
     }
     
-    static func getFileContent(filePath: String) -> String? {
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return nil }
+    static func getFileContentString(filePath: String) -> String? {
+        guard let fileURL = documentDirectory?.appending(path: filePath) else { return nil }
         do {
             return try String(contentsOf: fileURL, encoding: .utf8)
         } catch {
-            print(error)
+            print(error.localizedDescription)
+            return nil
         }
-        return nil
     }
-    
-    static func getFileMetadata(filePath: String) async -> Music {
-        var music: Music = Music()
-        music.filePath = filePath
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return music }
+
+    static func getFileMetadata(filePath: String) async -> Music? {
+        guard let fileURL = documentDirectory?.appending(path: filePath) else { return nil }
         let asset = AVURLAsset(url: fileURL)
-        guard let metadata = try? await asset.load(.commonMetadata) else { return music }
-        let musicName = try? await metadata.first(where: { $0.commonKey == .commonKeyTitle })?.load(.stringValue)
-        let artistName = try? await metadata.first(where: { $0.commonKey == .commonKeyArtist })?.load(.stringValue)
-        let albumName = try? await metadata.first(where: { $0.commonKey == .commonKeyAlbumName })?.load(.stringValue)
-        let coverImage = try? await metadata.first(where: { $0.commonKey == .commonKeyArtwork })?.load(.dataValue)
-        let folderPath = getFolderPath(filePath: filePath)
-        let bcf = ByteCountFormatter()
-        bcf.allowedUnits = [.useAll]
-        bcf.countStyle = .file
-        do {
-            let attributes: [FileAttributeKey: Any] = try fileManager.attributesOfItem(atPath: fileURL.planePath)
-            guard let editedDate = attributes[FileAttributeKey.modificationDate] as? Date else { return music }
-            guard let bytes = attributes[.size] as? Int64 else { return music }
-            let fileSize = bcf.string(fromByteCount: bytes)
-            let musicLength = try await CMTimeGetSeconds(asset.load(.duration))
-            music = Music(musicName: musicName, artistName: artistName, albumName: albumName, coverImage: coverImage, editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, folderPath: folderPath, filePath: filePath)
-        } catch {
-            print(error)
+        async let metadataTask = asset.load(.commonMetadata)
+        async let durationTask = asset.load(.duration)
+        guard let attributes = try? fileManager.attributesOfItem(atPath: fileURL.planePath) else { return nil }
+        guard let editedDate = attributes[.modificationDate] as? Date else { return nil }
+        guard let bytes = attributes[.size] as? Int64 else { return nil }
+        let fileSize = fileSizeFormatter.string(fromByteCount: bytes)
+        guard let metadata = try? await metadataTask else { return nil }
+        let musicLength = (try? await CMTimeGetSeconds(durationTask)) ?? 0
+        var musicName: String?
+        var artistName: String?
+        var albumName: String?
+        var coverImage: Data?
+        for item in metadata {
+            switch item.commonKey {
+            case .commonKeyTitle:
+                musicName = try? await item.load(.stringValue)
+            case .commonKeyArtist:
+                artistName = try? await item.load(.stringValue)
+            case .commonKeyAlbumName:
+                albumName = try? await item.load(.stringValue)
+            case .commonKeyArtwork:
+                coverImage = try? await item.load(.dataValue)
+            default:
+                break
+            }
         }
-        return music
-    }
-    
-    static func getFolderPath(filePath: String) -> String {
-        URL(fileURLWithPath: filePath).deletingLastPathComponent().planePath
+        return Music(musicName: musicName, artistName: artistName, albumName: albumName, coverImage: coverImage, editedDate: editedDate, fileSize: fileSize, musicLength: musicLength, filePath: filePath)
     }
     
     //update
-    static func updateFile(filePath: String, content: String) -> Bool {
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
+    static func updateFileString(filePath: String, content: String) -> Bool {
+        guard let fileURL = documentDirectory?.appending(path:filePath) else { return false }
         do {
             try content.write(to: fileURL, atomically: true, encoding: .utf8)
             return true
         } catch {
-            print(error)
+            print(error.localizedDescription)
+            return false
         }
-        return false
     }
     
-    static func renameFile(filePath: String, newFilePath: String) -> Bool {
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
-        guard let newFileURL = documentDirectory?.appendingPathComponent(newFilePath) else { return false }
+    static func moveFile(filePath: String, newFilePath: String) -> Bool {
+        guard let fileURL = documentDirectory?.appending(path:filePath) else { return false }
+        guard let newFileURL = documentDirectory?.appending(path:newFilePath) else { return false }
         do {
             try fileManager.moveItem(at: fileURL, to: newFileURL)
             return true
         } catch {
-            print(error)
+            print(error.localizedDescription)
+            return false
         }
-        return false
     }
     
     //delete
     static func fileDelete(filePath: String) -> Bool {
-        guard isExistFile(filePath: filePath) else { return false }
-        guard let fileURL = documentDirectory?.appendingPathComponent(filePath) else { return false }
+        guard isExist(path: filePath) else { return false }
+        guard let fileURL = documentDirectory?.appending(path:filePath) else { return false }
         do {
             try fileManager.trashItem(at: fileURL, resultingItemURL: nil)
             return true
         } catch {
-            print(error)
+            print(error.localizedDescription)
+            return false
         }
-        return false
     }
 }

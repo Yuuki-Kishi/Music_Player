@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 class PlayFlowDataStore: ObservableObject {
     static let shared = PlayFlowDataStore()
-    @Published var willPlayMusicArray: [Music] = []
-    @Published var playedMusicArray: [Music] = []
+    @Published var playNextMusicArray: [Music] = []
+    @Published var playBackMusicArray: [Music] = []
     @Published var isLoading: Bool = true
 }

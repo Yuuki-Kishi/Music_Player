@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct PlaylistSelectMusicViewCell: View {
-    @State var music: Music
+    private let music: Music
+    
+    init(music: Music) {
+        self.music = music
+    }
     
     var body: some View {
         HStack {
@@ -17,30 +21,15 @@ struct PlaylistSelectMusicViewCell: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                HStack {
-                    Text(music.artistName)
-                        .lineLimit(1)
-                        .font(.system(size: 12.5))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundStyle(.secondary)
-                    Text(music.albumName)
-                        .lineLimit(1)
-                        .font(.system(size: 12.5))
-                        .frame(maxWidth: .infinity,alignment: .leading)
-                        .foregroundStyle(.secondary)
-                }
+                Text(music.artistName + " - " + music.albumName)
+                    .lineLimit(1)
+                    .font(.system(size: 12.5))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundStyle(.secondary)
             }
-            Text(secToMin(second:music.musicLength))
+            Text(music.musicLength.formattedTime)
                 .foregroundStyle(.secondary)
         }
-    }
-    func secToMin(second: TimeInterval) -> String {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.unitsStyle = .positional
-        if second < 3600 { dateFormatter.allowedUnits = [.minute, .second] }
-        else { dateFormatter.allowedUnits = [.hour, .minute, .second] }
-        dateFormatter.zeroFormattingBehavior = .pad
-        return dateFormatter.string(from: second)!
     }
 }
 

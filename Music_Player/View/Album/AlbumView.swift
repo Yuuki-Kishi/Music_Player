@@ -8,53 +8,42 @@
 import SwiftUI
 
 struct AlbumView: View {
-    @StateObject var albumDataStore = AlbumDataStore.shared
-    @ObservedObject var playDataStore: PlayDataStore
-    @ObservedObject var viewDataStore: ViewDataStore
-    @ObservedObject var pathDataStore: PathDataStore
-    @State private var isLoading: Bool = true
+    @EnvironmentObject private var albumDataStore: AlbumDataStore
+    @EnvironmentObject private var pathDataStore: PathDataStore
     
     var body: some View {
         NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
             VStack {
-                if isLoading {
-                    Spacer()
-                    Text("読み込み中...")
-                    Spacer()
-                } else {
-                    if albumDataStore.albumArray.isEmpty {
-                        Spacer()
-                        Text("表示できるアルバムがありません")
-                        Spacer()
-                    } else {
-                        Text(String(albumDataStore.albumArray.count) + "個のアルバム")
-                            .font(.system(size: 15))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal)
-                        List(albumDataStore.albumArray) { album in
-                            AlbumViewCell(albumDataStore: albumDataStore, pathDataStore: pathDataStore, album: album)
-                        }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
+                BoolSwitchView(isEmpty: albumDataStore.albumArray.isEmpty, isLoading: albumDataStore.isLoading) {
+                    Text("\(String(albumDataStore.albumArray.count))AlbumView.content.Text")
+                        .font(.system(size: 15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    List(albumDataStore.albumArray) { album in
+                        AlbumViewCell(album: album)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                } emptyContent: {
+                    Text("AlbumView.emptyContent.Text")
                 }
-                PlayWindowView(viewDataStore: viewDataStore, playDataStore: playDataStore)
+                PlayWindowView()
             }
-            .navigationTitle("アルバム")
+            .navigationTitle("AlbumView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: PathDataStore.AlbumViewPath.self) { path in
                 destination(path: path)
             }
+            .sheet(isPresented: $albumDataStore.isShowAddPlaylistView) {
+                AddPlaylistView(music: albumDataStore.albumMusicArray.selected)
+            }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
+                ToolbarItem(placement: .topBarTrailing) {
                     toolBarMenu()
-                })
+                }
             }
             .onAppear() {
                 getAlbums()
-            }
-            .onDisappear() {
-                isLoading = true
             }
         }
     }
@@ -62,47 +51,40 @@ struct AlbumView: View {
     func destination(path: PathDataStore.AlbumViewPath) -> some View {
         switch path {
         case .albumMusic:
-            AlbumMusicView(albumDataStore: albumDataStore, playDataStore: playDataStore, viewDataStore: viewDataStore, pathDataStore: pathDataStore)
-        case .addPlaylist:
-            AddPlaylistView(pathDataStore: pathDataStore, music: albumDataStore.selectedMusic ?? Music(), pathArray: .album)
+            AlbumMusicView()
         case .musicInfo:
-            MusicInfoView(music: albumDataStore.selectedMusic ?? Music())
+//            MusicInfoView(playGroup: .album)
+            MusicInfoView(music: albumDataStore.albumMusicArray.selected)
         }
     }
     func toolBarMenu() -> some View {
         Menu {
-            Button(action: {
-                reloadData()
-            }, label: {
-                Label("再読み込み", systemImage: "arrow.clockwise")
-            })
+            ReloadButton {
+                getAlbums()
+            }
             Menu {
-                Button(action: {
-                    albumDataStore.albumArraySort(mode: .nameAscending)
-                    albumDataStore.saveSortMode()
-                }, label: {
-                    Text("アルバム名昇順")
-                })
-                Button(action: {
-                    albumDataStore.albumArraySort(mode: .nameDescending)
-                    albumDataStore.saveSortMode()
-                }, label: {
-                    Text("アルバム名降順")
-                })
-                Button(action: {
-                    albumDataStore.albumArraySort(mode: .countAscending)
-                    albumDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数昇順")
-                })
-                Button(action: {
-                    albumDataStore.albumArraySort(mode: .countDescending)
-                    albumDataStore.saveSortMode()
-                }, label: {
-                    Text("曲数降順")
-                })
+                Button {
+                    AlbumRepository.sortAndUpdateAlbumSortMode(sortMode: .nameAscending)
+                } label: {
+                    Text("AlbumView.toolBarMenu.sort.nameAscending.Text")
+                }
+                Button {
+                    AlbumRepository.sortAndUpdateAlbumSortMode(sortMode: .nameDescending)
+                } label: {
+                    Text("AlbumView.toolBarMenu.sort.nameDescending.Text")
+                }
+                Button {
+                    AlbumRepository.sortAndUpdateAlbumSortMode(sortMode: .countAscending)
+                } label: {
+                    Text("AlbumView.toolBarMenu.sort.countAscending.Text")
+                }
+                Button {
+                    AlbumRepository.sortAndUpdateAlbumSortMode(sortMode: .countDescending)
+                } label: {
+                    Text("AlbumView.toolBarMenu.sort.countDescending.Text")
+                }
             } label: {
-                Label("並べ替え", systemImage: "arrow.up.arrow.down")
+                Label("AlbumView.toolBarMenu.sort.Label", systemImage: "arrow.up.arrow.down")
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -110,17 +92,14 @@ struct AlbumView: View {
     }
     func getAlbums() {
         Task {
+            albumDataStore.isLoading = true
             albumDataStore.albumArray = await AlbumRepository.getAlbums()
-            albumDataStore.loadSort()
-            isLoading = false
+            AlbumRepository.sortAlbumArray()
+            albumDataStore.isLoading = false
         }
-    }
-    func reloadData() {
-        isLoading = true
-        getAlbums()
     }
 }
 
 #Preview {
-    AlbumView(albumDataStore: AlbumDataStore.shared, playDataStore: PlayDataStore.shared, viewDataStore: ViewDataStore.shared, pathDataStore: PathDataStore.shared)
+    AlbumView()
 }
