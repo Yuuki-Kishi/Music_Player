@@ -53,7 +53,6 @@ struct FolderView: View {
         case .folderMusic:
             FolderMusicView()
         case .musicInfo:
-//            MusicInfoView(playGroup: .folder)
             MusicInfoView(music: folderDataStore.folderMusicArray.selected)
         }
     }

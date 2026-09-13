@@ -65,7 +65,6 @@ struct PlaylistView: View {
         case .selectMusic:
             PlaylistSelectMusicView()
         case .musicInfo:
-//            MusicInfoView(playGroup: .playlist)
             MusicInfoView(music: playlistDataStore.playlistMusicArray.selected)
         }
     }

@@ -21,7 +21,7 @@ struct FavoriteMusicSelectViewCell: View {
                     .lineLimit(1)
                     .font(.system(size: 20.0))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(music.artistName + " - " + music.albumName)
+                Text(music.artistAndAlbumName)
                     .lineLimit(1)
                     .font(.system(size: 12.5))
                     .frame(maxWidth: .infinity, alignment: .leading)

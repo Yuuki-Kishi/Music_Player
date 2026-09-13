@@ -51,8 +51,6 @@ class FileService {
             let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: nil)
             for fileURL in fileURLs {
                 guard !fileURL.planePath.contains("/.Trash/") else { continue }
-//                guard !fileURL.planePath.contains("/Playlist/") else { continue }
-//                guard !fileURL.lastPathComponent.hasPrefix(".") else { continue }
                 let path = fileURL.planePath.replacingOccurrences(of: folderURL.planePath, with: "")
                 let filePath = path.replacingOccurrences(of: "/private", with: "")
                 filePaths.append(filePath)
@@ -94,8 +92,7 @@ class FileService {
         async let durationTask = asset.load(.duration)
         guard let attributes = try? fileManager.attributesOfItem(atPath: fileURL.planePath) else { return nil }
         guard let editedDate = attributes[.modificationDate] as? Date else { return nil }
-        guard let bytes = attributes[.size] as? Int64 else { return nil }
-        let fileSize = fileSizeFormatter.string(fromByteCount: bytes)
+        guard let fileSize = attributes[.size] as? UInt64 else { return nil }
         guard let metadata = try? await metadataTask else { return nil }
         let musicLength = (try? await CMTimeGetSeconds(durationTask)) ?? 0
         var musicName: String?

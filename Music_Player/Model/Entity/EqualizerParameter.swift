@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class EqualizerParameter: Sendable {
+final class EqualizerParameter {
     @Attribute(.unique) var id: UUID = UUID()
     var type: UInt32
     var bandWidth: Float

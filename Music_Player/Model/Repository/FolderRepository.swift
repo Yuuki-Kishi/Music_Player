@@ -40,7 +40,6 @@ class FolderRepository {
             guard !ExcludeFolderRepository.isExclude(filePath: filePath) else { continue }
             guard let music = await FileService.getFileMetadata(filePath: filePath) else { continue }
             let musicFolderPath = URL(filePath: filePath).deletingLastPathComponent().planePath
-//            let musicFolderName = URL(filePath: musicFolderPath).lastPathComponent
             guard musicFolderPath == folderPath else { continue }
             musics.append(music)
         }

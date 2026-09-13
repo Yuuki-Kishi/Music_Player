@@ -20,7 +20,7 @@ struct EqualizerViewCell: View {
         HStack {
             Text(frequencyString())
                 .frame(width: 60, alignment: .trailing)
-            Slider(value: $gain, in: -24.0...24.0, step: 1.0)
+            Slider(value: $gain, in: -12.0...12.0, step: 1.0)
             Text(String(Int(gain)) + "dB")
                 .frame(width: 60, alignment: .trailing)
         }

@@ -14,11 +14,11 @@ struct Music: Hashable, Identifiable {
     var albumName: String
     var coverImage: Data
     var editedDate: Date
-    var fileSize: String
+    var fileSize: UInt64
     var musicLength: TimeInterval
     var filePath: String
     
-    init(musicName: String, artistName: String, albumName: String, coverImage: Data, editedDate: Date, fileSize: String, musicLength: TimeInterval, filePath: String) {
+    init(musicName: String, artistName: String, albumName: String, coverImage: Data, editedDate: Date, fileSize: UInt64, musicLength: TimeInterval, filePath: String) {
         self.musicName = musicName
         self.artistName = artistName
         self.albumName = albumName
@@ -29,26 +29,26 @@ struct Music: Hashable, Identifiable {
         self.filePath = filePath
     }
     
-    init(musicName: String?, artistName: String?, albumName: String?, coverImage: Data?, editedDate: Date?, fileSize: String?, musicLength: TimeInterval?, filePath: String?) {
-        self.musicName = musicName ?? "不明な曲"
-        self.artistName = artistName ?? "不明なアーティスト"
-        self.albumName = albumName ?? "不明なアルバム"
+    init(musicName: String?, artistName: String?, albumName: String?, coverImage: Data?, editedDate: Date?, fileSize: UInt64?, musicLength: TimeInterval?, filePath: String?) {
+        self.musicName = musicName ?? String(localized: "Music.unknownMusicName")
+        self.artistName = artistName ?? String(localized: "Music.unknownArtistName")
+        self.albumName = albumName ?? String(localized: "Music.unknownAlbumName")
         self.coverImage = coverImage ?? Data()
         self.editedDate = editedDate ?? Date()
-        self.fileSize = fileSize ?? "0MB"
+        self.fileSize = fileSize ?? 0
         self.musicLength = musicLength ?? 0.0
-        self.filePath = filePath ?? "unknownFilePath"
+        self.filePath = filePath ?? String(localized: "Music.unknownFilePath")
     }
     
     init() {
-        self.musicName = "不明な曲"
-        self.artistName = "不明なアーティスト"
-        self.albumName = "不明なアルバム"
+        self.musicName = String(localized: "Music.unknownMusicName")
+        self.artistName = String(localized: "Music.unknownArtistName")
+        self.albumName = String(localized: "Music.unknownAlbumName")
         self.coverImage = Data()
         self.editedDate = Date()
-        self.fileSize = "0MB"
+        self.fileSize = 0
         self.musicLength = 0.0
-        self.filePath = "unknownFilePath"
+        self.filePath = String(localized: "Music.unknownFilePath")
     }
 }
 
@@ -76,6 +76,9 @@ extension Array where Element == Music {
 extension Music {
     var isPlayingMusic: Bool {
         return self.filePath == PlayDataStore.shared.playingMusic?.filePath
+    }
+    var artistAndAlbumName: String {
+        self.artistName + " - " + self.albumName
     }
 }
 

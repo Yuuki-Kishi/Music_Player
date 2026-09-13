@@ -13,16 +13,13 @@ class PlayDataStore: ObservableObject {
     static let shared = PlayDataStore()
     @Published var playingMusic: Music? = nil
     @Published var seekPosition: Double = 0.0
-    @Published var displaySeekPosition: TimeInterval = 0.0
     @Published var seekPositionUpdateTimer: Timer?
     @Published var cashedSeekBarSeconds: Double = 0.0
     @Published var isPlaying: Bool = false
-    @Published var isEditingSeekPosition: Bool = false
     @Published var isShowPlayView: Bool = false
     @Published var isShowAddPlaylistView: Bool = false
     @Published var isShuffle: Bool = false
     @Published var repeatMode: RepeatModeEnum = .off
-//    @Published var playGroup: PlayGroup = .music
     @Published var audioEngine: AVAudioEngine = AVAudioEngine()
     @Published var playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
     @Published var equalizerNode: AVAudioUnitEQ = AVAudioUnitEQ(numberOfBands: 10)
@@ -32,10 +29,6 @@ class PlayDataStore: ObservableObject {
         case all, one, off
     }
     
-    enum PlayGroup: String {
-        case music, artist, album, playlist, folder, favorite, play
-    }
-    
     init() {
         // 接続するオーディオノードをAudioEngineにアタッチする
         try? audioSession.setCategory(.playback)
@@ -43,14 +36,7 @@ class PlayDataStore: ObservableObject {
         audioEngine.attach(equalizerNode)
         audioEngine.connect(playerNode, to: equalizerNode, format: nil)
         audioEngine.connect(equalizerNode, to: audioEngine.mainMixerNode, format: nil)
-//        Task {
-//            let equalizerParameters: [EqualizerParameter] = await EqualizerParameterRepository.read()
-//            setEqualizer(equalizerParameters: equalizerParameters)
-//        }
-//        loadNextMusic()
-//        playMode = UserDefaultsRepository.loadPlayMode()
         NotificationRepository.initRemoteCommand()
         NotificationRepository.setNotification()
-//        PlayRepository.stop()
     }
 }

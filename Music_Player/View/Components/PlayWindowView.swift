@@ -70,7 +70,7 @@ struct PlayWindowView: View {
     }
     func artistAndAlbumString() -> String {
         guard let playingMusic = playDataStore.playingMusic else { return "" }
-        return playingMusic.artistName + " - " + playingMusic.albumName
+        return playingMusic.artistAndAlbumName
     }
     func playButtonAction() {
         if playDataStore.playingMusic == nil {

@@ -1,0 +1,196 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "gray:1.00000,1.00000",
+      "gray:0.95040,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 1
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.3
+      }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "display-p3:0.89745,0.49707,0.73524,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.89745,0.49707,0.73524,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "gray:1.00000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "FileMusician_アイコン4.svg",
+          "name" : "FileMusician_アイコン4",
+          "opacity-specializations" : [
+            {
+              "value" : 0.8
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ],
+          "position" : {
+            "scale" : 0.85,
+            "translation-in-points" : [
+              21.25833645382653,
+              199.11187499999994
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "gray:0.35435,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "gray:0.50000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "gray:0.15044,1.00000"
+              }
+            }
+          ],
+          "image-name" : "FileMusician_アイコン3.svg",
+          "name" : "FileMusician_アイコン3",
+          "opacity-specializations" : [
+            {
+              "value" : 0.9
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ],
+          "position" : {
+            "scale" : 0.85,
+            "translation-in-points" : [
+              -12.641815592146372,
+              -99.81489744922345
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "gray:0.90328,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "gray:0.85482,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "FileMusician_アイコン2.svg",
+          "name" : "FileMusician_アイコン2",
+          "opacity-specializations" : [
+            {
+              "value" : 0.8
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.9
+            }
+          ],
+          "position" : {
+            "scale" : 0.85,
+            "translation-in-points" : [
+              12.36745352326011,
+              -99.81431282124515
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "srgb:0.89605,0.40108,0.70001,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "srgb:0.89605,0.40108,0.70001,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "image-name" : "FileMusicianアイコン1.svg",
+          "name" : "FileMusicianアイコン1",
+          "opacity-specializations" : [
+            {
+              "value" : 1
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.55
+            }
+          ],
+          "position" : {
+            "scale" : 0.85,
+            "translation-in-points" : [
+              0,
+              82.640625
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var equalizerDataStore: EqualizerDataStore
     @EnvironmentObject private var playDataStore: PlayDataStore
+    @State private var updateAlertIsPresented: Bool = false
+    @Environment(\.openURL) private var openURL
     
     var body: some View {
         TabView() {
@@ -52,6 +55,15 @@ struct ContentView: View {
         .sheet(isPresented: $playDataStore.isShowPlayView) {
             PlayView()
         }
+        .alert("ContentView.Alert.title", isPresented: $updateAlertIsPresented) {
+            Button {
+                openURL(URL(string: "https://itunes.apple.com/jp/app/apple-store/id6503210233")!)
+            } label: {
+                Text("ContentView.Alert.OpenButton.text")
+            }
+        } message: {
+            Text("ContentView.Alert.message")
+        }
         .onAppear() {
             onAppear()
         }
@@ -92,6 +104,9 @@ struct ContentView: View {
             }
             if await EqualizerParameterRepository.isEmpty() {
                 await EqualizerParameterRepository.createDefault()
+            } else {
+                equalizerDataStore.equalizerParameters = await EqualizerParameterRepository.getParameters()
+                EqualizerParameterRepository.setEqualizer()
             }
             if let playingMusic = await PlayRepository.loadPlayingMusic() {
                 PlayRepository.setMusic(music: playingMusic)
@@ -103,6 +118,9 @@ struct ContentView: View {
             }
             if let repeatModeString = UserDefaultsRepository.load(key: "repeatMode", as: String.self), let repeatMode = PlayDataStore.RepeatModeEnum(rawValue: repeatModeString) {
                 playDataStore.repeatMode = repeatMode
+            }
+            if await UpdateRepository.checkUpdate() {
+                updateAlertIsPresented = true
             }
         }
     }

@@ -134,7 +134,7 @@ class NotificationRepository {
         
         switch reason {
         case .newDeviceAvailable:
-            break
+            PlayRepository.pause()
         case .oldDeviceUnavailable:
             PlayRepository.pause()
         default:

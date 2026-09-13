@@ -16,14 +16,12 @@ struct SleepTimerView: View {
                 Spacer()
                 if timerDataStore.sleepTimer == nil {
                     Text("SleepTimerView.timerExplaination")
-                    //                Spacer()
                     TimePickerView(time: $timerDataStore.remainTime)
                         .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.5)
                 } else {
                     Text(timerDataStore.remainTime.timeFormatted)
                         .font(.system(size: 50))
                         .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.5)
-                    //                Spacer()
                 }
                 Spacer()
                 Button {

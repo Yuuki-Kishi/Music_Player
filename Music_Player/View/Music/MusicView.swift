@@ -11,7 +11,7 @@ import SwiftData
 struct MusicView: View {
     @EnvironmentObject private var musicDataStore: MusicDataStore
     @EnvironmentObject private var pathDataStore: PathDataStore
-    @Environment(\.openURL) var openURL
+    @Environment(\.openURL) private var openURL
     
     var body: some View {
         NavigationStack(path: $pathDataStore.musicViewNavigationPath) {
@@ -50,7 +50,6 @@ struct MusicView: View {
     func destination(path: PathDataStore.MusicViewPath) -> some View {
         switch path {
         case .musicInfo:
-//            MusicInfoView(playGroup: .music)
             MusicInfoView(music: musicDataStore.musicArray.selected)
         case .favoriteMusic:
             FavoriteMusicView()

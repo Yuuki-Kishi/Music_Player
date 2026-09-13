@@ -27,7 +27,7 @@ struct ArtistMusicViewCell: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundStyle(music.filePath == playDataStore.playingMusic?.filePath ? .accent : .primary)
                 HStack {
-                    Text(music.artistName + " - " + music.albumName)
+                    Text(music.artistAndAlbumName)
                         .lineLimit(1)
                         .font(.system(size: 12.5))
                         .frame(maxWidth: .infinity, alignment: .leading)

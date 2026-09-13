@@ -12,16 +12,12 @@ struct SliderView: View {
     
     var body: some View {
         VStack {
-            Slider(value: $playDataStore.displaySeekPosition, in: 0 ... (playDataStore.playingMusic?.musicLength ?? 300)) { isEditing in
-                playDataStore.isEditingSeekPosition = isEditing
-                if !isEditing {
-                    playDataStore.seekPosition = playDataStore.displaySeekPosition
+            Slider(value: $playDataStore.seekPosition, in: 0 ... (playDataStore.playingMusic?.musicLength ?? 300)) { isEditing in
+                if isEditing {
+                    playDataStore.seekPositionUpdateTimer?.invalidate()
+                } else {
                     PlayRepository.setSeek()
-                }
-            }
-            .onChange(of: playDataStore.seekPosition) {
-                if !playDataStore.isEditingSeekPosition {
-                    playDataStore.displaySeekPosition = playDataStore.seekPosition
+                    PlayRepository.setTimer()
                 }
             }
             HStack {
@@ -39,11 +35,11 @@ struct SliderView: View {
     }
     func playTimeString() -> String {
         guard playDataStore.playingMusic != nil else { return "--:--"}
-        return playDataStore.displaySeekPosition.formattedTime
+        return playDataStore.seekPosition.formattedTime
     }
     func remainTimeString() -> String {
         guard playDataStore.playingMusic != nil else { return "--:--"}
-        return ((playDataStore.playingMusic?.musicLength ?? 300) - playDataStore.displaySeekPosition).formattedTime
+        return ((playDataStore.playingMusic?.musicLength ?? 300) - playDataStore.seekPosition).formattedTime
     }
 }
 

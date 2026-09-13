@@ -60,10 +60,16 @@ struct MusicInfoViewCell: View {
         case .musicLength:
             return music?.musicLength.formattedTime ?? "----"
         case .fileSize:
-            return music?.fileSize ?? "----"
+            return fileSizeString() ?? "----"
         case .filePath:
             return music?.filePath ?? "----"
         }
+    }
+    func fileSizeString() -> String? {
+        guard let fileSize = music?.fileSize, let fileSize = Int64(exactly: fileSize) else { return nil }
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: fileSize)
     }
 }
 

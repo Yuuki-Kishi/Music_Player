@@ -36,7 +36,7 @@ class PlayRepository {
     
     static func setTimer() {
         playDataStore.seekPositionUpdateTimer?.invalidate()
-        playDataStore.seekPositionUpdateTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateSeekPosition), userInfo: nil, repeats: true)
+        playDataStore.seekPositionUpdateTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(updateSeekPosition), userInfo: nil, repeats: true)
     }
     
     @objc static func updateSeekPosition() {
@@ -48,7 +48,8 @@ class PlayRepository {
         let sampleRate = playerTime.sampleRate
         let sampleTime = playerTime.sampleTime
         // 秒数を取得し保持する ④
-        let currentTime = Double(sampleTime) / sampleRate + playDataStore.cashedSeekBarSeconds
+        let musicLength = playDataStore.playingMusic?.musicLength ?? 300
+        let currentTime = min(max(0, Double(sampleTime) / sampleRate + playDataStore.cashedSeekBarSeconds), musicLength)
         isEndOfFile(currentTime: currentTime)
         playDataStore.seekPosition = currentTime
         NotificationRepository.setNowPlayingInfo()
@@ -71,8 +72,7 @@ class PlayRepository {
         // 変更する秒数のSampleTimeを取得する
         let startSampleTime = AVAudioFramePosition(sampleRate * playDataStore.seekPosition)
         // 変更した後の曲の残り時間とそのSampleTimeを取得する(曲の秒数-変更する秒数)
-        let length = playDataStore.playingMusic?.musicLength ?? 300 - playDataStore.seekPosition
-        let remainSampleTime = AVAudioFrameCount(length * Double(sampleRate))
+        let remainSampleTime = AVAudioFrameCount(audioFile.length - startSampleTime)
         // 変更した秒数をキャッシュしておく
         playDataStore.cashedSeekBarSeconds = Double(playDataStore.seekPosition)
         // 変更した秒数から曲を再生し直すため、AudioEngineとPlayerNodeを停止する

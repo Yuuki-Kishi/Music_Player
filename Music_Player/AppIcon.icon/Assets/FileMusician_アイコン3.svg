@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_レイヤー_1" data-name="レイヤー 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 341.23 345.13">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #999;
+      }
+    </style>
+  </defs>
+  <ellipse class="cls-1" cx="63.44" cy="293.14" rx="65" ry="50" transform="translate(-96.43 39.38) rotate(-20)"/>
+  <ellipse class="cls-1" cx="277.5" cy="254.93" rx="65" ry="50" transform="translate(-70.46 110.29) rotate(-20)"/>
+  <rect class="cls-1" x="86.89" y="56.78" width="40" height="242.25" rx="20" ry="20"/>
+  <rect class="cls-1" x="301.23" y="0" width="40" height="261.49" rx="20" ry="20"/>
+  <rect class="cls-1" x="188.08" y="-75.26" width="51.96" height="258.68" rx="20" ry="20" transform="translate(217.22 274.84) rotate(-105)"/>
+</svg>
