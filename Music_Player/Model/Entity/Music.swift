@@ -58,6 +58,9 @@ extension Array where Element == Music {
         guard let selectedMusicFilePath = MusicDataStore.shared.selectedMusicFilePath else { return nil }
         return self.first { $0.filePath == selectedMusicFilePath }
     }
+    var filePaths: [String] {
+        self.map { $0.filePath }
+    }
     mutating func append(noDuplicate item: Element) {
         if let index = self.firstIndex(of: item) {
             self[index] = item

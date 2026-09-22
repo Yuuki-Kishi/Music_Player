@@ -137,7 +137,7 @@ class PlayRepository {
         }
         guard PlayFlowRepository.cleanUpPlayNextM3U8() else { return }
         guard PlayFlowRepository.cleanUpPlayBackM3U8() else { return }
-        guard PlayFlowRepository.writePlayNextM3U8(filePaths: musics.map { $0.filePath }) else { return }
+        guard PlayFlowRepository.writePlayNextM3U8(filePaths: musics.filePaths) else { return }
         print("setSucceeded")
     }
     
@@ -157,7 +157,7 @@ class PlayRepository {
                     } else {
                         playBackMusics.sort { $0.musicName < $1.musicName }
                     }
-                    guard PlayFlowRepository.writePlayNextM3U8(filePaths: playBackMusics.map { $0.filePath }) else { return }
+                    guard PlayFlowRepository.writePlayNextM3U8(filePaths: playBackMusics.filePaths) else { return }
                     guard PlayFlowRepository.cleanUpPlayBackM3U8() else { return }
                 }
                 guard let nextMusicFilePath = PlayFlowRepository.getNextMusicFilePath() else { return }

@@ -107,29 +107,45 @@ class PlayFlowRepository {
     }
     
     static func selectPlayNextMusic(filePath: String) -> Bool {
-        guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return false }
         guard let index = playFlowDataStore.playNextMusicArray.firstIndex(where: { $0.filePath == filePath }) else { return false }
-        var beforeFilePaths = Array(playFlowDataStore.playNextMusicArray[..<index]).map { $0.filePath }
-        let afterFilePaths = Array(playFlowDataStore.playNextMusicArray[index...].dropFirst()).map { $0.filePath }
-        beforeFilePaths.insert(playingMusicFilePath, at: 0)
-        beforeFilePaths = playFlowDataStore.playBackMusicArray.map { $0.filePath } + beforeFilePaths
+        var playBackMusicArray = playFlowDataStore.playBackMusicArray
+        guard let playingMusic = playDataStore.playingMusic else { return false }
+        let beforePlayMusic = Array(playFlowDataStore.playNextMusicArray[..<index])
         let playMusic = playFlowDataStore.playNextMusicArray[index]
+        let afterPlayMusic = Array(playFlowDataStore.playNextMusicArray[index...].dropFirst())
+        var playBackFilePaths = playBackMusicArray.filePaths
+        playBackFilePaths.append(noDuplicate: playMusic.filePath)
+        playBackFilePaths = playBackFilePaths + beforePlayMusic.filePaths
+        let playNextFilePaths = afterPlayMusic.filePaths
+        guard M3U8Service.updateM3U8(filePath: playBackFilePath, contents: playBackFilePaths) else { return false }
+        guard M3U8Service.updateM3U8(filePath: playNextFilePath, contents: playNextFilePaths) else { return false }
+        playBackMusicArray.append(noDuplicate: playingMusic)
+        playBackMusicArray = playBackMusicArray + beforePlayMusic
         PlayRepository.musicSelected(music: playMusic)
-        guard M3U8Service.updateM3U8(filePath: playBackFilePath, contents: beforeFilePaths) else { return false }
-        return M3U8Service.updateM3U8(filePath: playNextFilePath, contents: afterFilePaths)
+        playFlowDataStore.playBackMusicArray = playBackMusicArray
+        playFlowDataStore.playNextMusicArray = afterPlayMusic
+        return true
     }
     
     static func selectPlayBackMusic(filePath: String) -> Bool {
-        guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return false }
-        guard let index = playFlowDataStore.playBackMusicArray.firstIndex(where: { $0.filePath == filePath}) else { return false }
-        let beforeFilePaths = Array(playFlowDataStore.playBackMusicArray[..<index]).map { $0.filePath }
-        var afterFilePaths = Array(playFlowDataStore.playBackMusicArray[index...].dropFirst()).map { $0.filePath }
-        afterFilePaths.insert(playingMusicFilePath, at: 0)
-        afterFilePaths = afterFilePaths + playFlowDataStore.playNextMusicArray.map { $0.filePath }
+        guard let index = playFlowDataStore.playBackMusicArray.firstIndex(where: { $0.filePath == filePath }) else { return false }
+        let beforePlayMusic = Array(playFlowDataStore.playBackMusicArray[..<index])
         let playMusic = playFlowDataStore.playBackMusicArray[index]
+        let afterPlayMusic = Array(playFlowDataStore.playBackMusicArray[index...].dropFirst())
+        guard let playingMusic = playDataStore.playingMusic else { return false }
+        var playNextMusicArray = playFlowDataStore.playNextMusicArray
+        let playBackFilePaths = beforePlayMusic.filePaths
+        var playNextFilePaths = afterPlayMusic.filePaths
+        playNextFilePaths.append(noDuplicate: playingMusic.filePath)
+        playNextFilePaths = playNextFilePaths + playNextMusicArray.filePaths
+        guard M3U8Service.updateM3U8(filePath: playBackFilePath, contents: playBackFilePaths) else { return false }
+        guard M3U8Service.updateM3U8(filePath: playNextFilePath, contents: playNextFilePaths) else { return false }
+        playNextMusicArray.insert(playingMusic, at: 0)
+        playNextMusicArray = afterPlayMusic + playNextMusicArray
         PlayRepository.musicSelected(music: playMusic)
-        guard M3U8Service.updateM3U8(filePath: playBackFilePath, contents: beforeFilePaths) else { return false }
-        return M3U8Service.updateM3U8(filePath: playNextFilePath, contents: afterFilePaths)
+        playFlowDataStore.playBackMusicArray = beforePlayMusic
+        playFlowDataStore.playNextMusicArray = playNextMusicArray
+        return true
     }
     
     static func rearrangePlayNextM3U8() -> Bool {
@@ -148,12 +164,12 @@ class PlayFlowRepository {
         var musics = musics
         if playDataStore.isShuffle {
             musics.shuffle()
-            let contents = musics.map { $0.filePath }
+            let contents = musics.filePaths
             guard writePlayNextM3U8(filePaths: contents) else { return }
             print("setSucceeded")
         } else {
             musics.sort { $0.musicName < $1.musicName }
-            let contents = musics.map { $0.filePath }
+            let contents = musics.filePaths
             guard writePlayNextM3U8(filePaths: contents) else { return }
             print("setSucceeded")
         }

@@ -13,7 +13,7 @@ struct PlayFlowViewCell: View {
     private let cellType: CellTypeEnum
     
     enum CellTypeEnum {
-        case playNext, playBuck
+        case playNext, playBack
     }
     
     init(music: Music, cellType: CellTypeEnum) {
@@ -47,15 +47,15 @@ struct PlayFlowViewCell: View {
         case .playNext:
             Task {
                 guard PlayFlowRepository.selectPlayNextMusic(filePath: music.filePath) else { return }
-                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
-                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
+//                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
+//                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
                 print("SelectPlayNextSuccessed")
             }
-        case .playBuck:
+        case .playBack:
             Task {
                 guard PlayFlowRepository.selectPlayBackMusic(filePath: music.filePath) else { return }
-                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
-                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
+//                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
+//                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
                 print("SelectPlayBackSuccessed")
             }
         }

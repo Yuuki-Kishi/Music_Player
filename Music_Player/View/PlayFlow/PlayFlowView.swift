@@ -16,7 +16,7 @@ struct PlayFlowView: View {
                 Section {
                     BoolSwitchView(isEmpty: playFlowDataStore.playBackMusicArray.isEmpty, isLoading: playFlowDataStore.isLoading) {
                         ForEach(playFlowDataStore.playBackMusicArray, id: \.filePath) { music in
-                            PlayFlowViewCell(music: music, cellType: .playBuck)
+                            PlayFlowViewCell(music: music, cellType: .playBack)
                         }
                     } emptyContent: {
                         Text("PlayFlowView.List.PlayBackSection.emptyContent.Text")
