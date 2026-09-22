@@ -9,13 +9,16 @@ import SwiftUI
 
 struct SettingView: View {    
     var body: some View {
-        List {
-            SettingViewCell(cellType: .excludeFolder)
-            SettingViewCell(cellType: .equalizer)
-            SettingViewCell(cellType: .sleepTimer)
+        VStack {
+            List {
+                SettingViewCell(cellType: .excludeFolder)
+                SettingViewCell(cellType: .equalizer)
+                SettingViewCell(cellType: .sleepTimer)
+            }
+            .listStyle(.plain)
+            .navigationTitle("SettingView.navigationTitle")
+            VersionView()
         }
-        .listStyle(.plain)
-        .navigationTitle("SettingView.navigationTitle")
     }
 }
 
