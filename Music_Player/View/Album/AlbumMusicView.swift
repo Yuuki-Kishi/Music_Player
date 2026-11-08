@@ -11,18 +11,23 @@ struct AlbumMusicView: View {
     @EnvironmentObject private var albumDataStore: AlbumDataStore
     
     var body: some View {
-        VStack {
-            BoolSwitchView(isEmpty: albumDataStore.albumMusicArray.isEmpty, isLoading: albumDataStore.isLoading) {
-                RandomPlayButton(dataStore: .album)
-                List(albumDataStore.albumMusicArray) { music in
-                    AlbumMusicViewCell(music: music)
+        BoolSwitchView(isEmpty: albumDataStore.albumMusicArray.isEmpty, isLoading: albumDataStore.isLoading) {
+            ZStack {
+                List {
+                    Section {
+                        ForEach(albumDataStore.albumMusicArray) { music in
+                            AlbumMusicViewCell(music: music)
+                        }
+                    } header: {
+                        Text("")
+                    }
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-            } emptyContent: {
-                Text("AlbumMusicView.emptyContent.Text")
+                RandomPlayButton(dataStore: .album)
             }
-            PlayWindowView()
+        } emptyContent: {
+            Text("AlbumMusicView.emptyContent.Text")
         }
         .navigationTitle(albumDataStore.albumArray.selected?.albumName ?? String(localized: "AlbumMusicView.navigationTitle.unknownAlbumName"))
         .toolbar {

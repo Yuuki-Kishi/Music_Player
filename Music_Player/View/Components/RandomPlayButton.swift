@@ -25,22 +25,27 @@ struct RandomPlayButton: View {
     }
     
     var body: some View {
-        Button{
-            randomPlay()
-        } label: {
-            HStack {
-                Image(systemName: "play.circle")
-                    .foregroundStyle(.accent)
-                Text("\(musicCountString())RandomPlayButton.label.Text")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Spacer()
-                Text(allMusicLengthString())
-                    .foregroundStyle(.secondary)
-                    .frame(alignment: .trailing)
+        VStack {
+            Button{
+                randomPlay()
+            } label: {
+                HStack {
+                    Image(systemName: "play.circle")
+                        .foregroundStyle(.accent)
+                    Text("\(musicCountString())RandomPlayButton.label.Text")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer()
+                    Text(allMusicLengthString())
+                        .foregroundStyle(.secondary)
+                        .frame(alignment: .trailing)
+                }
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal)
+            .buttonStyle(.glass)
+            .foregroundStyle(.primary)
+            Spacer()
         }
-        .foregroundStyle(.primary)
+        .padding(.horizontal)
     }
     func randomPlay() {
         switch dataStore {

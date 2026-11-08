@@ -14,18 +14,15 @@ struct FavoriteMusicView: View {
     @State private var isShowAlert: Bool = false
     
     var body: some View {
-        VStack {
-            BoolSwitchView(isEmpty: favoriteMusicDataStore.favoriteMusicArray.isEmpty, isLoading: favoriteMusicDataStore.isLoading) {
-                RandomPlayButton(dataStore: .favorite)
-                List(favoriteMusicDataStore.favoriteMusicArray) { music in
-                    FavoriteMusicViewCell(music: music)
-                }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-            } emptyContent: {
-                Text("FavotiteMusicView.emptyContent.Text")
+        BoolSwitchView(isEmpty: favoriteMusicDataStore.favoriteMusicArray.isEmpty, isLoading: favoriteMusicDataStore.isLoading) {
+            RandomPlayButton(dataStore: .favorite)
+            List(favoriteMusicDataStore.favoriteMusicArray) { music in
+                FavoriteMusicViewCell(music: music)
             }
-            PlayWindowView()
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        } emptyContent: {
+            Text("FavotiteMusicView.emptyContent.Text")
         }
         .navigationTitle("FavoriteMusicView.navigationTitle")
         .toolbar {

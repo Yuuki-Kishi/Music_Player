@@ -11,18 +11,22 @@ struct FolderMusicView: View {
     @EnvironmentObject private var folderDataStore: FolderDataStore
     
     var body: some View {
-        VStack {
-            BoolSwitchView(isEmpty: folderDataStore.folderMusicArray.isEmpty, isLoading: folderDataStore.isLoading) {
-                RandomPlayButton(dataStore: .folder)
-                List(folderDataStore.folderMusicArray) { music in
-                    FolderMusicViewCell(music: music)
+        BoolSwitchView(isEmpty: folderDataStore.folderMusicArray.isEmpty, isLoading: folderDataStore.isLoading) {
+            ZStack {
+                List {
+                    Section {
+                        ForEach(folderDataStore.folderMusicArray) { music in
+                            FolderMusicViewCell(music: music)
+                        }
+                    } header: {
+                        Text("")
+                    }
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-            } emptyContent: {
-                Text("FolderMusicView.emptyContent.Text")
+                RandomPlayButton(dataStore: .folder)
             }
-            PlayWindowView()
+        } emptyContent: {
+            Text("FolderMusicView.emptyContent.Text")
         }
         .navigationTitle(folderDataStore.folderArray.selected?.folderName ?? String(localized: "FolderMusicView.navigationTitle.unknownFolderName"))
         .toolbar {

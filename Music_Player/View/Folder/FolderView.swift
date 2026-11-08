@@ -13,21 +13,14 @@ struct FolderView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.folderViewNavigationPath) {
-            VStack {
-                BoolSwitchView(isEmpty: folderDataStore.folderArray.isEmpty, isLoading: folderDataStore.isLoading) {
-                    Text("\(String(folderDataStore.folderArray.count))FolderView.content.Text")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                    List(folderDataStore.folderArray) { folder in
-                        FolderViewCell(folder: folder)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                } emptyContent: {
-                    Text("FolderView.emptyContent.Text")
+            BoolSwitchView(isEmpty: folderDataStore.folderArray.isEmpty, isLoading: folderDataStore.isLoading) {
+                List(folderDataStore.folderArray) { folder in
+                    FolderViewCell(folder: folder)
                 }
-                PlayWindowView()
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            } emptyContent: {
+                Text("FolderView.emptyContent.Text")
             }
             .navigationTitle("FolderView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)

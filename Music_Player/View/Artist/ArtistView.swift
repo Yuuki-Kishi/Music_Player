@@ -14,20 +14,13 @@ struct ArtistView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.artistViewNavigationPath) {
-            VStack {
-                BoolSwitchView(isEmpty: artistDataStore.artistArray.isEmpty, isLoading: artistDataStore.isLoading) {
-                    Text("\(String(artistDataStore.artistArray.count))ArtistView.content.Text")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                    List(artistDataStore.artistArray) { artist in
-                        ArtistViewCell(artist: artist)
-                    }
-                    .listStyle(.plain)
-                } emptyContent: {
-                    Text("ArtistView.emptyContent.Text")
+            BoolSwitchView(isEmpty: artistDataStore.artistArray.isEmpty, isLoading: artistDataStore.isLoading) {
+                List(artistDataStore.artistArray) { artist in
+                    ArtistViewCell(artist: artist)
                 }
-                PlayWindowView()
+                .listStyle(.plain)
+            } emptyContent: {
+                Text("ArtistView.emptyContent.Text")
             }
             .navigationTitle("ArtistView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)

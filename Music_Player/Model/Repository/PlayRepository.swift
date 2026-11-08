@@ -189,6 +189,10 @@ class PlayRepository {
     static func movePreviousMusic() {
         Task {
             stop()
+            if playDataStore.seekPosition > 5 {
+                await restartMusic()
+                return
+            }
             playDataStore.seekPosition = 0.0
             playDataStore.cashedSeekBarSeconds = 0.0
             guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return }
@@ -206,6 +210,17 @@ class PlayRepository {
             setTimer()
             play()
         }
+    }
+    
+    static func restartMusic() async {
+        playDataStore.seekPosition = 0.0
+        playDataStore.cashedSeekBarSeconds = 0.0
+        guard let playingMusicFilePath = playDataStore.playingMusic?.filePath else { return }
+        guard let playingMusic = await FileService.getFileMetadata(filePath: playingMusicFilePath) else { return }
+        setMusic(music: playingMusic)
+        setScheduleFile()
+        setTimer()
+        play()
     }
     
     static func loadPlayingMusic() async -> Music? {

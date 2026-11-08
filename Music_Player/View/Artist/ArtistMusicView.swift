@@ -13,18 +13,22 @@ struct ArtistMusicView: View {
     @EnvironmentObject private var pathDataStore: PathDataStore
     
     var body: some View {
-        VStack {
-            BoolSwitchView(isEmpty: artistDataStore.artistMusicArray.isEmpty, isLoading: artistDataStore.isLoading) {
-                RandomPlayButton(dataStore: .artist)
-                List(artistDataStore.artistMusicArray) { music in
-                    ArtistMusicViewCell(music: music)
+        BoolSwitchView(isEmpty: artistDataStore.artistMusicArray.isEmpty, isLoading: artistDataStore.isLoading) {
+            ZStack {
+                List {
+                    Section {
+                        ForEach(artistDataStore.artistMusicArray) { music in
+                            ArtistMusicViewCell(music: music)
+                        }
+                    } header: {
+                        Text("")
+                    }
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-            } emptyContent: {
-                Text("ArtistMusicView.emptyContent.Text")
+                RandomPlayButton(dataStore: .artist)
             }
-            PlayWindowView()
+        } emptyContent: {
+            Text("ArtistMusicView.emptyContent.Text")
         }
         .navigationTitle(artistDataStore.artistArray.selected?.artistName ?? String(localized: "ArtistMusicView.navigationTitle.unknownArtistName"))
         .toolbar {

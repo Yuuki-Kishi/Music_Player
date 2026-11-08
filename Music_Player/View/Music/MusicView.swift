@@ -15,18 +15,22 @@ struct MusicView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.musicViewNavigationPath) {
-            VStack {
-                BoolSwitchView(isEmpty: musicDataStore.musicArray.isEmpty, isLoading: musicDataStore.isLoading) {
-                    RandomPlayButton(dataStore: .music)
-                    List(musicDataStore.musicArray) { music in
-                        MusicViewCell(music: music)
+            BoolSwitchView(isEmpty: musicDataStore.musicArray.isEmpty, isLoading: musicDataStore.isLoading) {
+                ZStack {
+                    List {
+                        Section {
+                            ForEach(musicDataStore.musicArray) { music in
+                                MusicViewCell(music: music)
+                            }
+                        } header: {
+                            Text("")
+                        }
                     }
                     .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                } emptyContent: {
-                    Text("MusicView.emptyContent.Text")
+                    RandomPlayButton(dataStore: .music)
                 }
-                PlayWindowView()
+            } emptyContent: {
+                Text("MusicView.emptyContent.Text")
             }
             .navigationTitle("MusicView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)

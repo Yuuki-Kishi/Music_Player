@@ -38,6 +38,12 @@ struct PlayView: View {
             .sheet(isPresented: $playDataStore.isShowAddPlaylistView) {
                 AddPlaylistView(music: playDataStore.playingMusic)
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    AudioRoutePicker()
+                        .frame(width: 30, height: 30)
+                }
+            }
         }
     }
     @ViewBuilder

@@ -16,18 +16,22 @@ struct PlaylistMusicView: View {
     @State private var renameText: String = ""
     
     var body: some View {
-        VStack {
-            BoolSwitchView(isEmpty: playlistDataStore.playlistMusicArray.isEmpty, isLoading: playlistDataStore.isLoading) {
-                RandomPlayButton(dataStore: .playlist)
-                List(playlistDataStore.playlistMusicArray) { music in
-                    PlaylistMusicViewCell(music: music)
+        BoolSwitchView(isEmpty: playlistDataStore.playlistMusicArray.isEmpty, isLoading: playlistDataStore.isLoading) {
+            ZStack {
+                List {
+                    Section {
+                        ForEach(playlistDataStore.playlistMusicArray) { music in
+                            PlaylistMusicViewCell(music: music)
+                        }
+                    } header: {
+                        Text("")
+                    }
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-            } emptyContent: {
-                Text("PlaylistMusicView.emptyContent.Text")
+                RandomPlayButton(dataStore: .playlist)
             }
-            PlayWindowView()
+        } emptyContent: {
+            Text("PlaylistMusicView.emptyContent.Text")
         }
         .navigationTitle(playlistDataStore.playlistArray.selected?.playlistName ?? String(localized: "PlaylistMusicView.navigationTitle.unknownPlaylistName"))
         .toolbar {

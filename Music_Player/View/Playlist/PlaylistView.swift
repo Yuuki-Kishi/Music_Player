@@ -15,22 +15,15 @@ struct PlaylistView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.playlistViewNavigationPath) {
-            VStack {
-                BoolSwitchView(isEmpty: playlistDataStore.playlistArray.isEmpty, isLoading: playlistDataStore.isLoading) {
-                    Text("\(String(playlistDataStore.playlistArray.count))PlaylistView.content.Text")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                    List(playlistDataStore.playlistArray) { playlist in
-                        PlaylistViewCell(playlist: playlist)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                } emptyContent: {
-                    Text("PlaylistView.emptyContent.Text")
+            BoolSwitchView(isEmpty: playlistDataStore.playlistArray.isEmpty, isLoading: playlistDataStore.isLoading) {
+                List(playlistDataStore.playlistArray) { playlist in
+                    PlaylistViewCell(playlist: playlist)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            } emptyContent: {
+                Text("PlaylistView.emptyContent.Text")
             }
-            PlayWindowView()
             .navigationTitle("PlaylistView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: PathDataStore.PlaylistViewPath.self) { path in

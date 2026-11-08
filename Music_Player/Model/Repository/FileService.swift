@@ -43,6 +43,11 @@ class FileService {
         return fileManager.fileExists(atPath: url.planePath)
     }
     
+    static func printDocumentDirectory() {
+        guard let path = documentDirectory?.planePath else { return }
+        print(path)
+    }
+    
     //get
     static func getFilePaths(folderPath: String) -> [String] {
         guard let folderURL = documentDirectory?.appending(path:folderPath) else { return [] }

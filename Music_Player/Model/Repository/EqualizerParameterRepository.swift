@@ -24,12 +24,6 @@ class EqualizerParameterRepository {
         }
     }
     
-    static func insert() async {
-        for equalizerParameter in equalizerDataStore.equalizerParameters {
-            await actor.insert(equalizerParameter)
-        }
-    }
-    
     //get
     static func getParameters() async -> [EqualizerParameter] {
         let predicate = #Predicate<EqualizerParameter> { equalizerParameter in
@@ -66,9 +60,9 @@ class EqualizerParameterRepository {
     }
     
     //delete
-    static func deleteAll() async {
-        for equalizerParameter in await getParameters() {
-            await actor.delete(equalizerParameter)
+    static func resetAll() async {
+        for (index, _) in await getParameters().enumerated() {
+            equalizerDataStore.equalizerParameters[index].gain = 0.0
         }
     }
 }

@@ -22,30 +22,8 @@ struct EqualizerView: View {
                         EqualizerViewCell(gain: $equalizerParameter.gain, frequency: equalizerParameter.frequency)
                     }
                     Spacer()
-                    Button {
-                        setEqualizerParameters()
-                    } label: {
-                        Text("EqualizerView.setButton.Text")
-                            .frame(width: geometry.size.width * 0.6, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.accent, lineWidth: 1)
-                            )
-                    }
-                    .padding(.bottom)
-                    Button {
-                        isShowAlert = true
-                    } label: {
-                        Text("EqualizerView.resetButton.Text")
-                            .frame(width: geometry.size.width * 0.6, height: 30)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.primary, lineWidth: 1)
-                            )
-                    }
                 } emptyContent: {}
-                    .foregroundStyle(.primary)
-                Spacer()
+                    .padding(.horizontal)
             }
         }
         .alert("EqualizerView.Alert.title", isPresented: $isShowAlert) {
@@ -58,8 +36,14 @@ struct EqualizerView: View {
         } message: {
             Text("EqualizerView.Alert.message")
         }
-        .padding(.horizontal)
         .navigationTitle("EqualizerView.NavigationTitle")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                ResetButton {
+                    isShowAlert = true
+                }
+            }
+        }
         .onAppear() {
             onAppear()
         }
@@ -73,8 +57,8 @@ struct EqualizerView: View {
     }
     func resetEqualizerParameters() {
         Task {
-            await EqualizerParameterRepository.deleteAll()
-            await EqualizerParameterRepository.insert()
+            await EqualizerParameterRepository.resetAll()
+            await EqualizerParameterRepository.save()
             EqualizerParameterRepository.setEqualizer()
             pathDataStore.musicViewNavigationPath.removeLast()
         }

@@ -51,6 +51,10 @@ struct ContentView: View {
                     }
                 }
         }
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tabViewBottomAccessory {
+            PlayWindowView()
+        }
         .accentColor(.accent)
         .sheet(isPresented: $playDataStore.isShowPlayView) {
             PlayView()
@@ -70,6 +74,7 @@ struct ContentView: View {
     }
     func onAppear() {
         Task {
+            FileService.printDocumentDirectory()
             FileService.createDirectory(folderPath: "Playlist")
             FileService.createDirectory(folderPath: "System")
             if !ExcludeFolderRepository.isExistExcludeFolder() {

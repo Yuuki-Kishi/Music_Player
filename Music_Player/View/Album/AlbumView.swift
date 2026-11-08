@@ -13,21 +13,14 @@ struct AlbumView: View {
     
     var body: some View {
         NavigationStack(path: $pathDataStore.albumViewNavigationPath) {
-            VStack {
-                BoolSwitchView(isEmpty: albumDataStore.albumArray.isEmpty, isLoading: albumDataStore.isLoading) {
-                    Text("\(String(albumDataStore.albumArray.count))AlbumView.content.Text")
-                        .font(.system(size: 15))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                    List(albumDataStore.albumArray) { album in
-                        AlbumViewCell(album: album)
-                    }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
-                } emptyContent: {
-                    Text("AlbumView.emptyContent.Text")
+            BoolSwitchView(isEmpty: albumDataStore.albumArray.isEmpty, isLoading: albumDataStore.isLoading) {
+                List(albumDataStore.albumArray) { album in
+                    AlbumViewCell(album: album)
                 }
-                PlayWindowView()
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+            } emptyContent: {
+                Text("AlbumView.emptyContent.Text")
             }
             .navigationTitle("AlbumView.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)

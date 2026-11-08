@@ -13,31 +13,25 @@ struct PlayWindowView: View {
     
     var body: some View {
         ZStack {
-            Rectangle()
-                .foregroundStyle(Color(UIColor.systemGray6))
-                .frame(height: 60)
-            VStack {
-                ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .accent))
-                Spacer()
-            }
-            .padding(.horizontal)
             HStack {
                 VStack {
                     Text(musicNameString())
                         .lineLimit(1)
-                        .font(.system(size: 20.0))
+                        .font(.system(size: 17.0))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Text(artistAndAlbumString())
                         .lineLimit(1)
-                        .font(.system(size: 12.5))
+                        .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    ProgressView(value: playDataStore.seekPosition, total: playDataStore.playingMusic?.musicLength ?? 300)
+                        .progressViewStyle(LinearProgressViewStyle(tint: .accent))
+                        .scaleEffect(x: 1.0, y: 0.5, anchor: .center)
                 }
-                Spacer(minLength: 100)
+                Spacer(minLength: 90)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
+            .padding(.leading, 25)
             HStack {
                 Button {
                     playDataStore.isShowPlayView = true
@@ -54,7 +48,7 @@ struct PlayWindowView: View {
                 Button {
                     PlayRepository.moveNextMusic()
                 } label: {
-                    Image(systemName: "forward.fill")
+                    Image(systemName: "forward.end.fill")
                         .font(.system(size: 25.0))
                         .padding(.vertical, 10)
                 }
