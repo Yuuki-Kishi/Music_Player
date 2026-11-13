@@ -16,6 +16,7 @@ struct SettingView: View {
                 SettingViewCell(cellType: .sleepTimer)
             }
             .listStyle(.plain)
+            .scrollEdgeEffectStyle(.soft, for: .vertical)
             .navigationTitle("SettingView.navigationTitle")
             VersionView()
         }

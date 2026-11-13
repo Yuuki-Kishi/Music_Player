@@ -22,6 +22,7 @@ struct PlaylistSelectMusicView: View {
                 }
                 .environment(\.editMode, .constant(.active))
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("PlaylistSelectMusicView.emptyContent.Text")
             }

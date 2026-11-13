@@ -19,6 +19,7 @@ struct ExcludeFolderSelectView: View {
                 }
                 .environment(\.editMode, .constant(.active))
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("ExcludeFolderSelectView.emptyContent.Text")
             }

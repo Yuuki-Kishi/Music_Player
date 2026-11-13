@@ -19,6 +19,7 @@ struct ArtistView: View {
                     ArtistViewCell(artist: artist)
                 }
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("ArtistView.emptyContent.Text")
             }

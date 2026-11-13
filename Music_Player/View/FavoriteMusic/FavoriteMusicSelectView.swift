@@ -21,6 +21,7 @@ struct FavoriteMusicSelectView: View {
                 }
                 .environment(\.editMode, .constant(.active))
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("FavoriteMusicSelectView.emptyContent.Text")
             }

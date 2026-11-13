@@ -15,16 +15,13 @@ struct ArtistMusicView: View {
     var body: some View {
         BoolSwitchView(isEmpty: artistDataStore.artistMusicArray.isEmpty, isLoading: artistDataStore.isLoading) {
             ZStack {
-                List {
-                    Section {
-                        ForEach(artistDataStore.artistMusicArray) { music in
-                            ArtistMusicViewCell(music: music)
-                        }
-                    } header: {
-                        Text("")
-                    }
+                List(artistDataStore.artistMusicArray) { music in
+                    MusicViewCell(music: music)
+                        .listRowInsets(.top, artistDataStore.artistMusicArray.first == music ? 65 : 11)
+                        .listRowSeparator(artistDataStore.artistMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
                 RandomPlayButton(dataStore: .artist)
             }
         } emptyContent: {

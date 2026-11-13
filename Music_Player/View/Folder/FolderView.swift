@@ -18,7 +18,7 @@ struct FolderView: View {
                     FolderViewCell(folder: folder)
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("FolderView.emptyContent.Text")
             }

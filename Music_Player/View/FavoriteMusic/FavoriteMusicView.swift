@@ -15,12 +15,16 @@ struct FavoriteMusicView: View {
     
     var body: some View {
         BoolSwitchView(isEmpty: favoriteMusicDataStore.favoriteMusicArray.isEmpty, isLoading: favoriteMusicDataStore.isLoading) {
-            RandomPlayButton(dataStore: .favorite)
-            List(favoriteMusicDataStore.favoriteMusicArray) { music in
-                FavoriteMusicViewCell(music: music)
+            ZStack {
+                List(favoriteMusicDataStore.favoriteMusicArray) { music in
+                    FavoriteMusicViewCell(music: music)
+                        .listRowInsets(.top, favoriteMusicDataStore.favoriteMusicArray.first == music ? 65 : 11)
+                        .listRowSeparator(favoriteMusicDataStore.favoriteMusicArray.first == music ? .hidden : .visible, edges: .top)
+                }
+                .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
+                RandomPlayButton(dataStore: .favorite)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         } emptyContent: {
             Text("FavotiteMusicView.emptyContent.Text")
         }

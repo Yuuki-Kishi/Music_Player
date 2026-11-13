@@ -18,7 +18,7 @@ struct AlbumView: View {
                     AlbumViewCell(album: album)
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("AlbumView.emptyContent.Text")
             }

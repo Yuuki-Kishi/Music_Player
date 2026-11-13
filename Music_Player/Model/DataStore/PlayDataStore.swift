@@ -34,8 +34,8 @@ class PlayDataStore: ObservableObject {
         try? audioSession.setCategory(.playback)
         audioEngine.attach(playerNode)
         audioEngine.attach(equalizerNode)
-        audioEngine.connect(playerNode, to: equalizerNode, format: nil)
-        audioEngine.connect(equalizerNode, to: audioEngine.mainMixerNode, format: nil)
+        try? audioEngine.connectNode(playerNode, to: equalizerNode, format: nil)
+        try? audioEngine.connectNode(equalizerNode, to: audioEngine.mainMixerNode, format: nil)
         NotificationRepository.initRemoteCommand()
         NotificationRepository.setNotification()
     }

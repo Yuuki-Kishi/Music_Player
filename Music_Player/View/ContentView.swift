@@ -10,46 +10,28 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var equalizerDataStore: EqualizerDataStore
     @EnvironmentObject private var playDataStore: PlayDataStore
+    @State private var selection = 0
     @State private var updateAlertIsPresented: Bool = false
     @Environment(\.openURL) private var openURL
+    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
     
     var body: some View {
-        TabView() {
-            MusicView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "music.note")
-                        Text("ContentView.MusicView.tabItem.Text")
-                    }
-                }
-            ArtistView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "music.mic")
-                        Text("ContentView.ArtistView.tabItem.Text")
-                    }
-                }
-            AlbumView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "square.stack")
-                        Text("ContentView.AlbumView.tabItem.Text")
-                    }
-                }
-            PlaylistView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "music.note.list")
-                        Text("ContentView.PlaylistView.tabItem.Text")
-                    }
-                }
-            FolderView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "folder.fill")
-                        Text("ContentView.FolderView.tabItem.Text")
-                    }
-                }
+        TabView(selection: $selection) {
+            Tab("ContentView.MusicView.Tab.Text", systemImage: "music.note", value: 0) {
+                MusicView()
+            }
+            Tab("ContentView.ArtistView.Tab.Text", systemImage: "music.mic", value: 1) {
+                ArtistView()
+            }
+            Tab("ContentView.AlbumView.Tab.Text", systemImage: "square.stack", value: 2) {
+                AlbumView()
+            }
+            Tab("ContentView.PlaylistView.Tab.Text", systemImage: "music.note.list", value: 3) {
+                PlaylistView()
+            }
+            Tab("ContentView.FolderView.Tab.Text", systemImage: "folder.fill", value: 4) {
+                FolderView()
+            }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
         .tabViewBottomAccessory {

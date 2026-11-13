@@ -13,16 +13,13 @@ struct FolderMusicView: View {
     var body: some View {
         BoolSwitchView(isEmpty: folderDataStore.folderMusicArray.isEmpty, isLoading: folderDataStore.isLoading) {
             ZStack {
-                List {
-                    Section {
-                        ForEach(folderDataStore.folderMusicArray) { music in
-                            FolderMusicViewCell(music: music)
-                        }
-                    } header: {
-                        Text("")
-                    }
+                List(folderDataStore.folderMusicArray) { music in
+                    MusicViewCell(music: music)
+                        .listRowInsets(.top, folderDataStore.folderMusicArray.first == music ? 65 : 11)
+                        .listRowSeparator(folderDataStore.folderMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
                 RandomPlayButton(dataStore: .folder)
             }
         } emptyContent: {

@@ -99,29 +99,26 @@ class NotificationRepository {
     }
     
     static func setNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(onInterruption(_:)), name: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver( self, selector: #selector(onAudioSessionInactive(_:)), name: AVAudioSession.didBecomeInactiveNotification, object: AVAudioSession.sharedInstance())
+        NotificationCenter.default.addObserver(self, selector: #selector(onResumptionRecommendation(_:)), name: AVAudioSession.resumptionRecommendationNotification, object: AVAudioSession.sharedInstance())
         NotificationCenter.default.addObserver(self, selector: #selector(onAudioSessionRouteChanged(_:)), name: AVAudioSession.routeChangeNotification, object: nil)
     }
     
-    @objc static func onInterruption(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
-            return
+    @objc static func onAudioSessionInactive(_ notification: Notification) {
+        guard let context = notification.userInfo?[AVAudioSession.deactivationContextKey] as? AVAudioSession.DeactivationContext else { return }
+        guard context.source == .system else { return }
+        
+        if playDataStore.isPlaying {
+            PlayRepository.pause()
         }
-        switch type {
-        case .began:
-            if playDataStore.isPlaying {
-                PlayRepository.pause()
-            }
-            break
-        case .ended:
-            if !playDataStore.isPlaying {
-                PlayRepository.play()
-            }
-            break
-        @unknown default:
-            break
+    }
+    
+    @objc static func onResumptionRecommendation(_ notification: Notification) {
+        guard let context = notification.userInfo?[AVAudioSession.resumptionContextKey] as? AVAudioSession.ResumptionContext else { return }
+        guard context.recommendation == .shouldResume else { return }
+        
+        if !playDataStore.isPlaying {
+            PlayRepository.play()
         }
     }
     

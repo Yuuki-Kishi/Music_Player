@@ -13,17 +13,13 @@ struct AlbumMusicView: View {
     var body: some View {
         BoolSwitchView(isEmpty: albumDataStore.albumMusicArray.isEmpty, isLoading: albumDataStore.isLoading) {
             ZStack {
-                List {
-                    Section {
-                        ForEach(albumDataStore.albumMusicArray) { music in
-                            AlbumMusicViewCell(music: music)
-                        }
-                    } header: {
-                        Text("")
-                    }
+                List(albumDataStore.albumMusicArray) { music in
+                    MusicViewCell(music: music)
+                        .listRowInsets(.top, albumDataStore.albumMusicArray.first == music ? 65 : 11)
+                        .listRowSeparator(albumDataStore.albumMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
                 RandomPlayButton(dataStore: .album)
             }
         } emptyContent: {

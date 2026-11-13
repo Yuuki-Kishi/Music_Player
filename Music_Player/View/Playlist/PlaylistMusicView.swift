@@ -18,16 +18,13 @@ struct PlaylistMusicView: View {
     var body: some View {
         BoolSwitchView(isEmpty: playlistDataStore.playlistMusicArray.isEmpty, isLoading: playlistDataStore.isLoading) {
             ZStack {
-                List {
-                    Section {
-                        ForEach(playlistDataStore.playlistMusicArray) { music in
-                            PlaylistMusicViewCell(music: music)
-                        }
-                    } header: {
-                        Text("")
-                    }
+                List(playlistDataStore.playlistMusicArray) { music in
+                    MusicViewCell(music: music)
+                        .listRowInsets(.top, playlistDataStore.playlistMusicArray.first == music ? 65 : 11)
+                        .listRowSeparator(playlistDataStore.playlistMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }
                 .listStyle(.plain)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
                 RandomPlayButton(dataStore: .playlist)
             }
         } emptyContent: {

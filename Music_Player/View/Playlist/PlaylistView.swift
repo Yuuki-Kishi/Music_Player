@@ -20,7 +20,7 @@ struct PlaylistView: View {
                     PlaylistViewCell(playlist: playlist)
                 }
                 .listStyle(.plain)
-                .scrollContentBackground(.hidden)
+                .scrollEdgeEffectStyle(.soft, for: .vertical)
             } emptyContent: {
                 Text("PlaylistView.emptyContent.Text")
             }
@@ -35,7 +35,7 @@ struct PlaylistView: View {
                         isShowAlert = true
                     }
                 }
-                ToolbarSpacer()
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
                 ToolbarItem(placement: .topBarTrailing) {
                     toolBarMenu()
                 }

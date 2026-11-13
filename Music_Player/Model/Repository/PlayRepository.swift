@@ -25,8 +25,8 @@ class PlayRepository {
             // Source fileを取得する
             let audioFile = try AVAudioFile(forReading: fileURL)
             // PlayerNodeからAudioEngineのoutput先であるmainMixerNodeへ接続する
-            playDataStore.audioEngine.connect(playDataStore.playerNode, to: playDataStore.equalizerNode, format: nil)
-            playDataStore.audioEngine.connect(playDataStore.equalizerNode, to: playDataStore.audioEngine.mainMixerNode, format: nil)
+            try playDataStore.audioEngine.connectNode(playDataStore.playerNode, to: playDataStore.equalizerNode, format: nil)
+            try playDataStore.audioEngine.connectNode(playDataStore.equalizerNode, to: playDataStore.audioEngine.mainMixerNode, format: nil)
             // 再生準備
             playDataStore.playerNode.scheduleFile(audioFile, at: nil, completionCallbackType: .dataRendered)
         } catch {
@@ -86,14 +86,16 @@ class PlayRepository {
     
     static func play() {
         // 再生処理
-        do {
-            try playDataStore.audioSession.setActive(true, options: [])
-            try playDataStore.audioEngine.start()
-            playDataStore.playerNode.play()
-            NotificationRepository.setNowPlayingInfo()
-            playDataStore.isPlaying = true
-        } catch {
-            print(error.localizedDescription)
+        Task {
+            do {
+                try await playDataStore.audioSession.activate()
+                try playDataStore.audioEngine.start()
+                try playDataStore.playerNode.playAudio()
+                NotificationRepository.setNowPlayingInfo()
+                playDataStore.isPlaying = true
+            } catch {
+                print(error.localizedDescription)
+            }
         }
     }
     
