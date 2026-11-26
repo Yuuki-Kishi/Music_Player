@@ -96,8 +96,8 @@ class PlaylistRepository {
     }
     
     static func sortPlaylistArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "playlistSortMode", as: String.self) else { return }
-        guard let sortMode = PlaylistDataStore.PlaylistSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "playlistSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = PlaylistDataStore.PlaylistSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             playlistDataStore.playlistArray.sort { $0.playlistName < $1.playlistName }
@@ -125,8 +125,8 @@ class PlaylistRepository {
     }
     
     static func sortPlaylistMusicArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "playlistMusicSortMode", as: String.self) else { return }
-        guard let sortMode = PlaylistDataStore.PlaylistMusicSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "playlistMusicSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = PlaylistDataStore.PlaylistMusicSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             playlistDataStore.playlistMusicArray.sort { $0.musicName < $1.musicName }

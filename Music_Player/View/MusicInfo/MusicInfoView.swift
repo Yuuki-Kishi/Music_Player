@@ -36,6 +36,7 @@ struct MusicInfoView: View {
                     isShowAlert = true
                 }
         }
+        .scrollEdgeEffectStyle(.soft, for: .vertical)
         .listStyle(.plain)
         .navigationTitle("MusicInfoView.navigationTitle")
         .alert("MusicInfoView.Alert.title", isPresented: $isShowAlert) {

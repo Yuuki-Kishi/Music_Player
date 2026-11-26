@@ -20,7 +20,7 @@ struct MusicNameView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Text(artistNameString())
                     .lineLimit(1)
-                    .font(.system(size: 20))
+                    .font(.system(size: 15))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -31,14 +31,12 @@ struct MusicNameView: View {
                 Image(systemName: favoriteButtonIconName())
                     .font(.system(size: 15, weight: .semibold))
                     .frame(width: 30, height: 30)
-                    .background(Color(UIColor.systemGray5))
-                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
             }
+            .glassEffect(.regular)
             musicMenu()
                 .font(.system(size: 20, weight: .semibold))
                 .frame(width: 30, height: 30)
-                .background(Color(UIColor.systemGray5))
-                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .glassEffect(.regular)
         }
         .padding(.horizontal)
     }
@@ -96,4 +94,6 @@ struct MusicNameView: View {
 
 #Preview {
     MusicNameView()
+        .environmentObject(PlayDataStore.shared)
+        .environmentObject(PathDataStore.shared)
 }

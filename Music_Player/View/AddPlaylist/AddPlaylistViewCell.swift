@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct AddPlaylistViewCell: View {
-//    private let playGroup: PlayDataStore.PlayGroup
     private let music: Music?
     private let playlist: Playlist
     @State private var isShowAlert: Bool = false

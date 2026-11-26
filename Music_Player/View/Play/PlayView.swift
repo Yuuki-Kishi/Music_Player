@@ -50,7 +50,6 @@ struct PlayView: View {
     func destination(path: PathDataStore.PlayViewPath) -> some View {
         switch path {
         case .musicInfo:
-//            MusicInfoView(playGroup: .play)
             MusicInfoView(music: playDataStore.playingMusic)
         case .playFlow:
             PlayFlowView()

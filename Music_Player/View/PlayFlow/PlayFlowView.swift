@@ -38,15 +38,17 @@ struct PlayFlowView: View {
                     Text("PlayFlowView.List.PlayNextSection.header.Text").id("PlayNext")
                 }
             }
+            .scrollEdgeEffectStyle(.soft, for: .vertical)
+            .listStyle(.plain)
             .onAppear() {
-                getLists()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Task { @MainActor in
+                    await getLists()
+                    await Task.yield()
                     withAnimation {
                         proxy.scrollTo("PlayNext", anchor: .top)
                     }
                 }
             }
-            .listStyle(.plain)
         }
         .navigationTitle("PlayFlowView.NavigationTitle")
         .navigationBarTitleDisplayMode(.inline)
@@ -66,13 +68,11 @@ struct PlayFlowView: View {
         guard PlayFlowRepository.removePlayNextM3U8(filePath: deleteMusic.filePath) else { return }
         playFlowDataStore.playNextMusicArray.remove(Music: deleteMusic)
     }
-    func getLists() {
-        Task {
-            playFlowDataStore.isLoading = true
-            playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
-            playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
-            playFlowDataStore.isLoading = false
-        }
+    func getLists() async {
+        playFlowDataStore.isLoading = true
+        playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
+        playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
+        playFlowDataStore.isLoading = false
     }
 }
 

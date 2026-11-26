@@ -14,7 +14,7 @@ struct FolderMusicView: View {
         BoolSwitchView(isEmpty: folderDataStore.folderMusicArray.isEmpty, isLoading: folderDataStore.isLoading) {
             ZStack {
                 List(folderDataStore.folderMusicArray) { music in
-                    MusicViewCell(music: music)
+                    FolderMusicViewCell(music: music)
                         .listRowInsets(.top, folderDataStore.folderMusicArray.first == music ? 65 : 11)
                         .listRowSeparator(folderDataStore.folderMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }

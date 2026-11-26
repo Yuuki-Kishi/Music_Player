@@ -14,7 +14,7 @@ struct AlbumMusicView: View {
         BoolSwitchView(isEmpty: albumDataStore.albumMusicArray.isEmpty, isLoading: albumDataStore.isLoading) {
             ZStack {
                 List(albumDataStore.albumMusicArray) { music in
-                    MusicViewCell(music: music)
+                    AlbumMusicViewCell(music: music)
                         .listRowInsets(.top, albumDataStore.albumMusicArray.first == music ? 65 : 11)
                         .listRowSeparator(albumDataStore.albumMusicArray.first == music ? .hidden : .visible, edges: .top)
                 }

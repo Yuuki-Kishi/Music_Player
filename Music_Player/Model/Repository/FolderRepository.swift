@@ -62,8 +62,8 @@ class FolderRepository {
     }
     
     static func sortFolderArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "FolderSortMode", as: String.self) else { return }
-        guard let sortMode = FolderDataStore.FolderSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "FolderSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = FolderDataStore.FolderSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             folderDataStore.folderArray.sort { $0.folderName < $1.folderName }
@@ -91,8 +91,8 @@ class FolderRepository {
     }
     
     static func sortFolderMusicArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "FolderMusicSortMode", as: String.self) else { return }
-        guard let sortMode = FolderDataStore.FolderMusicSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "FolderMusicSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = FolderDataStore.FolderMusicSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             folderDataStore.folderMusicArray.sort { $0.musicName < $1.musicName }

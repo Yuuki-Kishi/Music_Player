@@ -60,8 +60,8 @@ class AlbumRepository {
     }
     
     static func sortAlbumArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "AlbumSortMode", as: String.self) else { return }
-        guard let sortMode = AlbumDataStore.AlbumSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "AlbumSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = AlbumDataStore.AlbumSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             albumDataStore.albumArray.sort { $0.albumName < $1.albumName }
@@ -89,8 +89,8 @@ class AlbumRepository {
     }
     
     static func sortAlbumMusicArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "AlbumMusicSortMode", as: String.self) else { return }
-        guard let sortMode = AlbumDataStore.AlbumMusicSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "AlbumMusicSortMode", as: String.self) ?? "nameAscending"
+        let sortMode = AlbumDataStore.AlbumMusicSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             albumDataStore.albumMusicArray.sort { $0.musicName < $1.musicName }

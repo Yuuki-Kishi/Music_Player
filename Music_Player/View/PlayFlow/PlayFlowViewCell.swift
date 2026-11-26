@@ -47,15 +47,11 @@ struct PlayFlowViewCell: View {
         case .playNext:
             Task {
                 guard PlayFlowRepository.selectPlayNextMusic(filePath: music.filePath) else { return }
-//                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
-//                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
                 print("SelectPlayNextSuccessed")
             }
         case .playBack:
             Task {
                 guard PlayFlowRepository.selectPlayBackMusic(filePath: music.filePath) else { return }
-//                playFlowDataStore.playNextMusicArray = await PlayFlowRepository.getPlayNextM3U8()
-//                playFlowDataStore.playBackMusicArray = await PlayFlowRepository.getPlayBackM3U8()
                 print("SelectPlayBackSuccessed")
             }
         }

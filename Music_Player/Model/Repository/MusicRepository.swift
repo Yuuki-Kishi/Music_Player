@@ -43,8 +43,8 @@ class MusicRepository {
     }
     
     static func sortMusicArray() {
-        guard let sortModeString = UserDefaultsRepository.load(key: "MusicArraySortMode", as: String.self) else { return }
-        guard let sortMode = MusicDataStore.MusicSortMode(rawValue: sortModeString) else { return }
+        let sortModeString = UserDefaultsRepository.load(key: "MusicArraySortMode", as: String.self) ?? "nameAscending"
+        let sortMode = MusicDataStore.MusicSortMode(rawValue: sortModeString) ?? .nameAscending
         switch sortMode {
         case .nameAscending:
             musicDataStore.musicArray.sort { $0.musicName < $1.musicName }
